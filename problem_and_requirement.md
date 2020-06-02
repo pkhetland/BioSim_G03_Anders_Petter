@@ -1,4 +1,5 @@
 Problem and requirement analysis
+DRAFT
 - A markdown document together with flowchart
 
 1. Simulate annual cycle of Herbivore without migration
