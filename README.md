@@ -8,6 +8,6 @@ Python BioSim project for INF200 (Advanced Python Programming) exam.
 
 ## Authors
 
-- Anders Mølmen Høst <anders.molmen.host@nmbu.no>
-- Petter Kolstad Hetland <petter.storesund.hetland@nmbu.no>
+- Anders Mølmen Høst <anderhof@nmbu.no>
+- Petter Kolstad Hetland <pehe@nmbu.no>
 
