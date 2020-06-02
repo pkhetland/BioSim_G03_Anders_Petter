@@ -21,7 +21,7 @@ DRAFT
  4. Make a coordinate system of the Island as a list of tuples? The outer edge is fixed
  as water. The remaining cells is random? Find a way to generate the Island with
  some fixed and some random cells.
- 
+
  5. The Herbivores and Carnivores start from one cell and migrate from there. Their
  populations are given as lists of dictionaries.
  
