@@ -13,8 +13,8 @@ Problem and requirement analysis
  with common methods and attributes of both animals. Then continue with
  a subclass Carnivore implementing specific requirements for that class.
  
- 3. Start with migration between the same celltype e.g Highland. Continue with 
- defining classes for different celltypes. With a super class for common methods and
+ 3. Start with migration between the same cell type e.g Highland. Continue with 
+ defining classes for different cell types. With a super class for common methods and
  attributes. 
   
  4. Make a coordinate system of the Island as a list of tuples? The outer edge is fixed
