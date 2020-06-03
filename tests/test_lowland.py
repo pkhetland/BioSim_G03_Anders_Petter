@@ -48,3 +48,8 @@ def test_animal_count():
     assert lowland.population_count == 3
     assert lowland.carn_count == 2
     assert lowland.herb_count == 1
+
+
+def test_lowland_location():
+    lowland = Lowland(location=(1, 2))
+    assert lowland.location == (1, 2)
