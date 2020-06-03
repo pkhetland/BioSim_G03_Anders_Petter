@@ -10,13 +10,13 @@ import pytest
 from src.biosim.Lowland import Lowland
 
 
-def test_lowland_instance(self):
+def test_lowland_instance():
     """Basic Lowland instance can be created with or without argument"""
     lowland_default = Lowland()
     lowland_100 = Lowland(f_max=100.0)
 
 
-def test_fodder(self):
+def test_fodder():
     """Fodder attribute of instance can be accessed and has the right value"""
     lowland = Lowland(f_max=200)
     f_max = lowland.f_max  # Get f_max attribute value
@@ -24,7 +24,7 @@ def test_fodder(self):
     lowland_fodder = f_max  # Check that initial fodder amount is same a f_max attribute
 
 
-def test_population(self):
+def test_population():
     """Default values for population counts in cell are correct"""
     lowland = Lowland()
     assert lowland.population == 0
@@ -32,7 +32,19 @@ def test_population(self):
     assert lowland.herb_count == 0
 
 
-def test_add_animal(self):
-    """Add a mockup animal to the cell"""
+def test_add_animal():
+    """Add a mock up animal to the cell"""
     lowland = Lowland()
-    lowland.add_animal('herbivore', {'attr_1': 50.0, 'attr_2': 100.0})
+    lowland.add_animal('Herbivore', 2, 20)
+
+
+def test_animal_count():
+    """Add animals and test count"""
+    lowland = Lowland()
+    lowland.add_animal('Herbivore', 2, 20)
+    lowland.add_animal('Carnivore', 10, 100)
+    lowland.add_animal('Carnivore', 5, 50)
+
+    assert lowland.population_count == 3
+    assert lowland.carn_count == 2
+    assert lowland.herb_count == 1
