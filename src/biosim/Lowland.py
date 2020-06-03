@@ -17,7 +17,6 @@ class Lowland:
         self.population = []  # List containing information about all animals in cell
         self.population_count = len(self.population)  # Total population in cell
 
-
     def add_animal(self, animal_class, attribute_values):
         animal = animal_class
         values = attribute_values
@@ -26,4 +25,4 @@ class Lowland:
 
     @property
     def herb_count(self):
-        return [np.count]
+        return np.sum[animal_key=='herb' for animal_key.keys in self.population]
