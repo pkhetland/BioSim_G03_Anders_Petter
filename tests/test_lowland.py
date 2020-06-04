@@ -27,7 +27,7 @@ def test_fodder():
 def test_population():
     """Default values for population counts in cell are correct"""
     lowland = Lowland()
-    assert lowland.population == 0
+    assert len(lowland.population) == 0
     assert lowland.carn_count == 0
     assert lowland.herb_count == 0
 
