@@ -28,6 +28,22 @@ class Animal:
         self.age += 1
         return self.age
 
+    """
+    Source: Afternoon lecture INF200. 2. June 2020
+    Comment: Consider merging the two function in one
+    """
+
+    def q(self, sgn, x, xhalf, phi):
+        return 1. / (1. + np.exp(sgn * phi * (x - xhalf)))
+
+    """
+    Source: Afternoon lecture INF200. 2. June 2020
+    """
+
+    def fitness(self, age, weight, p):
+        return (q(+1, age, p['a_half'], p['phi_age'])
+                * q(-1, weight, p['w_half'], p['phi_weight']))
+
 
 class Herbivore(Animal):
     def __init__(self, weight, age):
