@@ -21,6 +21,15 @@ class Animal:
         self.weight += beta * F
         return self.weight
 
+    def aging(self):
+        """
+        Increment age by one every season
+        """
+        self.age += 1
+        return self.age
+
+
+
 
 class Herbivore(Animal):
     def __init__(self, weight, age):

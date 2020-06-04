@@ -5,6 +5,7 @@ Tests for animal class.
 """
 from src.biosim.animal import Herbivore
 
+
 class TestAnimal:
 
     """
@@ -34,3 +35,12 @@ class TestHerbivore:
         # new weight
         herb_weight_after = herb.weight
         assert herb_weight < herb_weight_after
+
+    def test_aging(self):
+        """
+        Test that the animal age increases
+        """
+        herb = Herbivore(weight=10, age=0)
+        herb.aging()
+        assert herb.age > 0
+
