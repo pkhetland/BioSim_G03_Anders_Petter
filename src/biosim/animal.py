@@ -29,8 +29,6 @@ class Animal:
         return self.age
 
 
-
-
 class Herbivore(Animal):
     def __init__(self, weight, age):
         super().__init__(weight, age)
