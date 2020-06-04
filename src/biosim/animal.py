@@ -3,17 +3,16 @@
 __author__ = 'Anders Mølmen Høst & Petter Kolstad Hetland'
 __email__ = 'anders.molmen.host@nmbu.no, petter.storesund.hetland@nmbu.no'
 
-"""
-Super class for Herbivores and Carnivores
-"""
-
 
 class Animal:
+    """
+    Super class for Herbivores and Carnivores
+    """
 
-    def __init__(self, landscape, weight=None):
+    def __init__(self, landscape, weight, age=0):
         self._landscape = landscape
         self.weight = weight
-        self.age = 0
+        self.age = age
 
     @property
     def eat_fodder(self, beta=0.9, F=10):
@@ -23,3 +22,8 @@ class Animal:
         """
         self.weight += beta * F
         return self.weight
+
+
+class Herbivore(Animal):
+    def __init__(self, landscape, weight, age):
+        super().__init__(landscape, weight, age)
