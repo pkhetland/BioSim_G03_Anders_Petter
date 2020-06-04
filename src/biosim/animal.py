@@ -9,12 +9,10 @@ class Animal:
     Super class for Herbivores and Carnivores
     """
 
-    def __init__(self, landscape, weight, age=0):
-        self._landscape = landscape
+    def __init__(self, weight, age=0):
         self.weight = weight
         self.age = age
 
-    @property
     def eat_fodder(self, beta=0.9, F=10):
         """
         When an animal eats, its weight increases
@@ -25,5 +23,5 @@ class Animal:
 
 
 class Herbivore(Animal):
-    def __init__(self, landscape, weight, age):
-        super().__init__(landscape, weight, age)
+    def __init__(self, weight, age):
+        super().__init__(weight, age)
