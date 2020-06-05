@@ -11,7 +11,7 @@ class Animal:
     """
     Super class for Herbivores and Carnivores
     """
-    p = {}    # Empty dictionary to fill in parameters Herbivore or Carnivore
+    # p = {}    # Empty dictionary to fill in parameters Herbivore or Carnivore
 
     def __init__(self, weight, age, p):
         if weight is None:
