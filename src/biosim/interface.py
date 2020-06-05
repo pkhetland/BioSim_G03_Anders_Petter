@@ -13,33 +13,19 @@ import textwrap
 
 class Simulation:
     def __init__(self):
-        self.geogr = None
-        self.animals = [{'species': 'Herbivore',
-                         'age': 5,
-                         'weight': 20}
-                        for _ in range(150)]
+        self.cell = Lowland()
+        self.animals = [Herbivore(age=5, weight=20) for _ in range(5)]
 
         self.year = 0
 
-    # def add_landscape(self, landscape_str):
-    #     for placement, cell in enumerate(landscape_str):
-    #         if cell == 'L':
-    #             self.landscape.append(Lowland(location=placement))
-    #         else:
-    #             pass
-
-    def add_animals(self, animals):
-        for animal in animals:
-            self.animals.append(animal)
-
-    # def run_year_cycle(self):
-    #     #  1. Feeding
-    #     for animal in self.animals:
-    #         #  Sort animals by fitness
-    #
-    #         #
-    #         animal.feed(self.landscape.fodder)
-    #         self.landscape.fodder
+    def run_year_cycle(self):
+        #  1. Feeding
+        self.cell.fodder = self.cell.f_max
+        for animal in self.animals:
+            self.cell.fodder -= animal.p['beta'] * animal.p['F']  # Remove amount to be eaten
+            animal.eat_fodder()  # Feed animal
+            print(animal.fitness())
+        print(self.cell.fodder)
 
         #  2. Procreation
         #  3. Migration
@@ -49,18 +35,14 @@ class Simulation:
 
         # self.year += 1
 
-    # def run_simulation(self, num_years):
-    #     for year in num_years:
-    #         if year % 10 == 0:  # Print every tenth year for progress
-    #             print(f'Simulation has been run for {year} years.')
-    #         self.run_year_cycle()
+    def run_simulation(self, num_years):
+        for year in range(num_years):
+            print(f'Simulation has been run for {year+1} years.')
+            self.run_year_cycle()
 
 
 if __name__ == '__main__':
 
     sim = Simulation()  # Create simple simulation instance
 
-    sim.animals
-
-
-    # sim.run_simulation(num_years=200)
+    sim.run_simulation(num_years=5)

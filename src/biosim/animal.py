@@ -36,7 +36,6 @@ class Animal:
     def eat_fodder(self, beta=0.9, F=10):
         """
         When an animal eats, its weight increases
-
         """
         self.weight += beta * F
 
