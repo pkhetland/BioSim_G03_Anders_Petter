@@ -126,6 +126,8 @@ class Herbivore(Animal):
         super().__init__(weight, age, p)
 
 
+
+
 if __name__ == "__main__":
     herb1 = Herbivore(10, 0)
     herb2 = Herbivore(weight=None, age=0)
