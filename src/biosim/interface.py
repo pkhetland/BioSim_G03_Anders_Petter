@@ -7,8 +7,9 @@ with one animal in one cell.
 
 
 class Simulation:
-    def __init__(self, landscape):
-        pass
+    def __init__(self):
+        self.landscape = None
+        self.animals = None
 
     def add_landscape(self, landscape):
         if type(landscape) == str:
@@ -24,8 +25,20 @@ class Simulation:
             print('animals variable needs to be a list')
             self.animals = []
 
+    def year_cycle(self):
+        pass
+
+    def run_simulation(self, num_years):
+        pass
+
+    
+
 
 if __name__ == '__main__':
-    sim = Simulation('W')
-    sim.add_landscape()
+    sim = Simulation()
+    print(sim.landscape, sim.animals)
+
+    sim.add_landscape('L')
     sim.add_animals(['Carnivore'])
+    print(sim.landscape, sim.animals)
+
