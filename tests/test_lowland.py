@@ -7,7 +7,7 @@ Test set for the initial Lowland class.
 
 import pytest
 
-from src.biosim.Lowland import Lowland
+from src.biosim.landscape import Lowland
 
 
 def test_lowland_instance():
