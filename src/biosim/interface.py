@@ -14,7 +14,7 @@ import textwrap
 class Simulation:
     def __init__(self):
         self.cell = Lowland()
-        self.animals = [Herbivore(age=5, weight=20) for _ in range(5)]
+        self.animals = [Herbivore(age=5, weight=20) for _ in range(3)]
 
         self.year = 0
 
@@ -22,14 +22,17 @@ class Simulation:
         #  1. Feeding
         self.cell.fodder = self.cell.f_max
         for animal in self.animals:
-            self.cell.fodder -= animal.p['beta'] * animal.p['F']  # Remove amount to be eaten
-            animal.eat_fodder()  # Feed animal
-            print(animal.fitness())
-        print(self.cell.fodder)
+            animal.eat_fodder(self.cell)  # Feed animal
+            print(self.cell.fodder)
+            print(animal.fitness)
 
         #  2. Procreation
+
         #  3. Migration
         #  4. Aging
+        for animal in self.animals:
+            animal.aging()
+            print(animal.age)
         #  5. Loss of weight
         #  6. Death
 

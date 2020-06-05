@@ -13,12 +13,13 @@ class Animal:
     """
     p = {}    # Empty dictionary to fill in parameters Herbivore or Carnivore
 
-    def __init__(self, weight, age):
+    def __init__(self, weight, age, p):
         if weight is None:
             self.weight = self.birth_weight()
         else:
             self.weight = weight
         self.age = age
+        self.p = p
 
     def birth_weight(self):
         """
@@ -33,11 +34,13 @@ class Animal:
         self.weight = np.random.normal(self.p["w_birth"], self.p["sigma_birth"])
         return self.weight
 
-    def eat_fodder(self, beta=0.9, F=10):
+    def eat_fodder(self, cell):
         """
         When an animal eats, its weight increases
         """
-        self.weight += beta * F
+        consumption_amount = self.p['beta'] * self.p['F']  # Calculate amount of fodder consumed
+        self.weight += consumption_amount  # Eat fodder
+        cell.fodder -= consumption_amount  # Removes consumed fodder from cell object
 
     def aging(self):
         """
@@ -49,6 +52,7 @@ class Animal:
     def q(sgn, x, xhalf, phi):
         return 1. / (1. + np.exp(sgn * phi * (x - xhalf)))
 
+    @property
     def fitness(self):
         """
         Function returning the fitness of an animal.
@@ -59,23 +63,24 @@ class Animal:
 
 
 class Herbivore(Animal):
-    p = {'w_birth': 8.0,
-         'sigma_birth': 1.5,
-         'beta': 0.9,
-         'eta': 0.05,
-         'a_half': 40,
-         'phi_age': 0.6,
-         'w_half': 10.0,
-         'phi_weight': 0.1,
-         'mu': 0.25,
-         'gamma': 0.2,
-         'zeta': 3.5,
-         'xi': 1.2,
-         'omega': 0.4,
-         'F': 10.0}
 
     def __init__(self, weight, age):
-        super().__init__(weight, age)
+        p = {'w_birth': 8.0,
+             'sigma_birth': 1.5,
+             'beta': 0.9,
+             'eta': 0.05,
+             'a_half': 40,
+             'phi_age': 0.6,
+             'w_half': 10.0,
+             'phi_weight': 0.1,
+             'mu': 0.25,
+             'gamma': 0.2,
+             'zeta': 3.5,
+             'xi': 1.2,
+             'omega': 0.4,
+             'F': 10.0}
+
+        super().__init__(weight, age, p)
 
 
 if __name__ == "__main__":
