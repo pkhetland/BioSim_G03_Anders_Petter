@@ -48,6 +48,32 @@ class Animal:
         """
         self.age += 1
 
+    def give_birth(self, cell, n_same):
+        """
+        Animals give birth based on fitness and same-type animals in cell
+        """
+        birth_prob = (self.p['gamma'] * self.fitness * n_same - 1)
+        if birth_prob > 1:
+            give_birth = True
+        elif 0 < birth_prob < 1:
+            give_birth = np.random.choice([False, True], p=[1 - birth_prob, birth_prob])
+        else:
+            give_birth = False
+
+        if give_birth:  # If give_birth is true
+            birth_weight = 5  # 5 is to be replace with the birth_weight function
+            self.weight -= self.p['xi'] * 5
+            return True, birth_weight
+        else:
+            return False, None
+
+    def death(self):
+        """
+        Return true when called if the animal is to be removed from the simulation
+        and false otherwise.
+        """
+        return [True if self.weight <= 0 else False]
+
     @staticmethod
     def q(sgn, x, xhalf, phi):
         return 1. / (1. + np.exp(sgn * phi * (x - xhalf)))
@@ -81,18 +107,6 @@ class Herbivore(Animal):
              'F': 10.0}
 
         super().__init__(weight, age, p)
-
-    def give_birth(self, cell, n):
-        """
-        Animals give birth based on fitness and same-type animals in cell
-        """
-        birth_factor = (self.p['gamma'] * self.fitness * n-1)
-        if birth_factor > 1:
-            return True
-        elif 0 < birth_factor < 1:
-            return np.random.choice([False, True], p=[1-birth_factor, birth_factor])
-        else:
-            return False
 
 
 if __name__ == "__main__":

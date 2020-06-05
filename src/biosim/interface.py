@@ -14,7 +14,7 @@ import textwrap
 class Simulation:
     def __init__(self):
         self.cell = Lowland()
-        self.animals = [Herbivore(age=5, weight=20) for _ in range(6)]
+        self.animals = [Herbivore(age=5, weight=20) for _ in range(15)]
         self.year = 0
 
     @property
@@ -30,9 +30,10 @@ class Simulation:
         #  2. Procreation
         n_herb = self.animal_count
         for animal in self.animals:
-            give_birth = animal.give_birth(self.cell, n_herb)
+            give_birth, birth_weight = animal.give_birth(self.cell, n_herb)
             if give_birth:
-                self.animals.append(Herbivore(weight=10, age=0))
+                self.animals.append(Herbivore(weight=birth_weight, age=0))
+
         #  3. Migration
 
         #  4. Aging
@@ -40,11 +41,14 @@ class Simulation:
             animal.aging()
 
         #  5. Loss of weight
-        
 
         #  6. Death
+        for animal in self.animals:
+            if animal.death():
+                self.animals.remove(animal)
 
-        self.year += 1
+        print(sim.animal_count)
+        self.year += 1  # Add year to simulation
 
     def run_simulation(self, num_years):
         for year in range(num_years):
@@ -57,5 +61,3 @@ if __name__ == '__main__':
     sim = Simulation()  # Create simple simulation instance
 
     sim.run_simulation(num_years=4)
-
-    print(sim.animal_count)
