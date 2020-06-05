@@ -48,6 +48,7 @@ class Animal:
         """
         self.age += 1
 
+
     @staticmethod
     def q(sgn, x, xhalf, phi):
         return 1. / (1. + np.exp(sgn * phi * (x - xhalf)))
@@ -81,6 +82,18 @@ class Herbivore(Animal):
              'F': 10.0}
 
         super().__init__(weight, age, p)
+
+    def give_birth(self, cell, n):
+        """
+        Animals give birth based on fitness and same-type animals in cell
+        """
+        birth_factor = (self.p['gamma'] * self.fitness * n-1)
+        if birth_factor > 1:
+            return True
+        elif 0 < birth_factor < 1:
+            return np.random.choice([False, True], p=[1-birth_factor, birth_factor])
+        else:
+            return False
 
 
 if __name__ == "__main__":

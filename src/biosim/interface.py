@@ -27,7 +27,9 @@ class Simulation:
             print(animal.fitness)
 
         #  2. Procreation
-
+        n_herb = self.cell.herb_count
+        for animal in self.animals:
+            animal.give_birth(self.cell, n_herb)
         #  3. Migration
         #  4. Aging
         for animal in self.animals:
