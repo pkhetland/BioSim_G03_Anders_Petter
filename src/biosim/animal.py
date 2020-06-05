@@ -13,7 +13,7 @@ class Animal:
     """
     p = {}    # Empty dictionary to fill in parameters Herbivore or Carnivore
 
-    def __init__(self, weight=None, age=0):
+    def __init__(self, weight, age):
         if weight is None:
             self.weight = self.birth_weight()
         else:
@@ -30,8 +30,7 @@ class Animal:
         Seed: default_rng(int)
 
         """
-        np.random.normal(self.p["w_birth"], self.p["sigma_birth"])
-        # numpy.random.normal ... en og en verdi
+        self.weight = np.random.normal(self.p["w_birth"], self.p["sigma_birth"])
         return self.weight
 
     def eat_fodder(self, beta=0.9, F=10):
@@ -40,14 +39,12 @@ class Animal:
 
         """
         self.weight += beta * F
-        return self.weight
 
     def aging(self):
         """
         Increment age by one every season
         """
         self.age += 1
-        return self.age
 
     @staticmethod
     def q(sgn, x, xhalf, phi):
@@ -83,5 +80,8 @@ class Herbivore(Animal):
 
 
 if __name__ == "__main__":
-    herb1 = Herbivore(10, 0)    # create an instance of herbivore
-    # Task: make use of birth_weight function in herb
+    herb1 = Herbivore(10, 0)
+    herb2 = Herbivore(weight=None, age=0)
+    print(herb1.weight)
+    print(herb1.birth_weight())
+    # Output: Herb1 has both weight and birth_weight. BUG
