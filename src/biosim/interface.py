@@ -10,12 +10,18 @@ from src.biosim.landscape import Lowland
 
 import textwrap
 
+import random as random
+
 
 class Simulation:
+    animals_random = []
+
     def __init__(self):
         self.cell = Lowland(f_max=800)
         self.animals = [Herbivore(age=0, weight=20) for _ in range(300)]
         self.year = 0
+        random.seed = 123
+
 
     @property
     def animal_count(self):
@@ -27,6 +33,7 @@ class Simulation:
         while self.cell.fodder > 0:
             for animal in self.animals:
                 animal.eat_fodder(self.cell)  # Feed animal
+            animal_random.append
 
         #  2. Procreation
         n_herb = self.animal_count
