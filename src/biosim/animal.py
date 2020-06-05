@@ -54,7 +54,7 @@ class Animal:
         """
         birth_prob = (self.p['gamma'] * self.fitness * n_same - 1)
         if self.weight < self.p['zeta']*(self.p['w_birth']+self.p['sigma_birth']):
-            return False  # Return false if weight of mother is less than birth
+            return False, None  # Return false if weight of mother is less than birth
         elif birth_prob > 1:
             give_birth = True
         elif 0 < birth_prob < 1:
