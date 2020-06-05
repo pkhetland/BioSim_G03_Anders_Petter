@@ -39,8 +39,16 @@ class Animal:
         When an animal eats, its weight increases
         """
         consumption_amount = self.p['beta'] * self.p['F']  # Calculate amount of fodder consumed
-        self.weight += consumption_amount  # Eat fodder
-        cell.fodder -= consumption_amount  # Removes consumed fodder from cell object
+        if consumption_amount < cell.fodder:
+            self.weight += consumption_amount  # Eat fodder
+            cell.fodder -= consumption_amount  # Removes consumed fodder from cell object
+
+        elif consumption_amount > cell.fodder > 0:
+            self.weight += cell.fodder  # Eat fodder
+            cell.fodder -= cell.fodder  # Sets fodder to zero.
+
+        else:
+            pass
 
     def aging(self):
         """

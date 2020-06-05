@@ -43,7 +43,6 @@ class Simulation:
 
         #  5. Loss of weight
 
-
         #  6. Death
         for animal in self.animals:
             if animal.death():
