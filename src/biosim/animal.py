@@ -12,10 +12,12 @@ class Animal:
     Super class for Herbivores and Carnivores
     """
     p = {}    # Empty dictionary to fill in parameters Herbivore or Carnivore
-    N = 0
 
-    def __init__(self, weight, age=0):
-        self.weight = weight
+    def __init__(self, weight=None, age=0):
+        if weight is None:
+            self.weight = self.birth_weight()
+        else:
+            self.weight = weight
         self.age = age
 
     def birth_weight(self):
@@ -28,9 +30,9 @@ class Animal:
         Seed: default_rng(int)
 
         """
-        weight_dist = np.random.default_rng(123).normal(self.p["w_birth"],
-                                                        self.p["sigma_birth"], self.N)
-        return weight_dist
+        np.random.normal(self.p["w_birth"], self.p["sigma_birth"])
+        # numpy.random.normal ... en og en verdi
+        return self.weight
 
     def eat_fodder(self, beta=0.9, F=10):
         """
@@ -75,12 +77,11 @@ class Herbivore(Animal):
          'xi': 1.2,
          'omega': 0.4,
          'F': 10.0}
-    N = 1000
 
     def __init__(self, weight, age):
         super().__init__(weight, age)
 
 
 if __name__ == "__main__":
-    herb = Herbivore(10, 0)    # create an instance of herbivore
+    herb1 = Herbivore(10, 0)    # create an instance of herbivore
     # Task: make use of birth_weight function in herb
