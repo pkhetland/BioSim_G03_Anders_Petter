@@ -5,18 +5,22 @@ A basic interface file containing the minimum requirements for running a simulat
 with one animal in one cell.
 """
 
+from src.biosim.animal import Animal, Herbivore
+from src.biosim.landscape import Lowland
+
 
 class Simulation:
     def __init__(self):
-        self.landscape = None
-        self.animals = None
+        self.landscape = []
+        self.animals = []
 
-    def add_landscape(self, landscape):
-        if type(landscape) == str:
-            self.landscape = landscape
-        else:
-            print('landscape variable needs to be a string')
-            self.landscape = ""
+    def add_landscape(self, landscape_str):
+        for placement, cell in enumerate(landscape_str):
+            if cell is 'W':
+                self.landscape.append(Lowland(location=placement))
+            else:
+                pass
+
 
     def add_animals(self, animals):
         if type(animals) == list:
@@ -31,14 +35,13 @@ class Simulation:
     def run_simulation(self, num_years):
         pass
 
-    
-
 
 if __name__ == '__main__':
-    sim = Simulation()
-    print(sim.landscape, sim.animals)
+    sim = Simulation()  # Create simple simulation instance
+    print(sim.landscape, sim.animals)  # Test init attribute values
 
-    sim.add_landscape('L')
-    sim.add_animals(['Carnivore'])
-    print(sim.landscape, sim.animals)
+    sim.add_landscape('L')  # Add landscape
+    sim.add_animals(['Carnivore'])  # Add animals
+    print(sim.landscape, sim.animals)  # Print updated values
 
+    sim.run_simulation(num_years=200)
