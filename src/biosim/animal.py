@@ -12,10 +12,25 @@ class Animal:
     Super class for Herbivores and Carnivores
     """
     p = {}    # Empty dictionary to fill in parameters Herbivore or Carnivore
+    N = 0
 
     def __init__(self, weight, age=0):
         self.weight = weight
         self.age = age
+
+    def birth_weight(self):
+        """
+        birth weight of animal is drawn randomly
+        Param: w_birth: birth weight of animal
+        Param: sigma_birth: standard deviation
+        Param: N: Population size
+        return: array: weight_dist, Standard normal distribution of birth weights
+        Seed: default_rng(int)
+
+        """
+        weight_dist = np.random.default_rng(123).normal(self.p["w_birth"],
+                                                        self.p["sigma_birth"], self.N)
+        return weight_dist
 
     def eat_fodder(self, beta=0.9, F=10):
         """
@@ -32,21 +47,15 @@ class Animal:
         self.age += 1
         return self.age
 
-    """
-    Source: Afternoon lecture INF200. 2. June 2020
-    Comment: Consider merging the two function in one, not working as it should
-    Suggestions?
-    """
     @staticmethod
     def q(sgn, x, xhalf, phi):
         return 1. / (1. + np.exp(sgn * phi * (x - xhalf)))
 
-    """
-    Source: Afternoon lecture INF200. 2. June 2020
-    """
-
     def fitness(self):
-
+        """
+        Function returning the fitness of an animal.
+        Return: int: 0 < 1
+        """
         return (self.q(+1, self.age, self.p['a_half'], self.p['phi_age'])
                 * self.q(-1, self.weight, self.p['w_half'], self.p['phi_weight']))
 
@@ -66,10 +75,12 @@ class Herbivore(Animal):
          'xi': 1.2,
          'omega': 0.4,
          'F': 10.0}
+    N = 1000
 
     def __init__(self, weight, age):
         super().__init__(weight, age)
 
 
 if __name__ == "__main__":
-    herb = Herbivore(10, 0)
+    herb = Herbivore(10, 0)    # create an instance of herbivore
+    # Task: make use of birth_weight function in herb
