@@ -53,7 +53,9 @@ class Animal:
         Animals give birth based on fitness and same-type animals in cell
         """
         birth_prob = (self.p['gamma'] * self.fitness * n_same - 1)
-        if birth_prob > 1:
+        if self.weight < self.p['zeta']*(self.p['w_birth']+self.p['sigma_birth']):
+            return False  # Return false if weight of mother is less than birth
+        elif birth_prob > 1:
             give_birth = True
         elif 0 < birth_prob < 1:
             give_birth = np.random.choice([False, True], p=[1 - birth_prob, birth_prob])
@@ -61,9 +63,12 @@ class Animal:
             give_birth = False
 
         if give_birth:  # If give_birth is true
-            birth_weight = 5  # 5 is to be replace with the birth_weight function
-            self.weight -= self.p['xi'] * 5
-            return True, birth_weight
+            birth_weight = 2  # 2 is to be replace with the birth_weight function
+            if birth_weight < self.weight:
+                self.weight -= self.p['xi'] * birth_weight
+                return True, birth_weight
+            else:
+                return False, None
         else:
             return False, None
 
@@ -72,7 +77,11 @@ class Animal:
         Return true when called if the animal is to be removed from the simulation
         and false otherwise.
         """
-        return [True if self.weight <= 0 else False]
+        if self.weight <= 0:
+            return True
+        else:
+            death_prob = self.p['omega']*(1-self.fitness)
+            return np.random.choice([False, True], p=[1-death_prob, death_prob])
 
     @staticmethod
     def q(sgn, x, xhalf, phi):

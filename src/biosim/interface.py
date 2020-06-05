@@ -14,7 +14,7 @@ import textwrap
 class Simulation:
     def __init__(self):
         self.cell = Lowland()
-        self.animals = [Herbivore(age=5, weight=20) for _ in range(15)]
+        self.animals = [Herbivore(age=5, weight=20) for _ in range(5)]
         self.year = 0
 
     @property
@@ -42,6 +42,7 @@ class Simulation:
 
         #  5. Loss of weight
 
+
         #  6. Death
         for animal in self.animals:
             if animal.death():
@@ -60,4 +61,4 @@ if __name__ == '__main__':
 
     sim = Simulation()  # Create simple simulation instance
 
-    sim.run_simulation(num_years=4)
+    sim.run_simulation(num_years=10)
