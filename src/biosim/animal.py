@@ -48,7 +48,6 @@ class Animal:
         """
         self.age += 1
 
-
     @staticmethod
     def q(sgn, x, xhalf, phi):
         return 1. / (1. + np.exp(sgn * phi * (x - xhalf)))

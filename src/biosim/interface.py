@@ -5,7 +5,7 @@ A basic interface file containing the minimum requirements for running a simulat
 with one animal in one cell.
 """
 
-from src.biosim.animal import Animal, Herbivore
+from src.biosim.animal import Herbivore
 from src.biosim.landscape import Lowland
 
 import textwrap
@@ -14,31 +14,37 @@ import textwrap
 class Simulation:
     def __init__(self):
         self.cell = Lowland()
-        self.animals = [Herbivore(age=5, weight=20) for _ in range(3)]
-
+        self.animals = [Herbivore(age=5, weight=20) for _ in range(6)]
         self.year = 0
+
+    @property
+    def animal_count(self):
+        return len(self.animals)
 
     def run_year_cycle(self):
         #  1. Feeding
         self.cell.fodder = self.cell.f_max
         for animal in self.animals:
             animal.eat_fodder(self.cell)  # Feed animal
-            print(self.cell.fodder)
-            print(animal.fitness)
 
         #  2. Procreation
-        n_herb = self.cell.herb_count
+        n_herb = self.animal_count
         for animal in self.animals:
-            animal.give_birth(self.cell, n_herb)
+            give_birth = animal.give_birth(self.cell, n_herb)
+            if give_birth:
+                self.animals.append(Herbivore(weight=10, age=0))
         #  3. Migration
+
         #  4. Aging
         for animal in self.animals:
             animal.aging()
-            print(animal.age)
+
         #  5. Loss of weight
+        
+
         #  6. Death
 
-        # self.year += 1
+        self.year += 1
 
     def run_simulation(self, num_years):
         for year in range(num_years):
@@ -50,4 +56,6 @@ if __name__ == '__main__':
 
     sim = Simulation()  # Create simple simulation instance
 
-    sim.run_simulation(num_years=5)
+    sim.run_simulation(num_years=4)
+
+    print(sim.animal_count)
