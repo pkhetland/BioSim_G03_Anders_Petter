@@ -1,0 +1,20 @@
+==> 2020-06-06 13:21:42 <==
+# cmd: /Users/petter/opt/anaconda3/bin/conda create -p /Users/petter/Projects/school/INF200/inf200_exam/env -y python=3.8
+# conda version: 4.8.3
++defaults/osx-64::ca-certificates-2020.1.1-0
++defaults/osx-64::certifi-2020.4.5.1-py38_0
++defaults/osx-64::libcxx-10.0.0-1
++defaults/osx-64::libedit-3.1.20181209-hb402a30_0
++defaults/osx-64::libffi-3.3-h0a44026_1
++defaults/osx-64::ncurses-6.2-h0a44026_1
++defaults/osx-64::openssl-1.1.1g-h1de35cc_0
++defaults/osx-64::pip-20.0.2-py38_3
++defaults/osx-64::python-3.8.3-h26836e1_1
++defaults/osx-64::readline-8.0-h1de35cc_0
++defaults/osx-64::setuptools-47.1.1-py38_0
++defaults/osx-64::sqlite-3.31.1-h5c1f38d_1
++defaults/osx-64::tk-8.6.8-ha441bb4_0
++defaults/osx-64::wheel-0.34.2-py38_0
++defaults/osx-64::xz-5.2.5-h1de35cc_0
++defaults/osx-64::zlib-1.2.11-h1de35cc_3
+# update specs: ['python=3.8']
