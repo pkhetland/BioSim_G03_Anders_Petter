@@ -16,7 +16,7 @@ class Animal:
 
     def __init__(self, weight, age, p):
         if weight is None:
-            self.weight = self.birth_weight()
+            self.weight = self.birth_weight
         else:
             self.weight = weight
         self.age = age
@@ -65,8 +65,8 @@ class Animal:
             return np.random.choice([False, True], p=[1 - death_prob, death_prob])
 
     @staticmethod
-    def q(sgn, x, xhalf, phi):
-        return 1.0 / (1.0 + np.exp(sgn * phi * (x - xhalf)))
+    def q(sgn, x, x_half, phi):
+        return 1.0 / (1.0 + np.exp(sgn * phi * (x - x_half)))
 
     @property
     def fitness(self):
@@ -94,7 +94,7 @@ class Animal:
 
 
 class Herbivore(Animal):
-    def __init__(self, weight, age, p=None):
+    def __init__(self, weight=None, age=0, p=None):
         if p is None:  # If no parameters are specified
             self.p = {  # Insert default values for species
                 "w_birth": 8.0,
@@ -133,33 +133,40 @@ class Herbivore(Animal):
         else:
             pass
 
+
 class Carnivore:
-    def __init__(self, weight, age, p=None):
+    def __init__(self, weight=None, age=0, p=None):
         if p is None:  # If no parameters are specified
             self.p = {  # Insert default values for species
                 "w_birth": 6.0,
                 "sigma_birth": 1.0,
-                "beta": 0.9,
-                "eta": 0.05,
-                "a_half": 40,
-                "phi_age": 0.6,
-                "w_half": 10.0,
-                "phi_weight": 0.1,
-                "mu": 0.25,
-                "gamma": 0.2,
+                "beta": 0.75,
+                "eta": 0.125,
+                "a_half": 40.0,
+                "phi_age": 0.3,
+                "w_half": 4.0,
+                "phi_weight": 0.4,
+                "mu": 0.4,
+                "gamma": 0.8,
                 "zeta": 3.5,
-                "xi": 1.2,
-                "omega": 0.4,
-                "F": 10.0,
+                "xi": 1.1,
+                "omega": 0.8,
+                "F": 50.0,
             }
         else:
             self.p = p
 
         super().__init__(weight, age, self.p)
 
+    def kill_prey(self, cell):
+        pass
+
+
 if __name__ == "__main__":
+    herb1 = Herbivore(weight=None, age=0)
     herb2 = Herbivore(weight=None, age=0)
-    herb3 = Herbivore(weight=None, age=0)
+    carn1 = Carnivore(weight=None, age=0)
+    carn2 = Carnivore(weight=None, age=0)
+    print(herb1.birth_weight())
     print(herb2.birth_weight())
-    print(herb3.birth_weight())
     # Output: Herb1 has both weight and birth_weight. BUG
