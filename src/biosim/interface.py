@@ -17,7 +17,7 @@ class Simulation:
 
     def __init__(self, seed=123, randomize_animals=True):
         self.cell = Lowland(f_max=800)
-        self.animals = [Herbivore(age=0, weight=20) for _ in range(100)]
+        self.animals = [Herbivore(age=0, weight=20) for _ in range(200)]
         self.year = 0
         random.seed(seed)
         self.randomize_animals = randomize_animals
@@ -62,9 +62,13 @@ class Simulation:
         self.year += 1  # Add year to simulation
 
     def run_simulation(self, num_years):
-        for year in range(num_years):
-            print(f'Simulation has been run for {year+1} years.')
-            self.run_year_cycle()
+        if self.animal_count > 0:
+            for year in range(num_years):
+                print(f'Simulation has been run for {year+1} years.')
+                self.run_year_cycle()
+        else:
+            pass
+        print('Simulation complete.')
 
     @property
     def animal_count(self):
@@ -77,3 +81,5 @@ if __name__ == '__main__':
 
     sim.run_simulation(num_years=100)
 
+    # for animal in sim.animals:
+    #     print(animal.birth_weight())

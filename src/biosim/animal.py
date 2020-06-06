@@ -7,11 +7,9 @@ import numpy as np
 
 
 class Animal:
-
     """
     Super class for Herbivores and Carnivores
     """
-
     # p = {}    # Empty dictionary to fill in parameters Herbivore or Carnivore
 
     def __init__(self, weight, age, p):
@@ -56,7 +54,7 @@ class Animal:
             give_birth = False
 
         if give_birth:  # If give_birth is true
-            birth_weight = 2  # 2 is to be replace with the birth_weight function
+            birth_weight = self.birth_weight()
             if birth_weight < self.weight:
                 self.weight -= self.p["xi"] * birth_weight
                 return True, birth_weight
