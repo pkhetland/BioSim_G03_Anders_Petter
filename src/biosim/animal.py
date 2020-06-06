@@ -134,7 +134,7 @@ class Herbivore(Animal):
             pass
 
 
-class Carnivore:
+class Carnivore(Animal):
     def __init__(self, weight=None, age=0, p=None):
         if p is None:  # If no parameters are specified
             self.p = {  # Insert default values for species
@@ -152,21 +152,42 @@ class Carnivore:
                 "xi": 1.1,
                 "omega": 0.8,
                 "F": 50.0,
+                "DeltaPhiMax": 10.0
             }
         else:
             self.p = p
 
         super().__init__(weight, age, self.p)
 
-    def kill_prey(self, cell):
-        pass
+    def kill_prey(self, sorted_herbivores):
+        consumption_weight = 0
+        herbs_killed = []
+
+        while consumption_weight < self.p['F']:
+            for herb in sorted_herbivores:
+                fitness_diff = self.fitness - herb.fitness
+                if fitness_diff <= 0:
+                    kill_prey = False
+
+                elif 0 < fitness_diff < self.p['DeltaPhiMax']:
+                    kill_prob = fitness_diff / self.p['DeltaPhiMax']
+                    kill_prey = np.random.choice([True, False], p=[kill_prob, 1-kill_prob])
+
+                else:
+                    kill_prey = True
+
+                if kill_prey:  # If the herb is killed
+                    consumption_weight += herb.weight  # Add herb weight to consumption_weight variable
+                    herbs_killed.append(herb)  # Add herb to list of killed herbs
+
+            if consumption_weight > self.p['F']:  # Auto-adjust consumption_weight to be <= F-parameter
+                consumption_weight = self.p['F']
+
+            self.weight += consumption_weight * self.p['beta']  # Add weight to carnivore
 
 
 if __name__ == "__main__":
-    herb1 = Herbivore(weight=None, age=0)
-    herb2 = Herbivore(weight=None, age=0)
-    carn1 = Carnivore(weight=None, age=0)
-    carn2 = Carnivore(weight=None, age=0)
-    print(herb1.birth_weight())
-    print(herb2.birth_weight())
-    # Output: Herb1 has both weight and birth_weight. BUG
+    herb1 = Herbivore()
+    carn1 = Carnivore()
+    print(herb1.birth_weight)
+    print(carn1.birth_weight)
