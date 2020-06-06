@@ -11,6 +11,7 @@ class Animal:
     """
     Super class for Herbivores and Carnivores
     """
+
     # p = {}    # Empty dictionary to fill in parameters Herbivore or Carnivore
 
     def __init__(self, weight, age, p):
@@ -21,19 +22,6 @@ class Animal:
         self.age = age
         self.p = p
         np.random.seed(123)
-
-    def birth_weight(self):
-        """
-        birth weight of newborn animal is drawn randomly
-        param: w_birth: birth weight of animal
-        param: sigma_birth: standard deviation
-        param: N: Population size
-        return: array: weight_dist, Standard normal distribution of birth weights
-        Seed: default_rng(int)
-
-        """
-        self.weight = np.random.normal(self.p["w_birth"], self.p["sigma_birth"])
-        return self.weight
 
     def aging(self):
         """
@@ -56,7 +44,7 @@ class Animal:
             give_birth = False
 
         if give_birth:  # If give_birth is true
-            birth_weight = self.birth_weight()
+            birth_weight = self.birth_weight
             if birth_weight < self.weight:
                 self.weight -= self.p["xi"] * birth_weight
                 return True, birth_weight
@@ -89,6 +77,20 @@ class Animal:
         return self.q(+1, self.age, self.p["a_half"], self.p["phi_age"]) * self.q(
             -1, self.weight, self.p["w_half"], self.p["phi_weight"]
         )
+
+    @property
+    def birth_weight(self):
+        """
+        birth weight of newborn animal is drawn randomly
+        param: w_birth: birth weight of animal
+        param: sigma_birth: standard deviation
+        param: N: Population size
+        return: array: weight_dist, Standard normal distribution of birth weights
+        Seed: default_rng(int)
+
+        """
+        birth_weight = np.random.normal(self.p["w_birth"], self.p["sigma_birth"])
+        return birth_weight
 
 
 class Herbivore(Animal):
