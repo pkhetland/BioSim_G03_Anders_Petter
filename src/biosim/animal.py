@@ -41,7 +41,7 @@ class Animal:
         """
         self.age += 1
 
-    def give_birth(self, n_same):
+    def give_birth(self, cell, n_same):
         """
         Animals give birth based on fitness and same-type animals in cell
         """
