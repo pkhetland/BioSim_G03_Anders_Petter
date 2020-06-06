@@ -46,7 +46,6 @@ class Simulation:
             for animal in self.animals:
                 animal.eat_fodder(self.cell)  # Feed animal
 
-
         #  2. Procreation
         n_herb = self.animal_count
         for animal in self.animals:
@@ -80,5 +79,5 @@ if __name__ == '__main__':
 
     sim = Simulation()  # Create simple simulation instance
 
-    sim.run_simulation(num_years=3)
+    sim.run_simulation(num_years=100)
 
