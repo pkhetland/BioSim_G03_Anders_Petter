@@ -16,7 +16,7 @@ class Animal:
 
     def __init__(self, weight, age, p):
         if weight is None:
-            self.weight = self.birth_weight()
+            self.weight = self.birth_weight
         else:
             self.weight = weight
         self.age = age
@@ -137,6 +137,7 @@ class Herbivore(Animal):
 if __name__ == "__main__":
     herb2 = Herbivore(weight=None, age=0)
     herb3 = Herbivore(weight=None, age=0)
-    print(herb2.birth_weight())
-    print(herb3.birth_weight())
+    print(herb2.birth_weight)
+    print(herb3.birth_weight)
+
     # Output: Herb1 has both weight and birth_weight. BUG

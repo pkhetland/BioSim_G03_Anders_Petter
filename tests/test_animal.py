@@ -3,15 +3,27 @@
 """
 Tests for animal class.
 """
-from src.biosim.animal import Herbivore
+from src.biosim.animal import Herbivore, Animal
 from src.biosim.interface import Simulation
 from src.biosim.landscape import Lowland
+import pytest
 
 class TestAnimal:
 
     """
     Tests for animal class
     """
+    @pytest.fixture
+    def create_animals(self):
+        self.n_herbivores = 50
+        self.n_carnivores = 50
+        self.animals = Animal(self.n_herbivores, self.n_carnivores)
+
+    def test_death(self):
+        """
+        Test that the probability of death is greater than zero
+        """
+        self.n_herbivores =
 
 
 class TestHerbivore:
@@ -45,11 +57,7 @@ class TestHerbivore:
         herb.aging()
         assert herb.age > 0
 
-    def test_death(self):
-        """
-        Test that the probability of death is greater than zero
-        """
-        pass
+
 
     def test_give_birth(self):
         """
