@@ -44,6 +44,9 @@ class Simulation:
                 herb.eat_fodder(self.cell)
 
             for carn in self.carnivore_list:  # Carnivores eat last
+                herbivores_killed = carn.kill_prey(self.sorted_herbivores)  # Carnivore hunts for herbivores
+                for dead_herb in herbivores_killed:
+                    self.animals.remove(dead_herb)
 
 
         #  2. Procreation
@@ -135,10 +138,7 @@ if __name__ == '__main__':
 
     sim = Simulation()  # Create simple simulation instance
 
-    # sim.run_simulation(num_years=10)
-
-    print([herb.fitness for herb in sim.sorted_herbivores])
-    print([carn.fitness for carn in sim.sorted_carnivores])
+    sim.run_simulation(num_years=10)
 
     # for animal in sim.animals:
     #     print(animal.birth_weight())

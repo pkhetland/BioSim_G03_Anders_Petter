@@ -184,7 +184,7 @@ class Carnivore(Animal):
                 consumption_weight = self.p['F']
 
             self.weight += consumption_weight * self.p['beta']  # Add weight to carnivore
-
+        return herbs_killed
 
 if __name__ == "__main__":
     herb1 = Herbivore()
