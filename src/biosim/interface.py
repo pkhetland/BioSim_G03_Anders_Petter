@@ -40,23 +40,24 @@ class Simulation:
         # Randomize animals before feeding
         self.randomize()
         while self.cell.fodder > 0:
-            for animal in self.animals:
-                animal.eat_fodder(self.cell)  # Feed animal
+            for herb in self.herbivore_list:  # Herbivores eat first
+                herb.eat_fodder(self.cell)
+
+            for carn in self.carnivore_list:  # Carnivores eat last
+
 
         #  2. Procreation
-        for animal in self.animals:
-            if animal.__class__.__name__ == 'Herbivore':
-                give_birth, birth_weight = animal.give_birth(self.cell, self.herb_count)
+        for herb in self.herbivore_list:  # Herbivores give birth
+            give_birth, birth_weight = herb.give_birth(self.cell, self.herb_count)
 
-                if give_birth:
-                    self.animals.append(Herbivore(weight=birth_weight, age=0))
+            if give_birth:
+                self.animals.append(Herbivore(weight=birth_weight, age=0))
 
-            else:
-                give_birth, birth_weight = animal.give_birth(self.cell, self.carn_count)
+        for carn in self.carnivore_list:  # Carnivores give birth
+            give_birth, birth_weight = carn.give_birth(self.cell, self.carn_count)
 
-                if give_birth:
-                    self.animals.append(Herbivore(weight=birth_weight, age=0))
-
+            if give_birth:
+                self.animals.append(Carnivore(weight=birth_weight, age=0))
 
 
         #  3. Migration
@@ -72,13 +73,14 @@ class Simulation:
             if animal.death():
                 self.animals.remove(animal)
 
-        print(sim.animal_count)
         self.year += 1  # Add year to simulation
 
     def run_simulation(self, num_years):
         if self.animal_count > 0:
             for year in range(num_years):
-                print(f'Simulation has been run for {year+1} years.')
+                print(f'Year: {year+1}.')
+                print(f'Carnivore count: {self.carn_count}.')
+                print(f'Herbivore count: {self.herb_count}')
                 self.run_year_cycle()
         else:
             pass
@@ -90,17 +92,24 @@ class Simulation:
 
     @property
     def herb_count(self):
-        return len([animal for animal in self.animals if animal.__class__.__name__ == 'Herbivore'])
+        return len(self.herbivore_list)
 
     @property
     def carn_count(self):
-        return len([animal for animal in self.animals if animal.__class__.__name__ == 'Carnivore'])
+        return len(self.carnivore_list)
+
+    @property
+    def herbivore_list(self):
+        return [animal for animal in self.animals if animal.__class__.__name__ == 'Herbivore']
+
+    @property
+    def carnivore_list(self):
+        return [animal for animal in self.animals if animal.__class__.__name__ == 'Carnivore']
 
     @property
     def sorted_carnivores(self):  # Will probably be moved to landscape classes
         fitness_dict = dict([
-            (animal, animal.fitness) for animal in self.animals
-            if animal.__class__.__name__ == 'Carnivore'
+            (animal, animal.fitness) for animal in self.carnivore_list
         ])
         sorted_carn_list = [
             pair[0] for pair in sorted(fitness_dict.items(),
@@ -112,8 +121,7 @@ class Simulation:
     @property
     def sorted_herbivores(self):  # Will probably be moved to landscape classes
         fitness_dict = dict([
-            (animal, animal.fitness) for animal in self.animals
-            if animal.__class__.__name__ == 'Herbivore'
+            (animal, animal.fitness) for animal in self.herbivore_list
         ])
         sorted_herb_list = [
             pair[0] for pair in sorted(fitness_dict.items(),
