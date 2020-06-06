@@ -133,6 +133,29 @@ class Herbivore(Animal):
         else:
             pass
 
+class Carnivore:
+    def __init__(self, weight, age, p=None):
+        if p is None:  # If no parameters are specified
+            self.p = {  # Insert default values for species
+                "w_birth": 6.0,
+                "sigma_birth": 1.0,
+                "beta": 0.9,
+                "eta": 0.05,
+                "a_half": 40,
+                "phi_age": 0.6,
+                "w_half": 10.0,
+                "phi_weight": 0.1,
+                "mu": 0.25,
+                "gamma": 0.2,
+                "zeta": 3.5,
+                "xi": 1.2,
+                "omega": 0.4,
+                "F": 10.0,
+            }
+        else:
+            self.p = p
+
+        super().__init__(weight, age, self.p)
 
 if __name__ == "__main__":
     herb2 = Herbivore(weight=None, age=0)

@@ -17,18 +17,14 @@ class Lowland:
         # if location:
         #     self.location = location
 
-    # def add_animal(self, animal_species, age, weight):
-    #     animal_dict = {'species': animal_species, 'age': age, 'weight': weight}
-    #     self.population.append(animal_dict)  # Append new animal to population dict
 
-    # @property
-    # def herb_count(self):
-    #     return np.sum([animal_dict['species'] == 'Herbivore' for animal_dict in self.population])
-    #
-    # @property
-    # def carn_count(self):
-    #     return np.sum([animal_dict['species'] == 'Carnivore' for animal_dict in self.population])
+class Highland:
+    pass
 
-    # @property
-    # def population_count(self):
-    #     return len(self.population)
+
+class Desert:
+    pass
+
+
+class Ocean:
+    pass
