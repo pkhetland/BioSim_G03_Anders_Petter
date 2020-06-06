@@ -4,6 +4,7 @@ __author__ = "Anders Mølmen Høst & Petter Kolstad Hetland"
 __email__ = "anders.molmen.host@nmbu.no, petter.storesund.hetland@nmbu.no"
 
 import numpy as np
+import random as random
 
 
 class Animal:
@@ -19,6 +20,7 @@ class Animal:
             self.weight = weight
         self.age = age
         self.p = p
+        np.random.seed(123)
 
     def birth_weight(self):
         """
@@ -131,8 +133,8 @@ class Herbivore(Animal):
 
 
 if __name__ == "__main__":
-    herb1 = Herbivore(10, 0)
     herb2 = Herbivore(weight=None, age=0)
-    print(herb1.weight)
-    print(herb1.birth_weight())
+    herb3 = Herbivore(weight=None, age=0)
+    print(herb2.birth_weight())
+    print(herb3.birth_weight())
     # Output: Herb1 has both weight and birth_weight. BUG
