@@ -15,20 +15,33 @@ import random as random
 
 class Simulation:
 
-    def __init__(self):
+    def __init__(self, seed=123, randomize_animals=True):
         self.cell = Lowland(f_max=800)
         self.animals = [Herbivore(age=0, weight=20) for _ in range(3)]
         self.year = 0
+        random.seed(seed)
+        self.randomize_animals = randomize_animals
+
 
 
     @property
     def animal_count(self):
         return len(self.animals)
 
+    def randomize(self):
+        """
+        Defining a function to randomize animals
+        """
+        if self.randomize_animals is True:
+            random.shuffle(self.animals)
+
     def run_year_cycle(self):
         #  1. Feeding
         self.cell.fodder = self.cell.f_max
-        random.shuffle(self.animals)    # Randomize animals before feeding
+        print(self.animals)
+        # Randomize animals before feeding
+        self.randomize()
+        print(self.animals)
         while self.cell.fodder > 0:
             for animal in self.animals:
                 animal.eat_fodder(self.cell)  # Feed animal
@@ -67,4 +80,5 @@ if __name__ == '__main__':
 
     sim = Simulation()  # Create simple simulation instance
 
-    sim.run_simulation(num_years=5)
+    sim.run_simulation(num_years=3)
+
