@@ -189,5 +189,7 @@ class Carnivore(Animal):
 
 
 if __name__ == "__main__":
-    herb = Herbivore()
-    carn = Carnivore()
+    herb1 = Herbivore()
+    carn1 = Carnivore()
+    print(herb1.birth_weight)
+    print(carn1.birth_weight)
