@@ -45,3 +45,14 @@ class TestHerbivore:
         herb.aging()
         assert herb.age > 0
 
+    def test_death(self):
+        """
+        Test that the probability of death is greater than zero
+        """
+        pass
+
+    def test_give_birth(self):
+        """
+        Test that the give birth function works
+        """
+        pass
