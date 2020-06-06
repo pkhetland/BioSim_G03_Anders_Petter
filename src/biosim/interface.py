@@ -22,26 +22,18 @@ class Simulation:
         random.seed(seed)
         self.randomize_animals = randomize_animals
 
-
-
-    @property
-    def animal_count(self):
-        return len(self.animals)
-
     def randomize(self):
         """
         Defining a function to randomize animals
         """
-        if self.randomize_animals is True:
+        if self.randomize_animals:
             random.shuffle(self.animals)
 
     def run_year_cycle(self):
         #  1. Feeding
         self.cell.fodder = self.cell.f_max
-        print(self.animals)
         # Randomize animals before feeding
         self.randomize()
-        print(self.animals)
         while self.cell.fodder > 0:
             for animal in self.animals:
                 animal.eat_fodder(self.cell)  # Feed animal
@@ -73,6 +65,10 @@ class Simulation:
         for year in range(num_years):
             print(f'Simulation has been run for {year+1} years.')
             self.run_year_cycle()
+
+    @property
+    def animal_count(self):
+        return len(self.animals)
 
 
 if __name__ == '__main__':
