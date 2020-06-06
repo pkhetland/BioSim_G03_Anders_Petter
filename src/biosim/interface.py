@@ -25,7 +25,7 @@ class Simulation:
 
         for _ in range(200):  # Add animals
             self.animals.append(Herbivore(age=0, weight=20))
-            self.animals.append(Carnivore(age=0, weight=20))
+            self.animals.append(Carnivore(age=0, weight=80))
 
     def randomize(self):
         """
@@ -43,11 +43,10 @@ class Simulation:
             for herb in self.herbivore_list:  # Herbivores eat first
                 herb.eat_fodder(self.cell)
 
-            for carn in self.carnivore_list:  # Carnivores eat last
-                herbivores_killed = carn.kill_prey(self.sorted_herbivores)  # Carnivore hunts for herbivores
-                for dead_herb in herbivores_killed:
-                    self.animals.remove(dead_herb)
-
+        for carn in self.carnivore_list:  # Carnivores eat last
+            herbs_killed = carn.kill_prey(self.sorted_herbivores)  # Carnivore hunts for herbivores
+            for herb in herbs_killed:
+                self.animals.remove(herb)
 
         #  2. Procreation
         for herb in self.herbivore_list:  # Herbivores give birth
@@ -79,14 +78,11 @@ class Simulation:
         self.year += 1  # Add year to simulation
 
     def run_simulation(self, num_years):
-        if self.animal_count > 0:
-            for year in range(num_years):
-                print(f'Year: {year+1}.')
-                print(f'Carnivore count: {self.carn_count}.')
-                print(f'Herbivore count: {self.herb_count}')
-                self.run_year_cycle()
-        else:
-            pass
+        for year in range(num_years):
+            print(f'Year: {year+1}.')
+            print(f'Carnivore count: {self.carn_count}')
+            print(f'Herbivore count: {self.herb_count}')
+            self.run_year_cycle()
         print('Simulation complete.')
 
     @property
@@ -138,7 +134,7 @@ if __name__ == '__main__':
 
     sim = Simulation()  # Create simple simulation instance
 
-    sim.run_simulation(num_years=10)
+    sim.run_simulation(num_years=100)
 
     # for animal in sim.animals:
     #     print(animal.birth_weight())

@@ -163,8 +163,8 @@ class Carnivore(Animal):
         consumption_weight = 0
         herbs_killed = []
 
-        while consumption_weight < self.p['F']:
-            for herb in sorted_herbivores:
+        for herb in sorted_herbivores:
+            if consumption_weight < self.p['F']:
                 fitness_diff = self.fitness - herb.fitness
                 if fitness_diff <= 0:
                     kill_prey = False
@@ -178,16 +178,16 @@ class Carnivore(Animal):
 
                 if kill_prey:  # If the herb is killed
                     consumption_weight += herb.weight  # Add herb weight to consumption_weight variable
-                    herbs_killed.append(herb)  # Add herb to list of killed herbs
+                    herbs_killed.append(herb)
 
-            if consumption_weight > self.p['F']:  # Auto-adjust consumption_weight to be <= F-parameter
-                consumption_weight = self.p['F']
+        if consumption_weight > self.p['F']:  # Auto-adjust consumption_weight to be <= F-parameter
+            consumption_weight = self.p['F']
 
-            self.weight += consumption_weight * self.p['beta']  # Add weight to carnivore
+        self.weight += consumption_weight * self.p['beta']  # Add weight to carnivore
+
         return herbs_killed
 
+
 if __name__ == "__main__":
-    herb1 = Herbivore()
-    carn1 = Carnivore()
-    print(herb1.birth_weight)
-    print(carn1.birth_weight)
+    herb = Herbivore()
+    carn = Carnivore()
