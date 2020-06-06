@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
-__author__ = 'Anders Mølmen Høst & Petter Kolstad Hetland'
-__email__ = 'anders.molmen.host@nmbu.no, petter.storesund.hetland@nmbu.no'
+__author__ = "Anders Mølmen Høst & Petter Kolstad Hetland"
+__email__ = "anders.molmen.host@nmbu.no, petter.storesund.hetland@nmbu.no"
 
 import numpy as np
 
@@ -11,6 +11,7 @@ class Animal:
     """
     Super class for Herbivores and Carnivores
     """
+
     # p = {}    # Empty dictionary to fill in parameters Herbivore or Carnivore
 
     def __init__(self, weight, age, p):
@@ -38,7 +39,7 @@ class Animal:
         """
         When an animal eats, its weight increases
         """
-        consumption_amount = self.p['beta'] * self.p['F']  # Calculate amount of fodder consumed
+        consumption_amount = self.p["beta"] * self.p["F"]  # Calculate amount of fodder consumed
         if consumption_amount < cell.fodder:
             self.weight += consumption_amount  # Eat fodder
             cell.fodder -= consumption_amount  # Removes consumed fodder from cell object
@@ -60,8 +61,8 @@ class Animal:
         """
         Animals give birth based on fitness and same-type animals in cell
         """
-        birth_prob = (self.p['gamma'] * self.fitness * n_same - 1)
-        if self.weight < self.p['zeta']*(self.p['w_birth']+self.p['sigma_birth']):
+        birth_prob = self.p["gamma"] * self.fitness * n_same - 1
+        if self.weight < self.p["zeta"] * (self.p["w_birth"] + self.p["sigma_birth"]):
             return False, None  # Return false if weight of mother is less than birth
         elif birth_prob > 1:
             give_birth = True
@@ -73,7 +74,7 @@ class Animal:
         if give_birth:  # If give_birth is true
             birth_weight = 2  # 2 is to be replace with the birth_weight function
             if birth_weight < self.weight:
-                self.weight -= self.p['xi'] * birth_weight
+                self.weight -= self.p["xi"] * birth_weight
                 return True, birth_weight
             else:
                 return False, None
@@ -88,12 +89,12 @@ class Animal:
         if self.weight <= 0:
             return True
         else:
-            death_prob = self.p['omega']*(1-self.fitness)
-            return np.random.choice([False, True], p=[1-death_prob, death_prob])
+            death_prob = self.p["omega"] * (1 - self.fitness)
+            return np.random.choice([False, True], p=[1 - death_prob, death_prob])
 
     @staticmethod
     def q(sgn, x, xhalf, phi):
-        return 1. / (1. + np.exp(sgn * phi * (x - xhalf)))
+        return 1.0 / (1.0 + np.exp(sgn * phi * (x - xhalf)))
 
     @property
     def fitness(self):
@@ -101,31 +102,34 @@ class Animal:
         Function returning the fitness of an animal.
         Return: int: 0 < 1
         """
-        return (self.q(+1, self.age, self.p['a_half'], self.p['phi_age'])
-                * self.q(-1, self.weight, self.p['w_half'], self.p['phi_weight']))
+        return self.q(+1, self.age, self.p["a_half"], self.p["phi_age"]) * self.q(
+            -1, self.weight, self.p["w_half"], self.p["phi_weight"]
+        )
 
 
 class Herbivore(Animal):
+    def __init__(self, weight, age, p=None):
+        if p is None:  # If no parameters are specified
+            self.p = {  # Insert default values for species
+                "w_birth": 8.0,
+                "sigma_birth": 1.5,
+                "beta": 0.9,
+                "eta": 0.05,
+                "a_half": 40,
+                "phi_age": 0.6,
+                "w_half": 10.0,
+                "phi_weight": 0.1,
+                "mu": 0.25,
+                "gamma": 0.2,
+                "zeta": 3.5,
+                "xi": 1.2,
+                "omega": 0.4,
+                "F": 10.0,
+            }
+        else:
+            self.p = p
 
-    def __init__(self, weight, age):
-        p = {'w_birth': 8.0,
-             'sigma_birth': 1.5,
-             'beta': 0.9,
-             'eta': 0.05,
-             'a_half': 40,
-             'phi_age': 0.6,
-             'w_half': 10.0,
-             'phi_weight': 0.1,
-             'mu': 0.25,
-             'gamma': 0.2,
-             'zeta': 3.5,
-             'xi': 1.2,
-             'omega': 0.4,
-             'F': 10.0}
-
-        super().__init__(weight, age, p)
-
-
+        super().__init__(weight, age, self.p)
 
 
 if __name__ == "__main__":
