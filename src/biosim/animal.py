@@ -65,8 +65,8 @@ class Animal:
             return np.random.choice([False, True], p=[1 - death_prob, death_prob])
 
     @staticmethod
-    def q(sgn, x, xhalf, phi):
-        return 1.0 / (1.0 + np.exp(sgn * phi * (x - xhalf)))
+    def q(sgn, x, x_half, phi):
+        return 1.0 / (1.0 + np.exp(sgn * phi * (x - x_half)))
 
     @property
     def fitness(self):
@@ -94,7 +94,7 @@ class Animal:
 
 
 class Herbivore(Animal):
-    def __init__(self, weight, age, p=None):
+    def __init__(self, weight=None, age=0, p=None):
         if p is None:  # If no parameters are specified
             self.p = {  # Insert default values for species
                 "w_birth": 8.0,
@@ -134,10 +134,69 @@ class Herbivore(Animal):
             pass
 
 
+class Carnivore(Animal):
+    def __init__(self, weight=None, age=0, p=None):
+        if p is None:  # If no parameters are specified
+            self.p = {  # Insert default values for species
+                "w_birth": 6.0,
+                "sigma_birth": 1.0,
+                "beta": 0.75,
+                "eta": 0.125,
+                "a_half": 40.0,
+                "phi_age": 0.3,
+                "w_half": 4.0,
+                "phi_weight": 0.4,
+                "mu": 0.4,
+                "gamma": 0.8,
+                "zeta": 3.5,
+                "xi": 1.1,
+                "omega": 0.8,
+                "F": 50.0,
+                "DeltaPhiMax": 10.0
+            }
+        else:
+            self.p = p
+
+        super().__init__(weight, age, self.p)
+
+    def kill_prey(self, sorted_herbivores):
+        consumption_weight = 0
+        herbs_killed = []
+
+        while consumption_weight < self.p['F']:
+            for herb in sorted_herbivores:
+                fitness_diff = self.fitness - herb.fitness
+                if fitness_diff <= 0:
+                    kill_prey = False
+
+                elif 0 < fitness_diff < self.p['DeltaPhiMax']:
+                    kill_prob = fitness_diff / self.p['DeltaPhiMax']
+                    kill_prey = np.random.choice([True, False], p=[kill_prob, 1-kill_prob])
+
+                else:
+                    kill_prey = True
+
+                if kill_prey:  # If the herb is killed
+                    consumption_weight += herb.weight  # Add herb weight to consumption_weight variable
+                    herbs_killed.append(herb)  # Add herb to list of killed herbs
+
+            if consumption_weight > self.p['F']:  # Auto-adjust consumption_weight to be <= F-parameter
+                consumption_weight = self.p['F']
+
+            self.weight += consumption_weight * self.p['beta']  # Add weight to carnivore
+        return herbs_killed
+
 if __name__ == "__main__":
+<<<<<<< HEAD
     herb2 = Herbivore(weight=None, age=0)
     herb3 = Herbivore(weight=None, age=0)
     print(herb2.birth_weight)
     print(herb3.birth_weight)
 
     # Output: Herb1 has both weight and birth_weight. BUG
+=======
+    herb1 = Herbivore()
+    carn1 = Carnivore()
+    print(herb1.birth_weight)
+    print(carn1.birth_weight)
+>>>>>>> herb_carn_single_cell
