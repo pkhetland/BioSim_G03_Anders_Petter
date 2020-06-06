@@ -186,17 +186,15 @@ class Carnivore(Animal):
             self.weight += consumption_weight * self.p['beta']  # Add weight to carnivore
         return herbs_killed
 
+
 if __name__ == "__main__":
-<<<<<<< HEAD
     herb2 = Herbivore(weight=None, age=0)
     herb3 = Herbivore(weight=None, age=0)
     print(herb2.birth_weight)
     print(herb3.birth_weight)
 
-    # Output: Herb1 has both weight and birth_weight. BUG
-=======
     herb1 = Herbivore()
     carn1 = Carnivore()
     print(herb1.birth_weight)
     print(carn1.birth_weight)
->>>>>>> herb_carn_single_cell
+    #herb_carn_single_cell
