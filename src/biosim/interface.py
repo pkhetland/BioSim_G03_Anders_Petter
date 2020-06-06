@@ -23,9 +23,9 @@ class Simulation:
         random.seed(seed)
         self.randomize_animals = randomize_animals
 
-        for _ in range(200):  # Add animals
+        for _ in range(100:  # Add animals
             self.animals.append(Herbivore(age=0, weight=20))
-            self.animals.append(Carnivore(age=0, weight=80))
+            self.animals.append(Carnivore(age=0, weight=20))
 
     def randomize(self):
         """
