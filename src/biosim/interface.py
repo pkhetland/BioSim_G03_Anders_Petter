@@ -17,7 +17,7 @@ class Simulation:
 
     def __init__(self, seed=123, randomize_animals=True):
         self.cell = Lowland(f_max=800)
-        self.animals = [Herbivore(age=0, weight=20) for _ in range(3)]
+        self.animals = [Herbivore(age=0, weight=20) for _ in range(100)]
         self.year = 0
         random.seed(seed)
         self.randomize_animals = randomize_animals

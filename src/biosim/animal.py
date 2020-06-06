@@ -24,10 +24,10 @@ class Animal:
 
     def birth_weight(self):
         """
-        birth weight of animal is drawn randomly
-        Param: w_birth: birth weight of animal
-        Param: sigma_birth: standard deviation
-        Param: N: Population size
+        birth weight of newborn animal is drawn randomly
+        param: w_birth: birth weight of animal
+        param: sigma_birth: standard deviation
+        param: N: Population size
         return: array: weight_dist, Standard normal distribution of birth weights
         Seed: default_rng(int)
 
@@ -41,7 +41,7 @@ class Animal:
         """
         self.age += 1
 
-    def give_birth(self, cell, n_same):
+    def give_birth(self, n_same):
         """
         Animals give birth based on fitness and same-type animals in cell
         """
