@@ -35,22 +35,6 @@ class Animal:
         self.weight = np.random.normal(self.p["w_birth"], self.p["sigma_birth"])
         return self.weight
 
-    def eat_fodder(self, cell):
-        """
-        When an animal eats, its weight increases
-        """
-        consumption_amount = self.p["beta"] * self.p["F"]  # Calculate amount of fodder consumed
-        if consumption_amount < cell.fodder:
-            self.weight += consumption_amount  # Eat fodder
-            cell.fodder -= consumption_amount  # Removes consumed fodder from cell object
-
-        elif consumption_amount > cell.fodder > 0:
-            self.weight += cell.fodder  # Eat fodder
-            cell.fodder -= cell.fodder  # Sets fodder to zero.
-
-        else:
-            pass
-
     def aging(self):
         """
         Increment age by one every season
@@ -130,6 +114,22 @@ class Herbivore(Animal):
             self.p = p
 
         super().__init__(weight, age, self.p)
+
+    def eat_fodder(self, cell):
+        """
+        When an animal eats, its weight increases
+        """
+        consumption_amount = self.p["beta"] * self.p["F"]  # Calculate amount of fodder consumed
+        if consumption_amount < cell.fodder:
+            self.weight += consumption_amount  # Eat fodder
+            cell.fodder -= consumption_amount  # Removes consumed fodder from cell object
+
+        elif consumption_amount > cell.fodder > 0:
+            self.weight += cell.fodder  # Eat fodder
+            cell.fodder -= cell.fodder  # Sets fodder to zero.
+
+        else:
+            pass
 
 
 if __name__ == "__main__":
