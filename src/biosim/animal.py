@@ -12,15 +12,16 @@ class Animal:
     Super class for Herbivores and Carnivores
     """
 
-    # p = {}    # Empty dictionary to fill in parameters Herbivore or Carnivore
+    # instance_count = 0
 
-    def __init__(self, weight, age, p):
+    def __init__(self, weight, age):
         if weight is None:
             self.weight = self.birth_weight
         else:
             self.weight = weight
         self.age = age
-        self.p = p
+
+        # self.add_animal()
         np.random.seed(123)
 
     def aging(self):
@@ -39,7 +40,7 @@ class Animal:
         elif birth_prob >= 1:
             give_birth = True
         elif 0 < birth_prob < 1:
-            give_birth = np.random.choice([False, True], p=[1 - birth_prob, birth_prob])
+            give_birth = np.random.choice([True, False], p=[birth_prob, 1-birth_prob])
         else:
             give_birth = False
 
@@ -62,7 +63,16 @@ class Animal:
             return True
         else:
             death_prob = self.p["omega"] * (1 - self.fitness)
-            return np.random.choice([False, True], p=[1 - death_prob, death_prob])
+            death = np.random.choice([True, False], p=[death_prob, 1-death_prob])
+            return death
+
+    # @classmethod
+    # def add_animal(cls):
+    #     cls.instance_count += 1
+    #
+    # @classmethod
+    # def remove_animal(cls):
+    #     cls.instance_count -= 1
 
     @staticmethod
     def q(sgn, x, x_half, phi):
@@ -93,14 +103,16 @@ class Animal:
 
 
 class Herbivore(Animal):
+
     def __init__(self, weight=None, age=0, p=None):
+
         if p is None:  # If no parameters are specified
             self.p = {  # Insert default values for species
                 "w_birth": 8.0,
                 "sigma_birth": 1.5,
                 "beta": 0.9,
                 "eta": 0.05,
-                "a_half": 40,
+                "a_half": 40.0,
                 "phi_age": 0.6,
                 "w_half": 10.0,
                 "phi_weight": 0.1,
@@ -109,12 +121,13 @@ class Herbivore(Animal):
                 "zeta": 3.5,
                 "xi": 1.2,
                 "omega": 0.4,
-                "F": 10.0,
+                "F": 10.0
             }
         else:
             self.p = p
 
-        super().__init__(weight, age, self.p)
+        super().__init__(weight, age)
+        # super().add_animal()
 
     def eat_fodder(self, cell):
         """
@@ -127,13 +140,14 @@ class Herbivore(Animal):
 
         elif consumption_amount > cell.fodder > 0:
             self.weight += cell.fodder  # Eat fodder
-            cell.fodder -= cell.fodder  # Sets fodder to zero.
+            cell.fodder = 0  # Sets fodder to zero.
 
         else:
-            pass
+            return
 
 
 class Carnivore(Animal):
+
     def __init__(self, weight=None, age=0, p=None):
         if p is None:  # If no parameters are specified
             self.p = {  # Insert default values for species
@@ -156,7 +170,8 @@ class Carnivore(Animal):
         else:
             self.p = p
 
-        super().__init__(weight, age, self.p)
+        super().__init__(weight, age)
+        # super().add_animal()
 
     def kill_prey(self, sorted_herbivores):
         consumption_weight = 0
