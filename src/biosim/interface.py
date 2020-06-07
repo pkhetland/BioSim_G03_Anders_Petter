@@ -25,10 +25,10 @@ class Simulation:
         random.seed(seed)
         self.randomize_animals = randomize_animals
 
-        for _ in range(50):  # Add animals
+        for _ in range(150):  # Add animals
             self.animals.append(Herbivore(age=5, weight=20))
-        for _ in range(0):  # Add animals
-            self.animals.append(Carnivore(age=0, weight=20))
+        for _ in range(40):  # Add animals
+            self.animals.append(Carnivore(age=5, weight=20))
 
     def randomize(self):
         """
@@ -97,19 +97,28 @@ class Simulation:
         y_herb = [self.herb_count]
         y_carn = [self.carn_count]
 
-        ax, herb_line, carn_line = self.init_plot(y_herb, y_carn, num_years)
+        ax, herb_line, carn_line = self.init_plot(y_herb,
+                                                  y_carn,
+                                                  num_years)
 
         for year in range(num_years):
             self.run_year_cycle()
 
             y_herb.append(self.herb_count)
             y_carn.append(self.carn_count)
-            print(self.animal_count)
-            self.update_plot(y_herb, y_carn, ax, herb_line, carn_line)
+            self.update_plot(y_herb,
+                             y_carn,
+                             ax,
+                             herb_line,
+                             carn_line)
 
         print('Simulation complete.')
 
-    def init_plot(self, y_herb, y_carn, num_years):
+    def init_plot(self,
+                  y_herb,
+                  y_carn,
+                  num_years):
+
         fig = plt.figure()
         ax = fig.add_subplot(111)
         herb_line, = ax.plot(y_herb)
@@ -125,7 +134,11 @@ class Simulation:
         return ax, herb_line, carn_line
 
     @staticmethod
-    def update_plot(y_herb, y_carn, ax, herb_line, carn_line):
+    def update_plot(y_herb,
+                    y_carn,
+                    ax,
+                    herb_line,
+                    carn_line):
         if max(y_herb) >= max(y_carn):
             ax.set_ylim([0, max(y_herb) + 20])
         else:
@@ -182,6 +195,13 @@ class Simulation:
         ]
         return sorted_herb_list
 
+    @property
+    def mean_herb_fitness(self):
+        return np.mean([herb.fitness for herb in self.herbivore_list])
+
+    @property
+    def mean_carn_fitness(self):
+        return np.mean([carn.fitness for carn in self.carnivore_list])
 
 if __name__ == '__main__':
 

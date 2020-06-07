@@ -29,7 +29,9 @@ class TestAnimal:
         pass
 
     def test_constructor(self):
-        """Herbivore can be created"""
+        """
+        Herbivore can be created
+        """
         herb = Herbivore(weight=10, age=0)
         carn = Carnivore()
         assert isinstance(herb, Herbivore), isinstance(carn, Carnivore)
@@ -43,6 +45,23 @@ class TestAnimal:
         herb.aging()
         carn.aging()
         assert herb.age > 0, carn.age > 0
+
+    def test_lose_weight(self):
+        """
+        Test that animals lose weight
+        """
+        herb, carn = Herbivore(weight=20), Carnivore(weight=20)
+        herb.lose_weight(), carn.lose_weight()
+
+        assert herb.weight == (20 - (20 * herb.p['eta']))
+        assert carn.weight == (20 - (20 * carn.p['eta']))
+
+    def test_parameters(self):
+        """
+        Test parameters of herbs and carns
+        """
+        herb, carn = Herbivore(), Carnivore()
+        assert herb.p != carn.p
 
 
 class TestHerbivore:
@@ -61,16 +80,20 @@ class TestHerbivore:
         herb_weight_after = herb.weight
         assert herb_weight < herb_weight_after
 
-
     def test_give_birth(self):
         """
         Test that the give birth function works
         """
         pass
 
+
 class TestCarnivore:
     """
     Test for carnivore class
     """
     def test_kill_prey(self):
-        pass
+        carn = Carnivore(age=5, weight=90)
+        killed_herbivores = carn.kill_prey([Herbivore(age=10, weight=10), Herbivore(age=5, weight=80)])
+        assert carn.weight > 40
+
+

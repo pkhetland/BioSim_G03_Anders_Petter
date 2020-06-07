@@ -210,9 +210,9 @@ class Carnivore(Animal):
 
         return herbs_killed
 
-
-if __name__ == "__main__":
-    herb1 = Herbivore()
-    carn1 = Carnivore()
-    print(herb1.birth_weight)
-    print(carn1.birth_weight)
+#
+# if __name__ == "__main__":
+#     herb1 = Herbivore()
+#     carn1 = Carnivore()
+#     print(herb1.birth_weight)
+#     print(carn1.birth_weight)
