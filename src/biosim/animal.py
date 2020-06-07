@@ -36,7 +36,7 @@ class Animal:
         birth_prob = self.p["gamma"] * self.fitness * n_same - 1
         if self.weight < self.p["zeta"] * (self.p["w_birth"] + self.p["sigma_birth"]):
             return False, None  # Return false if weight of mother is less than birth
-        elif birth_prob > 1:
+        elif birth_prob >= 1:
             give_birth = True
         elif 0 < birth_prob < 1:
             give_birth = np.random.choice([False, True], p=[1 - birth_prob, birth_prob])
@@ -86,7 +86,6 @@ class Animal:
         param: sigma_birth: standard deviation
         param: N: Population size
         return: array: weight_dist, Standard normal distribution of birth weights
-        Seed: default_rng(int)
 
         """
         birth_weight = np.random.normal(self.p["w_birth"], self.p["sigma_birth"])
@@ -122,7 +121,7 @@ class Herbivore(Animal):
         When an animal eats, its weight increases
         """
         consumption_amount = self.p["beta"] * self.p["F"]  # Calculate amount of fodder consumed
-        if consumption_amount < cell.fodder:
+        if consumption_amount <= cell.fodder:
             self.weight += consumption_amount  # Eat fodder
             cell.fodder -= consumption_amount  # Removes consumed fodder from cell object
 
