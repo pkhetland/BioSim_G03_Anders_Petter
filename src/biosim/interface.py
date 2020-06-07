@@ -5,8 +5,8 @@ A basic interface file containing the minimum requirements for running a simulat
 with one animal in one cell.
 """
 
-from src.biosim.animal import Herbivore, Carnivore, Animal
-from src.biosim.landscape import Lowland
+from src.biosim.animal import Herbivore, Carnivore
+from src.biosim.landscape import Lowland, Highland, Ocean, Desert
 
 import textwrap
 
@@ -17,9 +17,15 @@ import matplotlib.pyplot as plt
 
 
 class Simulation:
-
+    """
+    Main interface class for BioSim
+    """
     def __init__(self, seed=1234, randomize_animals=True):
-        self.cell = Lowland(f_max=700)
+        self.landscape = {
+            (1, 1): Ocean(), (1, 2): Ocean(), (1, 3): Ocean(),
+            (2, 1): Ocean(), (2, 2): Lowland(f_max=700.0), (2, 3): Ocean(),
+            (3, 1): Ocean(), (3, 2): Ocean(), (3, 3): Ocean(),
+        }
         self.animals = []
         self.year = 0
         random.seed(seed)
@@ -40,55 +46,56 @@ class Simulation:
         """
         Runs through each of the 6 yearly seasons for all cells
         """
-        #  1. Feeding
-        self.cell.fodder = self.cell.f_max
-        # Randomize animals before feeding
-        if self.randomize_animals:
-            self.randomize()
+        for cell in self.landscape.values():
+            if cell.__class__.__name__ != 'Ocean':
+                #  1. Feeding
+                cell.fodder = cell.f_max
+                # Randomize animals before feeding
+                if self.randomize_animals:
+                    self.randomize()
 
-        for herb in self.herbivore_list:  # Herbivores eat first
-            if self.cell.fodder != 0:
-                herb.eat_fodder(self.cell)
+                for herb in self.herbivore_list:  # Herbivores eat first
+                    if cell.fodder != 0:
+                        herb.eat_fodder(cell)
 
-        for carn in self.carnivore_list:  # Carnivores eat last
-            herbs_killed = carn.kill_prey(self.sorted_herbivores)  # Carnivore hunts for herbivores
-            for herb in herbs_killed:
-                self.animals.remove(herb)
+                for carn in self.carnivore_list:  # Carnivores eat last
+                    herbs_killed = carn.kill_prey(self.sorted_herbivores)  # Carnivore hunts for herbivores
+                    for herb in herbs_killed:
+                        self.animals.remove(herb)
 
-        #  2. Procreation
-        for herb in self.herbivore_list:  # Herbivores give birth
-            give_birth, birth_weight = herb.give_birth(self.herb_count)
+                #  2. Procreation
+                for herb in self.herbivore_list:  # Herbivores give birth
+                    give_birth, birth_weight = herb.give_birth(self.herb_count)
 
-            if give_birth:
-                self.animals.append(Herbivore(weight=birth_weight, age=0))
+                    if give_birth:
+                        self.animals.append(Herbivore(weight=birth_weight, age=0))
 
-        for carn in self.carnivore_list:  # Carnivores give birth
-            give_birth, birth_weight = carn.give_birth(self.carn_count)
+                for carn in self.carnivore_list:  # Carnivores give birth
+                    give_birth, birth_weight = carn.give_birth(self.carn_count)
 
-            if give_birth:
-                self.animals.append(Carnivore(weight=birth_weight, age=0))
+                    if give_birth:
+                        self.animals.append(Carnivore(weight=birth_weight, age=0))
 
+                #  3. Migration
 
-        #  3. Migration
+                #  4. Aging
+                for animal in self.animals:
+                    animal.aging()
 
-        #  4. Aging
-        for animal in self.animals:
-            animal.aging()
+                #  5. Loss of weight
+                for animal in self.animals:
+                    animal.lose_weight()
 
-        #  5. Loss of weight
-        for animal in self.animals:
-            animal.lose_weight()
+                #  6. Death
+                dead_animals = []
+                for animal in self.animals:
+                    if animal.death():
+                        dead_animals.append(animal)
 
-        #  6. Death
-        dead_animals = []
-        for animal in self.animals:
-            if animal.death():
-                dead_animals.append(animal)
+                for animal in dead_animals:
+                    self.animals.remove(animal)
 
-        for animal in dead_animals:
-            self.animals.remove(animal)
-
-        self.year += 1  # Add year to simulation
+                self.year += 1  # Add year to simulation
 
     def run_simulation(self, num_years):
         """
@@ -202,6 +209,7 @@ class Simulation:
     @property
     def mean_carn_fitness(self):
         return np.mean([carn.fitness for carn in self.carnivore_list])
+
 
 if __name__ == '__main__':
 
