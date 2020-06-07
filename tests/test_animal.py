@@ -15,6 +15,7 @@ class TestAnimal:
     """
     @pytest.fixture
     def create_animals(self):
+        # Comment AH. Need a function to create
         self.n_herbivores = 50
         self.n_carnivores = 50
         self.animals = Animal(self.n_herbivores, self.n_carnivores)
@@ -23,7 +24,7 @@ class TestAnimal:
         """
         Test that the probability of death is greater than zero
         """
-        self.n_herbivores =
+        pass
 
 
 class TestHerbivore:
