@@ -19,7 +19,7 @@ import matplotlib.pyplot as plt
 class Simulation:
 
     def __init__(self, seed=123, randomize_animals=True):
-        self.cell = Lowland(f_max=800)
+        self.cell = Lowland(f_max=1500)
         self.animals = []
         self.year = 0
         random.seed(seed)
@@ -56,13 +56,13 @@ class Simulation:
 
         #  2. Procreation
         for herb in self.herbivore_list:  # Herbivores give birth
-            give_birth, birth_weight = herb.give_birth(self.cell, self.herb_count)
+            give_birth, birth_weight = herb.give_birth(self.herb_count)
 
             if give_birth:
                 self.animals.append(Herbivore(weight=birth_weight, age=0))
 
         for carn in self.carnivore_list:  # Carnivores give birth
-            give_birth, birth_weight = carn.give_birth(self.cell, self.carn_count)
+            give_birth, birth_weight = carn.give_birth(self.carn_count)
 
             if give_birth:
                 self.animals.append(Carnivore(weight=birth_weight, age=0))
@@ -114,7 +114,6 @@ class Simulation:
         ax.set_xlim([0, num_years])
 
         plt.ion()
-        plt.show()
 
         return ax, herb_line, carn_line
 
