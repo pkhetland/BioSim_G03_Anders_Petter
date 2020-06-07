@@ -7,7 +7,7 @@ Test set for the initial Lowland class.
 
 import pytest
 
-from src.biosim.landscape import Lowland
+from src.biosim.landscape import Lowland, Highland, Ocean, Desert
 
 
 def test_lowland_instance():
@@ -53,3 +53,6 @@ def test_animal_count():
 def test_lowland_location():
     lowland = Lowland(location=(1, 2))
     assert lowland.location == (1, 2)
+
+def test_ocean_instance():
+    ocean = Ocean()
