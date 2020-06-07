@@ -67,3 +67,10 @@ class TestHerbivore:
         Test that the give birth function works
         """
         pass
+
+class TestCarnivore:
+    """
+    Test for carnivore class
+    """
+    def test_kill_prey(self):
+        pass
