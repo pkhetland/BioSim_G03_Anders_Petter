@@ -22,7 +22,7 @@ class Animal:
         self.age = age
 
         # self.add_animal()
-        np.random.seed(123)
+        np.random.seed(1234)
 
     def aging(self):
         """
@@ -53,6 +53,12 @@ class Animal:
                 return False, None
         else:
             return False, None
+
+    def lose_weight(self):
+        """
+        Animals lose weight based on eta parameter
+        """
+        self.weight -= self.weight * self.p['eta']
 
     def death(self):
         """
@@ -143,11 +149,14 @@ class Herbivore(Animal):
             cell.fodder = 0  # Sets fodder to zero.
 
         else:
+            print('Out of food')
             return
 
 
 class Carnivore(Animal):
-
+    """
+    Carnivore class
+    """
     def __init__(self, weight=None, age=0, p=None):
         if p is None:  # If no parameters are specified
             self.p = {  # Insert default values for species

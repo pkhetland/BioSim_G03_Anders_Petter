@@ -18,24 +18,23 @@ import matplotlib.pyplot as plt
 
 class Simulation:
 
-    def __init__(self, seed=123, randomize_animals=False):
-        self.cell = Lowland()
-        self.animals = set()
+    def __init__(self, seed=1234, randomize_animals=True):
+        self.cell = Lowland(f_max=700)
+        self.animals = []
         self.year = 0
         random.seed(seed)
         self.randomize_animals = randomize_animals
 
         for _ in range(50):  # Add animals
-            self.animals.add(Herbivore(age=5, weight=20))
+            self.animals.append(Herbivore(age=5, weight=20))
         for _ in range(0):  # Add animals
-            self.animals.add(Carnivore(age=0, weight=20))
+            self.animals.append(Carnivore(age=0, weight=20))
 
     def randomize(self):
         """
         Defining a function to randomize animals
         """
-        if self.randomize_animals:
-            random.shuffle(self.animals)
+        random.shuffle(self.animals)
 
     def run_year_cycle(self):
         """
@@ -44,9 +43,11 @@ class Simulation:
         #  1. Feeding
         self.cell.fodder = self.cell.f_max
         # Randomize animals before feeding
-        self.randomize()
-        while self.cell.fodder > 0:
-            for herb in self.herbivore_list:  # Herbivores eat first
+        if self.randomize_animals:
+            self.randomize()
+
+        for herb in self.herbivore_list:  # Herbivores eat first
+            if self.cell.fodder != 0:
                 herb.eat_fodder(self.cell)
 
         for carn in self.carnivore_list:  # Carnivores eat last
@@ -59,13 +60,13 @@ class Simulation:
             give_birth, birth_weight = herb.give_birth(self.herb_count)
 
             if give_birth:
-                self.animals.add(Herbivore(weight=birth_weight, age=0))
+                self.animals.append(Herbivore(weight=birth_weight, age=0))
 
         for carn in self.carnivore_list:  # Carnivores give birth
             give_birth, birth_weight = carn.give_birth(self.carn_count)
 
             if give_birth:
-                self.animals.add(Carnivore(weight=birth_weight, age=0))
+                self.animals.append(Carnivore(weight=birth_weight, age=0))
 
 
         #  3. Migration
@@ -75,12 +76,14 @@ class Simulation:
             animal.aging()
 
         #  5. Loss of weight
+        for animal in self.animals:
+            animal.lose_weight()
 
         #  6. Death
-        dead_animals = set()
+        dead_animals = []
         for animal in self.animals:
             if animal.death():
-                dead_animals.add(animal)
+                dead_animals.append(animal)
 
         for animal in dead_animals:
             self.animals.remove(animal)
@@ -101,7 +104,7 @@ class Simulation:
 
             y_herb.append(self.herb_count)
             y_carn.append(self.carn_count)
-
+            print(self.animal_count)
             self.update_plot(y_herb, y_carn, ax, herb_line, carn_line)
 
         print('Simulation complete.')
