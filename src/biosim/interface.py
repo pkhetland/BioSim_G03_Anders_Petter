@@ -10,8 +10,10 @@ from src.biosim.landscape import Lowland
 
 import textwrap
 
+import numpy as np
 import random as random
 import operator
+import matplotlib.pyplot as plt
 
 
 class Simulation:
@@ -23,8 +25,9 @@ class Simulation:
         random.seed(seed)
         self.randomize_animals = randomize_animals
 
-        for _ in range(100:  # Add animals
+        for _ in range(200):  # Add animals
             self.animals.append(Herbivore(age=0, weight=20))
+        for _ in range(50):  # Add animals
             self.animals.append(Carnivore(age=0, weight=20))
 
     def randomize(self):
@@ -78,12 +81,49 @@ class Simulation:
         self.year += 1  # Add year to simulation
 
     def run_simulation(self, num_years):
+        y_herb = [self.herb_count]
+        y_carn = [self.carn_count]
+
+        ax, herb_line, carn_line = self.init_plot(y_herb, y_carn, num_years)
+
         for year in range(num_years):
-            print(f'Year: {year+1}.')
-            print(f'Carnivore count: {self.carn_count}')
-            print(f'Herbivore count: {self.herb_count}')
             self.run_year_cycle()
+
+            y_herb.append(self.herb_count)
+            y_carn.append(self.carn_count)
+
+            self.update_plot(y_herb, y_carn, ax, herb_line, carn_line)
+
         print('Simulation complete.')
+
+    def init_plot(self, y_herb, y_carn, num_years):
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
+        herb_line, = ax.plot(y_herb)
+        carn_line, = ax.plot(y_carn)
+        ax.legend(['Herbivore count', 'Carnivore count'])
+        ax.set_xlabel('Simulation year')
+        ax.set_ylabel('Animal count')
+        ax.set_ylim([0, self.animal_count])
+        ax.set_xlim([0, num_years])
+
+        plt.ion()
+        plt.show()
+
+        return ax, herb_line, carn_line
+
+    def update_plot(self, y_herb, y_carn, ax, herb_line, carn_line):
+        if max(y_herb) >= max(y_carn):
+            ax.set_ylim([0, max(y_herb) + 20])
+        else:
+            ax.set_ylim([0, max(y_carn) + 20])
+
+        herb_line.set_ydata(y_herb)
+        herb_line.set_xdata(range(len(y_herb)))
+        carn_line.set_ydata(y_carn)
+        carn_line.set_xdata(range(len(y_carn)))
+
+        plt.pause(0.05)
 
     @property
     def animal_count(self):
