@@ -3,10 +3,12 @@
 """
 Tests for animal class.
 """
-from src.biosim.animal import Herbivore, Animal
+from src.biosim.animal import Herbivore, Carnivore, Animal
 from src.biosim.interface import Simulation
 from src.biosim.landscape import Lowland
+
 import pytest
+
 
 class TestAnimal:
 
@@ -26,18 +28,27 @@ class TestAnimal:
         """
         pass
 
-
-class TestHerbivore:
-
-    """
-    Tests for herbivore class
-    """
-
     def test_constructor(self):
         """Herbivore can be created"""
         herb = Herbivore(weight=10, age=0)
-        assert isinstance(herb, Herbivore)
+        carn = Carnivore()
+        assert isinstance(herb, Herbivore), isinstance(carn, Carnivore)
 
+    def test_aging(self):
+        """
+        Test that the animal age increases
+        """
+        herb = Herbivore(weight=10, age=0)
+        carn = Carnivore(weight=10)
+        herb.aging()
+        carn.aging()
+        assert herb.age > 0, carn.age > 0
+
+
+class TestHerbivore:
+    """
+    Tests for herbivore class
+    """
     def test_eat_fodder(self):
         """
         Weight of animal shall increase after eating fodder
@@ -49,15 +60,6 @@ class TestHerbivore:
         # new weight
         herb_weight_after = herb.weight
         assert herb_weight < herb_weight_after
-
-    def test_aging(self):
-        """
-        Test that the animal age increases
-        """
-        herb = Herbivore(weight=10, age=0)
-        herb.aging()
-        assert herb.age > 0
-
 
 
     def test_give_birth(self):

@@ -27,7 +27,7 @@ class Simulation:
 
         for _ in range(200):  # Add animals
             self.animals.append(Herbivore(age=0, weight=20))
-        for _ in range(50):  # Add animals
+        for _ in range(2):  # Add animals
             self.animals.append(Carnivore(age=0, weight=20))
 
     def randomize(self):
@@ -38,6 +38,9 @@ class Simulation:
             random.shuffle(self.animals)
 
     def run_year_cycle(self):
+        """
+        Runs through each of the 6 yearly seasons for all cells
+        """
         #  1. Feeding
         self.cell.fodder = self.cell.f_max
         # Randomize animals before feeding
@@ -81,6 +84,9 @@ class Simulation:
         self.year += 1  # Add year to simulation
 
     def run_simulation(self, num_years):
+        """
+        :param num_years: number of years to simulate
+        """
         y_herb = [self.herb_count]
         y_carn = [self.carn_count]
 
@@ -112,7 +118,8 @@ class Simulation:
 
         return ax, herb_line, carn_line
 
-    def update_plot(self, y_herb, y_carn, ax, herb_line, carn_line):
+    @staticmethod
+    def update_plot(y_herb, y_carn, ax, herb_line, carn_line):
         if max(y_herb) >= max(y_carn):
             ax.set_ylim([0, max(y_herb) + 20])
         else:
