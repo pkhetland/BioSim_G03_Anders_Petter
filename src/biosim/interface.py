@@ -5,7 +5,7 @@ A basic interface file containing the minimum requirements for running a simulat
 with one animal in one cell.
 """
 
-from src.biosim.animal import Herbivore, Carnivore
+from src.biosim.animal import Herbivore, Carnivore, Animal
 from src.biosim.landscape import Lowland, Highland, Water, Desert
 
 import textwrap
@@ -29,7 +29,7 @@ class Simulation:
             (1, 3): Water(),
             (1, 4): Water(),
             (2, 1): Water(),
-            (2, 2): Water(),
+            (2, 2): Water(),  # Mid cell
             (2, 3): Lowland(),  # Mid cell
             (2, 4): Water(),
             (3, 1): Water(),
@@ -49,25 +49,25 @@ class Simulation:
         self._herb_line = None
         self._carn_line = None
 
-    @ property  # Should be replaced with classmethod in animal class
-    def total_animals(self):
+    @ property
+    def all_animals(self):
         total_animals = []
         for cell in self.landscape.values():
             if cell.is_mainland:
                 total_animals.extend(cell.animals)
         return total_animals
 
-    @ property  # Should be replaced with classmethod in animal class
+    @ property
     def total_animal_count(self):
-        return len(self.total_animals)
+        return sum([cell.animal_count for cell in self.landscape.values() if cell.is_mainland])
 
-    @property  # Should be replaced with classmethod in animal class
+    @property
     def total_herb_count(self):
-        return len([animal for animal in self.total_animals if animal.species == 'Herbivore'])
+        return sum([cell.herb_count for cell in self.landscape.values() if cell.is_mainland])
 
-    @property  # Should be replaced with classmethod in animal class
+    @property
     def total_carn_count(self):
-        return len([animal for animal in self.total_animals if animal.species == 'Carnivore'])
+        return sum([cell.carn_count for cell in self.landscape.values() if cell.is_mainland])
 
     def run_year_cycle(self):
         """
@@ -141,6 +141,7 @@ class Simulation:
                     if animal.death():
                         dead_animals.append(animal)
 
+                print(cell.animals)
                 cell.remove_animals(dead_animals)
 
                 self.year += 1  # Add year to simulation
@@ -155,6 +156,8 @@ class Simulation:
         ax = self.init_plot(num_years)
 
         for year in range(num_years):
+            print(Herbivore.herbivore_instance_count)
+            print(Carnivore.carnivore_instance_count)
             self.run_year_cycle()
 
             self._y_herb[year] = self.total_herb_count
@@ -175,7 +178,6 @@ class Simulation:
         ax.legend(["Herbivore count", "Carnivore count"])  # Insert legend into plot
         ax.set_xlabel("Simulation year")  # Define x-label
         ax.set_ylabel("Animal count")  # Define y-label
-        ax.set_ylim([0, self.total_animal_count])  # Initial y-limit is equal to animal total
         ax.set_xlim([0, num_years])  # x-limit is set permanently to amount of years to simulate
 
         plt.ion()  # Activate interactive mode
@@ -183,9 +185,10 @@ class Simulation:
         return ax
 
     def update_plot(self, ax):
-        """
-        Redraw plot with updated values
-        :param ax: Pyplot axis
+        """Redraw plot with updated values
+
+        :param ax: pyplot axis
+        :type ax: object
         """
         if max(self._y_herb) >= max(self._y_carn):  # Find the biggest count value in either y_herb or y_carn
             ax.set_ylim([0, max(self._y_herb) + 20])  # Set the y-lim to this max
@@ -199,21 +202,13 @@ class Simulation:
 
         plt.pause(1e-6)
 
-    # @property
-    # def mean_herb_fitness(self):
-    #     return np.mean([herb.fitness for herb in self.herbivore_list])
-    #
-    # @property
-    # def mean_carn_fitness(self):
-    #     return np.mean([carn.fitness for carn in self.carnivore_list])
-
 
 if __name__ == "__main__":
 
     sim = Simulation()  # Create simple simulation instance
 
-    sim.landscape[(2, 3)].add_animals([Herbivore(age=5, weight=20) for _ in range(200)])
-    # sim.landscape[(2, 3)].add_animals([Carnivore(age=5, weight=20) for _ in range(40)])
+    sim.landscape[(2, 3)].add_animals([Herbivore(age=5, weight=20) for _ in range(150)])
+    sim.landscape[(2, 3)].add_animals([Carnivore(age=5, weight=20) for _ in range(40)])
 
     # Test multi-cell sim
     # sim.landscape[(2, 3)].add_animals([Herbivore(age=5, weight=20) for _ in range(50)])
@@ -223,7 +218,3 @@ if __name__ == "__main__":
     input("Press enter...")
     # print([herb.fitness for herb in cell.sorted_herbivores])
     # print([carn.fitness for carn in cell.sorted_carnivores])
-
-    #herb_carn_single_cell
-    # for animal in sim.animals:
-    #     print(animal.birth_weight())

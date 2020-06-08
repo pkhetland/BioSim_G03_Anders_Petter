@@ -29,7 +29,7 @@ class Landscape:
         :type animal_list: list
         """
         self.herbivores.extend([animal for animal in animal_list if animal.species == 'Herbivore'])
-        self.herbivores.extend([animal for animal in animal_list if animal.species == 'Carnivore'])
+        self.carnivores.extend([animal for animal in animal_list if animal.species == 'Carnivore'])
 
     def remove_animals(self, animal_list):
         """Removes a list of animal objects from the cell class
@@ -40,7 +40,7 @@ class Landscape:
         for animal in animal_list:  # Iterate through animals in list
             if animal.species == 'Herbivore':
                 self.herbivores.remove(animal)
-            else:
+            elif animal.species == 'Carnivore':
                 self.carnivores.remove(animal)
 
     def randomize_herbs(self):
@@ -49,13 +49,22 @@ class Landscape:
         random.shuffle(self.herbivores)
 
     @property
+    def animals(self):
+        """Combines herbivores list and carnivores list
+
+        :return: Animal count
+        :rtype: int
+        """
+        return self.herbivores + self.carnivores
+
+    @property
     def animal_count(self):
         """Counts the number of animals in the cell
 
         :return: Animal count
         :rtype: int
         """
-        return len(self.herbivores) + len(self.carnivores)
+        return len(self.animals)
 
     @property
     def herb_count(self):
@@ -76,22 +85,13 @@ class Landscape:
         return len(self.carnivores)
 
     @property
-    def animals(self):
-        """Combines herbivores list and carnivores list
-
-        :return: Animal count
-        :rtype: int
-        """
-        return self.herbivores + self.carnivores
-
-    @property
     def sorted_carnivores(self):  # Will probably be moved to landscape classes
         """Sorts all `carnivores` by `fitness` from higher to lower
 
         :return: Sorted carnivores
         :rtype: list
         """
-        fitness_dict = dict([(animal, animal.fitness) for animal in self.carnivores])
+        fitness_dict = dict([(carn, carn.fitness) for carn in self.carnivores])
         sorted_carnivores = [
             pair[0]
             for pair in sorted(fitness_dict.items(), key=operator.itemgetter(1), reverse=True)
@@ -105,7 +105,7 @@ class Landscape:
         :return: Sorted carnivores
         :rtype: list
         """
-        fitness_dict = dict([(animal, animal.fitness) for animal in self.herbivore_list])
+        fitness_dict = dict([(herb, herb.fitness) for herb in self.herbivores])
         sorted_herbivores = [
             pair[0]
             for pair in sorted(fitness_dict.items(), key=operator.itemgetter(1), reverse=False)
