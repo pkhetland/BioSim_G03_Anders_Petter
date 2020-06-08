@@ -16,17 +16,28 @@ class TestAnimal:
     Tests for animal class
     """
     @pytest.fixture
-    def create_animals(self):
-        # Comment AH. Need a function to create
-        self.n_herbivores = 50
-        self.n_carnivores = 50
-        self.animals = Animal(self.n_herbivores, self.n_carnivores)
+    def set_parameters(self, death_prob=1):
+        # Comment AH. Need a function to create animals
 
-    def test_death(self):
+        # Probability of dying 1
+
+        self.death_prob = death_prob
+
+
+
+    def test_certain_death(self):
         """
-        Test that the probability of death is greater than zero
+        Test that the animal always must die given death_prob = 1
+        100 Herbivore instances all must die
+        See examples/biolab/test_bacteria.py
+        NOT WORKING, test fails
+
         """
-        pass
+        h = Herbivore()
+        for _ in range(100):
+            assert h.death()
+
+
 
     def test_constructor(self):
         """
