@@ -8,7 +8,7 @@ Test set for the initial Lowland class.
 import pytest
 
 from src.biosim.animal import Herbivore, Carnivore
-from src.biosim.landscape import Lowland, Highland, Ocean, Desert
+from src.biosim.landscape import Lowland, Highland, Water, Desert
 
 
 def test_lowland_instance():
@@ -33,10 +33,13 @@ def test_population():
     assert lowland.herb_count == 0
 
 
-def test_add_animal():
+def test_add_animals():
     """Add a mock up animal to the cell"""
     lowland = Lowland()
-    lowland.add_animal([Herbivore()])
+    lowland.add_animals([Herbivore()])
+    assert len(lowland.animals) == 1
+    assert lowland.herb_count == 1
+    assert lowland.carn_count == 0
 
 
 def test_animal_count():
