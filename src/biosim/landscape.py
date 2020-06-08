@@ -17,24 +17,39 @@ class Landscape:
     def __init__(self, f_max):
         self.f_max = f_max  # Set fodder amount for each new year
         self.fodder = f_max  # Set starting fodder amount to f_max
+        self.is_mainland = True
 
         self.animals = []
 
     def add_animals(self, animal_list):
+        """Adds a list of animals to the cell class
+
+        :param animal_list: A list containing animal objects
+        :type animal_list: list
+        """
         self.animals.extend(animal_list)
 
     def remove_animals(self, animal_list):
-        for animal in animal_list:
+        """Removes a list of animal objects from the cell class
+
+        :param animal_list: A list containing animal objects
+        :type animal_list: list
+        """
+        for animal in animal_list:  # Iterate through animals in list
             self.animals.remove(animal)
 
     def randomize(self):
-        """
-        Defining a function to randomize animals
+        """Shuffles the self.animals list
         """
         random.shuffle(self.animals)
 
     @property
     def animal_count(self):
+        """Counts the number of animals in cell
+
+        :return: Animal count
+        :rtype: int
+        """
         return len(self.animals)
 
     @property
@@ -100,4 +115,5 @@ class Desert(Landscape):
 
 
 class Water():
-    pass
+    def __init__(self):
+        self.is_mainland = False

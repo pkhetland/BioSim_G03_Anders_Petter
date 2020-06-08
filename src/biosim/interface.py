@@ -53,7 +53,7 @@ class Simulation:
     def total_animals(self):
         total_animals = []
         for cell in self.landscape.values():
-            if cell.__class__.__name__ != 'Water':
+            if cell.is_mainland:
                 total_animals.extend(cell.animals)
         return total_animals
 
@@ -223,7 +223,6 @@ if __name__ == "__main__":
     # sim.landscape[(2, 3)].add_animals([Herbivore(age=5, weight=20) for _ in range(50)])
 
     sim.run_simulation(num_years=1000)
-
 
     input("Press enter...")
     print([herb.fitness for herb in sim.sorted_herbivores])
