@@ -6,6 +6,7 @@ Lowland class for the simulation.
 
 import numpy as np
 import operator
+import random
 
 
 class Landscape:
@@ -22,6 +23,12 @@ class Landscape:
     def add_animals(self, animal_list):
         for animal in animal_list:
             self.animals.append(animal)
+
+    def randomize(self):
+        """
+        Defining a function to randomize animals
+        """
+        random.shuffle(self.animals)
 
     @property
     def animal_count(self):
@@ -68,7 +75,7 @@ class Lowland(Landscape):
     """
 
     def __init__(self, f_max=800.0, location=None):
-        super().init(f_max)
+        super().__init__(f_max)
 
 
 class Highland(Landscape):
@@ -77,12 +84,12 @@ class Highland(Landscape):
     """
 
     def __init__(self, f_max=300.0, location=None):
-        super().init(f_max)
+        super().__init__(f_max)
 
 
 class Desert(Landscape):
     pass
 
 
-class Ocean:
+class Water():
     pass
