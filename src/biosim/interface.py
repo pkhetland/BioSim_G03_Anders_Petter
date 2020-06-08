@@ -63,64 +63,61 @@ class Simulation:
 
     @property  # Should be replaced with classmethod in animal class
     def total_herb_count(self):
-        return len([animal for animal in self.total_animals if animal.__class__.__name__ == 'Herbivore'])
+        return len([animal for animal in self.total_animals if animal.species == 'Herbivore'])
 
     @property  # Should be replaced with classmethod in animal class
     def total_carn_count(self):
-        return len([animal for animal in self.total_animals if animal.__class__.__name__ == 'Carnivore'])
+        return len([animal for animal in self.total_animals if animal.species == 'Carnivore'])
 
     def run_year_cycle(self):
         """
         Runs through each of the 6 yearly seasons for all cells
         """
         for loc, cell in self.landscape.items():
-            if cell.__class__.__name__ != "Water":
+            if cell.is_mainland:
                 #  1. Feeding
                 cell.fodder = cell.f_max
                 # Randomize animals before feeding
                 if self._randomize_animals:
-                    cell.randomize()
+                    cell.randomize_herbs()
 
-                for herb in cell.herbivore_list:  # Herbivores eat first
-                    if cell.fodder != 0:
+                for herb in cell.herbivores:  # Herbivores eat first
+                    if not cell.is_empty:
                         herb.eat_fodder(cell)
 
-                for carn in cell.carnivore_list:  # Carnivores eat last
+                for carn in cell.carnivores:  # Carnivores eat last
                     herbs_killed = carn.kill_prey(
                         cell.sorted_herbivores
                     )  # Carnivore hunts for herbivores
-                    for herb in herbs_killed:
-                        cell.animals.remove(herb)
+                    cell.remove_animals(herbs_killed)  # Remove killed animals from cell
 
                 #  2. Procreation
-                for herb in cell.herbivore_list:  # Herbivores give birth
-                    give_birth, birth_weight = herb.give_birth(cell.herb_count)
+                new_animals = []
 
-                    if give_birth:
-                        cell.animals.append(Herbivore(weight=birth_weight, age=0))
+                for herb in cell.herbivores:  # Herbivores give birth)
+                    if herb.give_birth(cell.herb_count):
+                        new_animals.append(Herbivore(weight=herb.birth_weight, age=0))
 
-                for carn in cell.carnivore_list:  # Carnivores give birth
-                    give_birth, birth_weight = carn.give_birth(cell.carn_count)
+                for carn in cell.carnivores:  # Carnivores give birth
+                    if carn.give_birth(cell.carn_count):
+                        new_animals.append(Carnivore(weight=carn.birth_weight, age=0))
 
-                    if give_birth:
-                        cell.animals.append(Carnivore(weight=birth_weight, age=0))
+                cell.add_animals(new_animals)  # Add new animals to cell
 
                 #  3. Migration
+                # Define neighbor cells once:
+                neighbor_cells = [
+                    self.landscape[(loc[0] - 1, loc[1])],
+                    self.landscape[(loc[0], loc[1] + 1)],
+                    self.landscape[(loc[0] + 1, loc[1])],
+                    self.landscape[(loc[0], loc[1] - 1)]
+                ]
+
                 removed_animals = []
                 for animal in cell.animals:
-                    will_migrate = animal.migrate()
-
-                    if will_migrate:
-                        top_neighbor = self.landscape[(loc[0]-1, loc[1])]
-                        right_neighbor = self.landscape[(loc[0], loc[1]+1)]
-                        bot_neighbor = self.landscape[(loc[0]+1, loc[1])]
-                        left_neighbor = self.landscape[(loc[0], loc[1]-1)]
-
-                        available_neighbors = [neighbor for neighbor in [top_neighbor,
-                                                                         right_neighbor,
-                                                                         bot_neighbor,
-                                                                         left_neighbor]
-                                               if neighbor.__class__.__name__ != 'Water'
+                    if animal.migrate():
+                        available_neighbors = [neighbor for neighbor in neighbor_cells
+                                               if neighbor.is_mainland
                                                ]
 
                         if len(available_neighbors) > 0:
@@ -144,8 +141,7 @@ class Simulation:
                     if animal.death():
                         dead_animals.append(animal)
 
-                for animal in dead_animals:
-                    cell.animals.remove(animal)
+                cell.remove_animals(dead_animals)
 
                 self.year += 1  # Add year to simulation
 
@@ -216,17 +212,17 @@ if __name__ == "__main__":
 
     sim = Simulation()  # Create simple simulation instance
 
-    sim.landscape[(2, 3)].add_animals([Herbivore(age=5, weight=20) for _ in range(150)])
+    sim.landscape[(2, 3)].add_animals([Herbivore(age=5, weight=20) for _ in range(200)])
     # sim.landscape[(2, 3)].add_animals([Carnivore(age=5, weight=20) for _ in range(40)])
 
     # Test multi-cell sim
     # sim.landscape[(2, 3)].add_animals([Herbivore(age=5, weight=20) for _ in range(50)])
 
-    sim.run_simulation(num_years=1000)
+    sim.run_simulation(num_years=200)
 
     input("Press enter...")
-    print([herb.fitness for herb in sim.sorted_herbivores])
-    print([carn.fitness for carn in sim.sorted_carnivores])
+    # print([herb.fitness for herb in cell.sorted_herbivores])
+    # print([carn.fitness for carn in cell.sorted_carnivores])
 
     #herb_carn_single_cell
     # for animal in sim.animals:

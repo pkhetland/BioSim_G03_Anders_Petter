@@ -20,9 +20,12 @@ class Animal:
         else:
             self.weight = weight
         self.age = age
+
+        self.species = self.__class__.__name__
         self.death_prob = None
 
         np.random.seed(123)
+
 
     def aging(self):
         """
@@ -36,7 +39,7 @@ class Animal:
         """
         birth_prob = self.p["gamma"] * self.fitness * n_same - 1
         if self.weight < self.p["zeta"] * (self.p["w_birth"] + self.p["sigma_birth"]):
-            return False, None  # Return false if weight of mother is less than birth
+            return False  # Return false if weight of mother is less than birth
         elif birth_prob >= 1:
             give_birth = True
         elif 0 < birth_prob < 1:
@@ -48,11 +51,11 @@ class Animal:
             birth_weight = self.birth_weight
             if birth_weight < self.weight:
                 self.weight -= self.p["xi"] * birth_weight
-                return True, birth_weight
+                return True
             else:
-                return False, None
+                return False
         else:
-            return False, None
+            return False
 
     def migrate(self):
         """
@@ -189,7 +192,6 @@ class Carnivore(Animal):
             self.p = p
 
         super().__init__(weight, age)
-        # super().add_animal()
 
     def kill_prey(self, sorted_herbivores):
         consumption_weight = 0
