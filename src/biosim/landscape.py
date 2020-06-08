@@ -21,8 +21,7 @@ class Landscape:
         self.animals = []
 
     def add_animals(self, animal_list):
-        for animal in animal_list:
-            self.animals.append(animal)
+        self.animals.extend(animal_list)
 
     def randomize(self):
         """

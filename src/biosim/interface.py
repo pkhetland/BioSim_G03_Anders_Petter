@@ -27,7 +27,7 @@ class Simulation:
             (1, 1): Water(),
             (1, 2): Water(),
             (1, 3): Water(),
-            (2, 1): Water(),
+            (2, 1): Lowland(f_max=700.0),
             (2, 2): Lowland(f_max=700.0),
             (2, 3): Water(),
             (3, 1): Water(),
@@ -36,6 +36,7 @@ class Simulation:
         }
 
         self.year = 0
+
         random.seed(seed)
         self.randomize_animals = randomize_animals
 
@@ -139,8 +140,6 @@ class Simulation:
 
             self.update_plot(ax)
 
-            print(self.total_animal_count)
-
         print("Simulation complete.")
 
     def init_plot(self, num_years):
@@ -191,7 +190,9 @@ if __name__ == "__main__":
 
     sim.landscape[(2, 2)].add_animals([Herbivore(age=5, weight=20) for _ in range(150)])
 
-    sim.landscape[(2, 2)].add_animals([Carnivore(age=5, weight=20) for _ in range(40)])
+    sim.landscape[(2, 2)].add_animals([Carnivore(age=5, weight=20) for _ in range(20)])
+
+    # sim.landscape[(2, 1)].add_animals([Herbivore(age=5, weight=20) for _ in range(50)])
 
     sim.run_simulation(num_years=200)
 
