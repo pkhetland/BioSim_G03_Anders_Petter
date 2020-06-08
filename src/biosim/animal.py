@@ -20,6 +20,7 @@ class Animal:
         else:
             self.weight = weight
         self.age = age
+        self.death_prob = None
 
         # self.add_animal()
         np.random.seed(1234)
@@ -68,9 +69,11 @@ class Animal:
         if self.weight <= 0:
             return True
         else:
-            death_prob = self.p["omega"] * (1 - self.fitness)
-            death = np.random.choice([True, False], p=[death_prob, 1-death_prob])
-            return death
+            if self.death_prob is None:
+                self.death_prob = self.p["omega"] * (1 - self.fitness)
+                death = np.random.choice([True, False], p=[self.death_prob, 1-self.death_prob])
+                self.death_prob = None
+                return death
 
     # @classmethod
     # def add_animal(cls):
@@ -211,8 +214,10 @@ class Carnivore(Animal):
         return herbs_killed
 
 #
-# if __name__ == "__main__":
-#     herb1 = Herbivore()
-#     carn1 = Carnivore()
-#     print(herb1.birth_weight)
-#     print(carn1.birth_weight)
+if __name__ == "__main__":
+     herb1 = Herbivore()
+     carn1 = Carnivore()
+     print(herb1.death())
+     print(herb1.fitness)
+     print(herb1.birth_weight)
+     print(carn1.birth_weight)
