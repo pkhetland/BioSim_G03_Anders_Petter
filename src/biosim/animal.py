@@ -41,7 +41,7 @@ class Animal:
         elif birth_prob >= 1:
             give_birth = True
         elif 0 < birth_prob < 1:
-            give_birth = np.random.choice([True, False], p=[birth_prob, 1-birth_prob])
+            give_birth = np.random.choice([True, False], p=[birth_prob, 1 - birth_prob])
         else:
             give_birth = False
 
@@ -59,7 +59,7 @@ class Animal:
         """
         Animals lose weight based on eta parameter
         """
-        self.weight -= self.weight * self.p['eta']
+        self.weight -= self.weight * self.p["eta"]
 
     def death(self):
         """
@@ -112,7 +112,6 @@ class Animal:
 
 
 class Herbivore(Animal):
-
     def __init__(self, weight=None, age=0, p=None):
 
         if p is None:  # If no parameters are specified
@@ -130,7 +129,7 @@ class Herbivore(Animal):
                 "zeta": 3.5,
                 "xi": 1.2,
                 "omega": 0.4,
-                "F": 10.0
+                "F": 10.0,
             }
         else:
             self.p = p
@@ -152,7 +151,7 @@ class Herbivore(Animal):
             cell.fodder = 0  # Sets fodder to zero.
 
         else:
-            print('Out of food')
+            print("Out of food")
             return
 
 
@@ -160,6 +159,7 @@ class Carnivore(Animal):
     """
     Carnivore class
     """
+
     def __init__(self, weight=None, age=0, p=None):
         if p is None:  # If no parameters are specified
             self.p = {  # Insert default values for species
@@ -177,7 +177,7 @@ class Carnivore(Animal):
                 "xi": 1.1,
                 "omega": 0.8,
                 "F": 50.0,
-                "DeltaPhiMax": 10.0
+                "DeltaPhiMax": 10.0,
             }
         else:
             self.p = p
@@ -190,28 +190,31 @@ class Carnivore(Animal):
         herbs_killed = []
 
         for herb in sorted_herbivores:
-            if consumption_weight < self.p['F']:
+            if consumption_weight < self.p["F"]:
                 fitness_diff = self.fitness - herb.fitness
                 if fitness_diff <= 0:
                     kill_prey = False
 
-                elif 0 < fitness_diff < self.p['DeltaPhiMax']:
-                    kill_prob = fitness_diff / self.p['DeltaPhiMax']
-                    kill_prey = np.random.choice([True, False], p=[kill_prob, 1-kill_prob])
+                elif 0 < fitness_diff < self.p["DeltaPhiMax"]:
+                    kill_prob = fitness_diff / self.p["DeltaPhiMax"]
+                    kill_prey = np.random.choice([True, False], p=[kill_prob, 1 - kill_prob])
 
                 else:
                     kill_prey = True
 
                 if kill_prey:  # If the herb is killed
-                    consumption_weight += herb.weight  # Add herb weight to consumption_weight variable
+                    consumption_weight += (
+                        herb.weight
+                    )  # Add herb weight to consumption_weight variable
                     herbs_killed.append(herb)
 
-        if consumption_weight > self.p['F']:  # Auto-adjust consumption_weight to be <= F-parameter
-            consumption_weight = self.p['F']
+        if consumption_weight > self.p["F"]:  # Auto-adjust consumption_weight to be <= F-parameter
+            consumption_weight = self.p["F"]
 
-        self.weight += consumption_weight * self.p['beta']  # Add weight to carnivore
+        self.weight += consumption_weight * self.p["beta"]  # Add weight to carnivore
 
         return herbs_killed
+
 
 #
 if __name__ == "__main__":
