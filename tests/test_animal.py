@@ -39,37 +39,29 @@ class TestAnimal:
         h.weight = 0
         assert h.death()
 
-    def test_death_z_test(self, seed=123):
+    def test_death_z_test(self):
 
         """
+        Souce: biolab/test_bacteria.py
 
+        Probabilistic test of death function. Test the number of deaths is
+        normally distributed for large number of animals. And the death probability is
+        significant with a p-value of 0.01.
         """
 
-        random.seed = seed
-        a = Herbivore(age=0, weight=10)
         b = Herbivore(age=0, weight=10)
-        a.death_prob = 0.5
-        p = a.death_prob
+        # Set mocking parameter of the death probability of the animal
+        p = 0.3
+        # 100 animals
         N = 100
         n = sum(b.death() for _ in range(N))
-        print(n)
-        print([b.death() for _ in range(10)])
-        print([a.death() for _ in range(10)])
+        # print([b.death() for _ in range(10)])
 
         mean = N * p * (1-p)
-        print(mean)
         var = N * p * (1-p)
         Z = (n-mean) / math.sqrt(var)
-        print(Z)
         phi = 2 * stats.norm.cdf(-abs(Z))
-        print(phi)
         assert phi > 0.01
-
-
-
-
-
-
 
     def test_constructor(self):
         """
