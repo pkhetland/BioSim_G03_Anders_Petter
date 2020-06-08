@@ -21,8 +21,7 @@ class Animal:
             self.weight = weight
         self.age = age
 
-        # self.add_animal()
-        np.random.seed(1234)
+        np.random.seed(123)
 
     def aging(self):
         """
@@ -53,6 +52,13 @@ class Animal:
                 return False, None
         else:
             return False, None
+
+    def migrate(self):
+        """
+        Returns bool indicating whether animal will migrate
+        """
+        move_prob = self.p['mu'] * self.fitness
+        return np.random.choice([True, False], p=[move_prob, 1-move_prob])
 
     def lose_weight(self):
         """

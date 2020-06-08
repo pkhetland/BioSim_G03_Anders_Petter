@@ -21,30 +21,33 @@ class Simulation:
     Main interface class for BioSim
     """
 
-    def __init__(self, seed=1234, randomize_animals=True):
+    def __init__(self, seed=123, randomize_animals=True):
 
-        self.landscape = {
+        self.landscape = {  # Hard-coded map
             (1, 1): Water(),
             (1, 2): Water(),
             (1, 3): Water(),
-            (2, 1): Lowland(f_max=700.0),
-            (2, 2): Lowland(f_max=700.0),
-            (2, 3): Water(),
+            (1, 4): Water(),
+            (2, 1): Water(),
+            (2, 2): Water(),
+            (2, 3): Lowland(),  # Mid cell
+            (2, 4): Water(),
             (3, 1): Water(),
             (3, 2): Water(),
             (3, 3): Water(),
+            (3, 4): Water()
         }
 
         self.year = 0
 
         random.seed(seed)
-        self.randomize_animals = randomize_animals
+        self._randomize_animals = randomize_animals
 
         # Arguments for plotting
-        self.y_herb = None
-        self.y_carn = None
-        self.herb_line = None
-        self.carn_line = None
+        self._y_herb = None
+        self._y_carn = None
+        self._herb_line = None
+        self._carn_line = None
 
     @ property  # Should be replaced with classmethod in animal class
     def total_animals(self):
@@ -70,12 +73,12 @@ class Simulation:
         """
         Runs through each of the 6 yearly seasons for all cells
         """
-        for cell in self.landscape.values():
+        for loc, cell in self.landscape.items():
             if cell.__class__.__name__ != "Water":
                 #  1. Feeding
                 cell.fodder = cell.f_max
                 # Randomize animals before feeding
-                if self.randomize_animals:
+                if self._randomize_animals:
                     cell.randomize()
 
                 for herb in cell.herbivore_list:  # Herbivores eat first
@@ -103,6 +106,29 @@ class Simulation:
                         cell.animals.append(Carnivore(weight=birth_weight, age=0))
 
                 #  3. Migration
+                removed_animals = []
+                for animal in cell.animals:
+                    will_migrate = animal.migrate()
+
+                    if will_migrate:
+                        top_neighbor = self.landscape[(loc[0]-1, loc[1])]
+                        right_neighbor = self.landscape[(loc[0], loc[1]+1)]
+                        bot_neighbor = self.landscape[(loc[0]+1, loc[1])]
+                        left_neighbor = self.landscape[(loc[0], loc[1]-1)]
+
+                        available_neighbors = [neighbor for neighbor in [top_neighbor,
+                                                                         right_neighbor,
+                                                                         bot_neighbor,
+                                                                         left_neighbor]
+                                               if neighbor.__class__.__name__ != 'Water'
+                                               ]
+
+                        if len(available_neighbors) > 0:
+                            chosen_cell = np.random.choice(available_neighbors)
+                            chosen_cell.add_animals([animal])
+                            removed_animals.append(animal)
+
+                cell.remove_animals(removed_animals)
 
                 #  4. Aging
                 for animal in cell.animals:
@@ -127,16 +153,16 @@ class Simulation:
         """
         :param num_years: number of years to simulate
         """
-        self.y_herb = [np.nan for _ in range(num_years)]
-        self.y_carn = [np.nan for _ in range(num_years)]
+        self._y_herb = [np.nan for _ in range(num_years)]
+        self._y_carn = [np.nan for _ in range(num_years)]
 
         ax = self.init_plot(num_years)
 
         for year in range(num_years):
             self.run_year_cycle()
 
-            self.y_herb[year] = self.total_herb_count
-            self.y_carn[year] = self.total_carn_count
+            self._y_herb[year] = self.total_herb_count
+            self._y_carn[year] = self.total_carn_count
 
             self.update_plot(ax)
 
@@ -144,34 +170,36 @@ class Simulation:
 
     def init_plot(self, num_years):
         """
-        :param y_herb: List of herbivore counts
-        :param y_carn: List of carnivore counts
         :param num_years: Number of years to run sim for x-axis
         """
-        fig = plt.figure()
-        ax = fig.add_subplot(111)
-        (self.herb_line,) = ax.plot(self.y_herb)
-        (self.carn_line,) = ax.plot(self.y_carn)
-        ax.legend(["Herbivore count", "Carnivore count"])
-        ax.set_xlabel("Simulation year")
-        ax.set_ylabel("Animal count")
-        ax.set_ylim([0, self.total_animal_count])
-        ax.set_xlim([0, num_years])
+        fig = plt.figure()  # Initiate pyplot
+        ax = fig.add_subplot(111)  # Add a single subplot
+        (self._herb_line,) = ax.plot(self._y_herb)  # Initiate the herbivore line
+        (self._carn_line,) = ax.plot(self._y_carn)  # Initiate the carnivore line
+        ax.legend(["Herbivore count", "Carnivore count"])  # Insert legend into plot
+        ax.set_xlabel("Simulation year")  # Define x-label
+        ax.set_ylabel("Animal count")  # Define y-label
+        ax.set_ylim([0, self.total_animal_count])  # Initial y-limit is equal to animal total
+        ax.set_xlim([0, num_years])  # x-limit is set permanently to amount of years to simulate
 
-        plt.ion()
+        plt.ion()  # Activate interactive mode
 
         return ax
 
     def update_plot(self, ax):
-        if max(self.y_herb) >= max(self.y_carn):
-            ax.set_ylim([0, max(self.y_herb) + 20])
+        """
+        Redraw plot with updated values
+        :param ax: Pyplot axis
+        """
+        if max(self._y_herb) >= max(self._y_carn):  # Find the biggest count value in either y_herb or y_carn
+            ax.set_ylim([0, max(self._y_herb) + 20])  # Set the y-lim to this max
         else:
-            ax.set_ylim([0, max(self.y_carn) + 20])
+            ax.set_ylim([0, max(self._y_carn) + 20])  #
 
-        self.herb_line.set_ydata(self.y_herb)
-        self.herb_line.set_xdata(range(len(self.y_herb)))
-        self.carn_line.set_ydata(self.y_carn)
-        self.carn_line.set_xdata(range(len(self.y_carn)))
+        self._herb_line.set_ydata(self._y_herb)
+        self._herb_line.set_xdata(range(len(self._y_herb)))
+        self._carn_line.set_ydata(self._y_carn)
+        self._carn_line.set_xdata(range(len(self._y_carn)))
 
         plt.pause(1e-6)
 
@@ -188,13 +216,13 @@ if __name__ == "__main__":
 
     sim = Simulation()  # Create simple simulation instance
 
-    sim.landscape[(2, 2)].add_animals([Herbivore(age=5, weight=20) for _ in range(150)])
+    sim.landscape[(2, 3)].add_animals([Herbivore(age=5, weight=20) for _ in range(150)])
+    # sim.landscape[(2, 3)].add_animals([Carnivore(age=5, weight=20) for _ in range(40)])
 
-    sim.landscape[(2, 2)].add_animals([Carnivore(age=5, weight=20) for _ in range(20)])
+    # Test multi-cell sim
+    # sim.landscape[(2, 3)].add_animals([Herbivore(age=5, weight=20) for _ in range(50)])
 
-    # sim.landscape[(2, 1)].add_animals([Herbivore(age=5, weight=20) for _ in range(50)])
-
-    sim.run_simulation(num_years=200)
+    sim.run_simulation(num_years=1000)
 
     input("Press enter...")
     # for animal in sim.animals:

@@ -23,6 +23,10 @@ class Landscape:
     def add_animals(self, animal_list):
         self.animals.extend(animal_list)
 
+    def remove_animals(self, animal_list):
+        for animal in animal_list:
+            self.animals.remove(animal)
+
     def randomize(self):
         """
         Defining a function to randomize animals
@@ -87,7 +91,12 @@ class Highland(Landscape):
 
 
 class Desert(Landscape):
-    pass
+    """
+    Desert class for cells.
+    No fodder available for herbivores, but carnivores may kill herbivores.
+    """
+    def __init__(self):
+        super().__init__(f_max=0.0)  # Forces fodder to be 0
 
 
 class Water():
