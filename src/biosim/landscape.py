@@ -16,6 +16,56 @@ class Lowland:
         self.f_max = f_max  # Set fodder amount for each new year
         self.fodder = f_max  # Set starting fodder amount to f_max
 
+        self.animals = []
+
+    def add_animals(self, animal_list):
+        for animal in animal_list:
+            self.animals.append(animal)
+
+    @property
+    def animal_count(self):
+        return len(self.animals)
+
+    @property
+    def herb_count(self):
+        return len(self.herbivore_list)
+
+    @property
+    def carn_count(self):
+        return len(self.carnivore_list)
+
+    @property
+    def herbivore_list(self):
+        return [animal for animal in self.animals if animal.__class__.__name__ == 'Herbivore']
+
+    @property
+    def carnivore_list(self):
+        return [animal for animal in self.animals if animal.__class__.__name__ == 'Carnivore']
+
+    @property
+    def sorted_carnivores(self):  # Will probably be moved to landscape classes
+        fitness_dict = dict([
+            (animal, animal.fitness) for animal in self.carnivore_list
+        ])
+        sorted_carn_list = [
+            pair[0] for pair in sorted(fitness_dict.items(),
+                                       key=operator.itemgetter(1),
+                                       reverse=True)
+        ]
+        return sorted_carn_list
+
+    @property
+    def sorted_herbivores(self):  # Will probably be moved to landscape classes
+        fitness_dict = dict([
+            (animal, animal.fitness) for animal in self.herbivore_list
+        ])
+        sorted_herb_list = [
+            pair[0] for pair in sorted(fitness_dict.items(),
+                                       key=operator.itemgetter(1),
+                                       reverse=False)
+        ]
+        return sorted_herb_list
+
 
 class Highland:
     """
