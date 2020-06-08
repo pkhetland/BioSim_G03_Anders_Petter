@@ -20,11 +20,19 @@ class Simulation:
     """
     Main interface class for BioSim
     """
+
     def __init__(self, seed=1234, randomize_animals=True):
+
         self.landscape = {
-            (1, 1): Ocean(), (1, 2): Ocean(), (1, 3): Ocean(),
-            (2, 1): Ocean(), (2, 2): Lowland(f_max=700.0), (2, 3): Ocean(),
-            (3, 1): Ocean(), (3, 2): Ocean(), (3, 3): Ocean(),
+            (1, 1): Ocean(),
+            (1, 2): Ocean(),
+            (1, 3): Ocean(),
+            (2, 1): Ocean(),
+            (2, 2): Lowland(f_max=700.0),
+            (2, 3): Ocean(),
+            (3, 1): Ocean(),
+            (3, 2): Ocean(),
+            (3, 3): Ocean(),
         }
         self.animals = []
         self.year = 0
@@ -47,7 +55,7 @@ class Simulation:
         Runs through each of the 6 yearly seasons for all cells
         """
         for cell in self.landscape.values():
-            if cell.__class__.__name__ != 'Ocean':
+            if cell.__class__.__name__ != "Ocean":
                 #  1. Feeding
                 cell.fodder = cell.f_max
                 # Randomize animals before feeding
@@ -59,7 +67,9 @@ class Simulation:
                         herb.eat_fodder(cell)
 
                 for carn in self.carnivore_list:  # Carnivores eat last
-                    herbs_killed = carn.kill_prey(self.sorted_herbivores)  # Carnivore hunts for herbivores
+                    herbs_killed = carn.kill_prey(
+                        self.sorted_herbivores
+                    )  # Carnivore hunts for herbivores
                     for herb in herbs_killed:
                         self.animals.remove(herb)
 
@@ -101,12 +111,10 @@ class Simulation:
         """
         :param num_years: number of years to simulate
         """
-        y_herb = [self.herb_count] + [np.nan for _ in range(num_years-1)]
-        y_carn = [self.carn_count] + [np.nan for _ in range(num_years-1)]
+        y_herb = [np.nan for _ in range(num_years)]
+        y_carn = [np.nan for _ in range(num_years)]
 
-        ax, herb_line, carn_line = self.init_plot(y_herb,
-                                                  y_carn,
-                                                  num_years)
+        ax, herb_line, carn_line = self.init_plot(y_herb, y_carn, num_years)
 
         for year in range(num_years):
             self.run_year_cycle()
@@ -114,21 +122,14 @@ class Simulation:
             y_herb = herb_line.get_ydata()
             y_carn = carn_line.get_ydata()
 
-            y_herb[year+1] = self.herb_count
-            y_carn[year + 1] = self.carn_count
+            y_herb[year] = self.herb_count
+            y_carn[year] = self.carn_count
 
-            self.update_plot(y_herb,
-                             y_carn,
-                             ax,
-                             herb_line,
-                             carn_line)
+            self.update_plot(y_herb, y_carn, ax, herb_line, carn_line)
 
-        print('Simulation complete.')
+        print("Simulation complete.")
 
-    def init_plot(self,
-                  y_herb,
-                  y_carn,
-                  num_years):
+    def init_plot(self, y_herb, y_carn, num_years):
         """
         :param y_herb: List of herbivore counts
         :param y_carn: List of carnivore counts
@@ -136,11 +137,11 @@ class Simulation:
         """
         fig = plt.figure()
         ax = fig.add_subplot(111)
-        herb_line, = ax.plot(y_herb)
-        carn_line, = ax.plot(y_carn)
-        ax.legend(['Herbivore count', 'Carnivore count'])
-        ax.set_xlabel('Simulation year')
-        ax.set_ylabel('Animal count')
+        (herb_line,) = ax.plot(y_herb)
+        (carn_line,) = ax.plot(y_carn)
+        ax.legend(["Herbivore count", "Carnivore count"])
+        ax.set_xlabel("Simulation year")
+        ax.set_ylabel("Animal count")
         ax.set_ylim([0, self.animal_count])
         ax.set_xlim([0, num_years])
 
@@ -148,12 +149,7 @@ class Simulation:
 
         return ax, herb_line, carn_line
 
-    @staticmethod
-    def update_plot(y_herb,
-                    y_carn,
-                    ax,
-                    herb_line,
-                    carn_line):
+    def update_plot(y_herb, y_carn, ax, herb_line, carn_line):
         if max(y_herb) >= max(y_carn):
             ax.set_ylim([0, max(y_herb) + 20])
         else:
@@ -180,33 +176,27 @@ class Simulation:
 
     @property
     def herbivore_list(self):
-        return [animal for animal in self.animals if animal.__class__.__name__ == 'Herbivore']
+        return [animal for animal in self.animals if animal.__class__.__name__ == "Herbivore"]
 
     @property
     def carnivore_list(self):
-        return [animal for animal in self.animals if animal.__class__.__name__ == 'Carnivore']
+        return [animal for animal in self.animals if animal.__class__.__name__ == "Carnivore"]
 
     @property
     def sorted_carnivores(self):  # Will probably be moved to landscape classes
-        fitness_dict = dict([
-            (animal, animal.fitness) for animal in self.carnivore_list
-        ])
+        fitness_dict = dict([(animal, animal.fitness) for animal in self.carnivore_list])
         sorted_carn_list = [
-            pair[0] for pair in sorted(fitness_dict.items(),
-                                       key=operator.itemgetter(1),
-                                       reverse=True)
+            pair[0]
+            for pair in sorted(fitness_dict.items(), key=operator.itemgetter(1), reverse=True)
         ]
         return sorted_carn_list
 
     @property
     def sorted_herbivores(self):  # Will probably be moved to landscape classes
-        fitness_dict = dict([
-            (animal, animal.fitness) for animal in self.herbivore_list
-        ])
+        fitness_dict = dict([(animal, animal.fitness) for animal in self.herbivore_list])
         sorted_herb_list = [
-            pair[0] for pair in sorted(fitness_dict.items(),
-                                       key=operator.itemgetter(1),
-                                       reverse=False)
+            pair[0]
+            for pair in sorted(fitness_dict.items(), key=operator.itemgetter(1), reverse=False)
         ]
         return sorted_herb_list
 
@@ -219,11 +209,12 @@ class Simulation:
     #     return np.mean([carn.fitness for carn in self.carnivore_list])
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
 
     sim = Simulation()  # Create simple simulation instance
 
-    sim.run_simulation(num_years=1000)
+    sim.run_simulation(num_years=200)
 
+    input("Press enter...")
     # for animal in sim.animals:
     #     print(animal.birth_weight())
