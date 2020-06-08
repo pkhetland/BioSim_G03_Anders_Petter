@@ -15,18 +15,29 @@ class TestAnimal:
     """
     Tests for animal class
     """
-    @pytest.fixture
-    def create_animals(self):
-        # Comment AH. Need a function to create
-        self.n_herbivores = 50
-        self.n_carnivores = 50
-        self.animals = Animal(self.n_herbivores, self.n_carnivores)
+    """
+    def test_death_prob(self):
+        # Comment AH. Need a function to create animals
 
-    def test_death(self):
+        # Probability of dying 1
+
+        self.death_prob = 1
         """
-        Test that the probability of death is greater than zero
+
+
+
+    def test_certain_death(self):
         """
-        pass
+        Test that the animal always must die given death_prob = 1
+        100 Herbivore instances all must die
+        See examples/biolab/test_bacteria.py
+
+        """
+        h = Herbivore()
+        h.weight = 0
+        assert h.death()
+
+
 
     def test_constructor(self):
         """
@@ -51,10 +62,14 @@ class TestAnimal:
         Test that animals lose weight
         """
         herb, carn = Herbivore(weight=20), Carnivore(weight=20)
+        # Decreasing parameters
+        herb.p['eta'] = 0.1
+        carn.p['eta'] = 0.2
+        herb_initial_weight, carn_initial_weight = herb.weight, carn.weight
         herb.lose_weight(), carn.lose_weight()
-
-        assert herb.weight == (20 - (20 * herb.p['eta']))
-        assert carn.weight == (20 - (20 * carn.p['eta']))
+        # New weight of animal must be less than before
+        assert herb.weight < herb_initial_weight
+        assert carn.weight < carn_initial_weight
 
     def test_parameters(self):
         """
@@ -94,6 +109,7 @@ class TestCarnivore:
     def test_kill_prey(self):
         carn = Carnivore(age=5, weight=90)
         killed_herbivores = carn.kill_prey([Herbivore(age=10, weight=10), Herbivore(age=5, weight=80)])
+        assert len(killed_herbivores) > 0
         assert carn.weight > 40
 
 

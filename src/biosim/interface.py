@@ -224,6 +224,11 @@ if __name__ == "__main__":
 
     sim.run_simulation(num_years=1000)
 
+
     input("Press enter...")
+    print([herb.fitness for herb in sim.sorted_herbivores])
+    print([carn.fitness for carn in sim.sorted_carnivores])
+
+    #herb_carn_single_cell
     # for animal in sim.animals:
     #     print(animal.birth_weight())
