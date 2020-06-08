@@ -6,6 +6,9 @@ Tests for animal class.
 from src.biosim.animal import Herbivore, Carnivore, Animal
 from src.biosim.interface import Simulation
 from src.biosim.landscape import Lowland
+import random as random
+import math
+import scipy.stats as stats
 
 import pytest
 
@@ -25,7 +28,6 @@ class TestAnimal:
         """
 
 
-
     def test_certain_death(self):
         """
         Test that the animal always must die given death_prob = 1
@@ -36,6 +38,36 @@ class TestAnimal:
         h = Herbivore()
         h.weight = 0
         assert h.death()
+
+    def test_death_z_test(self, seed=123):
+
+        """
+
+        """
+
+        random.seed = seed
+        a = Herbivore(age=0, weight=10)
+        b = Herbivore(age=0, weight=10)
+        a.death_prob = 0.5
+        p = a.death_prob
+        N = 100
+        n = sum(b.death() for _ in range(N))
+        print(n)
+        print([b.death() for _ in range(10)])
+        print([a.death() for _ in range(10)])
+
+        mean = N * p * (1-p)
+        print(mean)
+        var = N * p * (1-p)
+        Z = (n-mean) / math.sqrt(var)
+        print(Z)
+        phi = 2 * stats.norm.cdf(-abs(Z))
+        print(phi)
+        assert phi > 0.01
+
+
+
+
 
 
 

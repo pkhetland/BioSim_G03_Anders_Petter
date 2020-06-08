@@ -22,7 +22,7 @@ class Animal:
         self.age = age
         self.death_prob = None
 
-        np.random.seed(123)
+        np.random.seed(99876)
 
     def aging(self):
         """
@@ -72,6 +72,9 @@ class Animal:
         Return true when called if the animal is to be removed from the simulation
         and false otherwise.
         """
+        if self.death_prob:
+            death = np.random.choice([True, False], p=[self.death_prob, 1-self.death_prob])
+            return death
         if self.weight <= 0:
             return True
         else:
