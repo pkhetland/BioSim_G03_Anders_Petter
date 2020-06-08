@@ -12,14 +12,14 @@ class Animal:
     Super class for Herbivores and Carnivores
     """
 
-    # instance_count = 0
-
     def __init__(self, weight, age):
         if weight is None:
             self.weight = self.birth_weight
         else:
             self.weight = weight
         self.age = age
+
+        self.species = self.__class__.__name__
         self.death_prob = None
 
         np.random.seed(99876)
@@ -36,7 +36,7 @@ class Animal:
         """
         birth_prob = self.p["gamma"] * self.fitness * n_same - 1
         if self.weight < self.p["zeta"] * (self.p["w_birth"] + self.p["sigma_birth"]):
-            return False, None  # Return false if weight of mother is less than birth
+            return False  # Return false if weight of mother is less than birth
         elif birth_prob >= 1:
             give_birth = True
         elif 0 < birth_prob < 1:
@@ -48,11 +48,11 @@ class Animal:
             birth_weight = self.birth_weight
             if birth_weight < self.weight:
                 self.weight -= self.p["xi"] * birth_weight
-                return True, birth_weight
+                return True
             else:
-                return False, None
+                return False
         else:
-            return False, None
+            return False
 
     def migrate(self):
         """
@@ -73,21 +73,14 @@ class Animal:
         and false otherwise.
         """
         if self.weight <= 0:
-            return True
+            death = True
         else:
             if self.death_prob is None:
                 self.death_prob = self.p["omega"] * (1 - self.fitness)
-                death = np.random.choice([True, False], p=[self.death_prob, 1-self.death_prob])
+                death = np.random.choice([True, False], p=[self.death_prob, 1 - self.death_prob])
                 self.death_prob = None
-                return death
 
-    # @classmethod
-    # def add_animal(cls):
-    #     cls.instance_count += 1
-    #
-    # @classmethod
-    # def remove_animal(cls):
-    #     cls.instance_count -= 1
+        return death
 
     @staticmethod
     def q(sgn, x, x_half, phi):
@@ -118,6 +111,9 @@ class Animal:
 
 
 class Herbivore(Animal):
+
+    herbivore_instance_count = 0
+
     def __init__(self, weight=None, age=0, p=None):
 
         if p is None:  # If no parameters are specified
@@ -140,8 +136,17 @@ class Herbivore(Animal):
         else:
             self.p = p
 
+        self.count_herbivore()
+
         super().__init__(weight, age)
-        # super().add_animal()
+
+    @classmethod
+    def count_herbivore(cls):
+        cls.herbivore_instance_count += 1
+
+    @classmethod
+    def subtract_herbivore(cls):
+        cls.herbivore_instance_count -= 1
 
     def eat_fodder(self, cell):
         """
@@ -156,15 +161,13 @@ class Herbivore(Animal):
             self.weight += cell.fodder  # Eat fodder
             cell.fodder = 0  # Sets fodder to zero.
 
-        else:
-            print("Out of food")
-            return
-
 
 class Carnivore(Animal):
     """
     Carnivore class
     """
+
+    carnivore_instance_count = 0
 
     def __init__(self, weight=None, age=0, p=None):
         if p is None:  # If no parameters are specified
@@ -188,8 +191,17 @@ class Carnivore(Animal):
         else:
             self.p = p
 
+        self.count_carnivore()
+
         super().__init__(weight, age)
-        # super().add_animal()
+
+    @classmethod
+    def count_carnivore(cls):
+        cls.carnivore_instance_count += 1
+
+    @classmethod
+    def subtract_carnivore(cls):
+        cls.carnivore_instance_count -= 1
 
     def kill_prey(self, sorted_herbivores):
         consumption_weight = 0
@@ -221,12 +233,3 @@ class Carnivore(Animal):
 
         return herbs_killed
 
-
-#
-if __name__ == "__main__":
-     herb1 = Herbivore()
-     carn1 = Carnivore()
-     print(herb1.death())
-     print(herb1.fitness)
-     print(herb1.birth_weight)
-     print(carn1.birth_weight)
