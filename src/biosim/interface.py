@@ -101,8 +101,8 @@ class Simulation:
         """
         :param num_years: number of years to simulate
         """
-        y_herb = [self.herb_count]
-        y_carn = [self.carn_count]
+        y_herb = [self.herb_count] + [np.nan for _ in range(num_years-1)]
+        y_carn = [self.carn_count] + [np.nan for _ in range(num_years-1)]
 
         ax, herb_line, carn_line = self.init_plot(y_herb,
                                                   y_carn,
@@ -111,8 +111,12 @@ class Simulation:
         for year in range(num_years):
             self.run_year_cycle()
 
-            y_herb.append(self.herb_count)
-            y_carn.append(self.carn_count)
+            y_herb = herb_line.get_ydata()
+            y_carn = carn_line.get_ydata()
+
+            y_herb[year+1] = self.herb_count
+            y_carn[year + 1] = self.carn_count
+
             self.update_plot(y_herb,
                              y_carn,
                              ax,
@@ -125,7 +129,11 @@ class Simulation:
                   y_herb,
                   y_carn,
                   num_years):
-
+        """
+        :param y_herb: List of herbivore counts
+        :param y_carn: List of carnivore counts
+        :param num_years: Number of years to run sim for x-axis
+        """
         fig = plt.figure()
         ax = fig.add_subplot(111)
         herb_line, = ax.plot(y_herb)
@@ -156,7 +164,7 @@ class Simulation:
         carn_line.set_ydata(y_carn)
         carn_line.set_xdata(range(len(y_carn)))
 
-        plt.pause(0.05)
+        plt.pause(1e-6)
 
     @property
     def animal_count(self):
@@ -202,20 +210,20 @@ class Simulation:
         ]
         return sorted_herb_list
 
-    @property
-    def mean_herb_fitness(self):
-        return np.mean([herb.fitness for herb in self.herbivore_list])
-
-    @property
-    def mean_carn_fitness(self):
-        return np.mean([carn.fitness for carn in self.carnivore_list])
+    # @property
+    # def mean_herb_fitness(self):
+    #     return np.mean([herb.fitness for herb in self.herbivore_list])
+    #
+    # @property
+    # def mean_carn_fitness(self):
+    #     return np.mean([carn.fitness for carn in self.carnivore_list])
 
 
 if __name__ == '__main__':
 
     sim = Simulation()  # Create simple simulation instance
 
-    sim.run_simulation(num_years=200)
+    sim.run_simulation(num_years=1000)
 
     print([herb.fitness for herb in sim.sorted_herbivores])
     print([carn.fitness for carn in sim.sorted_carnivores])
