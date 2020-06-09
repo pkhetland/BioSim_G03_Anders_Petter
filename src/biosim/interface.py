@@ -26,8 +26,8 @@ class Simulation:
         if ini_geogr is None:
             self.landscape = self.map_from_str(
                 """WWW
-            WLW
-            WWW"""
+                WLW
+                WWW"""
             )
         elif type(ini_geogr) == str:
             self.landscape = self.map_from_str(ini_geogr)
@@ -249,25 +249,20 @@ class Simulation:
         :rtype: dict
         """
         map_dict = {}
+        symbol_to_class = {'W': Water(), 'L': Lowland(), 'H': Highland(), 'D': Desert()}
 
         for row_coord, cell_row in enumerate(map_str.splitlines()):
             for col_coord, cell in enumerate(cell_row.strip()):
                 coord = (row_coord + 1, col_coord + 1)
-                if cell == "W":
-                    map_dict[coord] = Water()
-                elif cell == "L":
-                    map_dict[coord] = Lowland()
-                elif cell == "H":
-                    map_dict[coord] = Highland()
-                elif cell == "D":
-                    map_dict[coord] = Desert()
-                else:
-                    raise ValueError("Map strings need to be either W, L, H or D!")
+                try:
+                    map_dict[coord] = symbol_to_class[cell]
+                except KeyError:
+                    print("Map strings need to be either W, L, H or D! Try setting map again.")
         return map_dict
 
 
 if __name__ == "__main__":
-    geogr = """WWW
+    geogr = """WWWS
             WLW
             WWW"""
     sim = Simulation(ini_geogr=geogr)  # Create simple simulation instance
