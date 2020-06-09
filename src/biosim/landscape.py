@@ -31,9 +31,9 @@ class Landscape:
         :type animal_list: list
         """
         for animal in animal_list:  # Iterate through animals in list
-            if animal.species == 'Herbivore':
+            if animal.species == "Herbivore":
                 self.herbivores.append(animal)
-            elif animal.species == 'Carnivore':
+            elif animal.species == "Carnivore":
                 self.carnivores.append(animal)
 
     def remove_animals(self, animal_list):
@@ -43,9 +43,9 @@ class Landscape:
         :type animal_list: list
         """
         for animal in animal_list:  # Iterate through animals in list
-            if animal.species == 'Herbivore':
+            if animal.species == "Herbivore":
                 self.herbivores.remove(animal)
-            elif animal.species == 'Carnivore':
+            elif animal.species == "Carnivore":
                 self.carnivores.remove(animal)
 
     def randomize_herbs(self):
@@ -99,7 +99,9 @@ class Landscape:
         fitness_dict = dict([(carn, carn.fitness) for carn in self.carnivores])
         sorted_carnivores = [
             pair[0]
-            for pair in sorted(fitness_dict.items(), key=operator.itemgetter(1), reverse=True)
+            for pair in sorted(
+                fitness_dict.items(), key=operator.itemgetter(1), reverse=True
+            )
         ]
         return sorted_carnivores
 
@@ -113,7 +115,9 @@ class Landscape:
         fitness_dict = dict([(herb, herb.fitness) for herb in self.herbivores])
         sorted_herbivores = [
             pair[0]
-            for pair in sorted(fitness_dict.items(), key=operator.itemgetter(1), reverse=False)
+            for pair in sorted(
+                fitness_dict.items(), key=operator.itemgetter(1), reverse=False
+            )
         ]
         return sorted_herbivores
 
@@ -150,6 +154,7 @@ class Desert(Landscape):
     Desert class for cells.
     No fodder available for herbivores, but carnivores may kill herbivores.
     """
+
     def __init__(self):
         super().__init__(f_max=0.0)  # Forces fodder to be 0
 
@@ -158,5 +163,6 @@ class Water:
     """
     Water class for cells. Does not do anything.
     """
+
     def __init__(self):
         self.is_mainland = False

@@ -21,24 +21,18 @@ class Simulation:
     Main interface class for BioSim
     """
 
-    def __init__(self, seed=123, randomize_animals=True, ini_geogr=None):
+    def __init__(self, seed=1234, randomize_animals=True, ini_geogr=None):
 
         if ini_geogr is None:
-            self.landscape = {  # Hard-coded map
-                (1, 1): Water(),
-                (1, 2): Water(),
-                (1, 3): Water(),
-                (1, 4): Water(),
-                (2, 1): Water(),
-                (2, 2): Lowland(),  # Mid cell
-                (2, 3): Water(),  # Mid cell
-                (2, 4): Water(),
-                (3, 1): Water(),
-                (3, 2): Water(),
-                (3, 3): Water(),
-                (3, 4): Water()}
+            self.landscape = self.map_from_str(
+                """WWW
+            WLW
+            WWW"""
+            )
         elif type(ini_geogr) == str:
             self.landscape = self.map_from_str(ini_geogr)
+        else:
+            print("Map string needs to be of type str!")
 
         self.year = 0
 
@@ -54,7 +48,8 @@ class Simulation:
     @property
     def all_animals(self):
         """
-
+        :return: A list containing all animals in the mainland cells
+        :rtype: list
         """
         total_animals = []
         for cell in self.landscape.values():
@@ -64,15 +59,33 @@ class Simulation:
 
     @property
     def total_animal_count(self):
-        return sum([cell.animal_count for cell in self.landscape.values() if cell.is_mainland])
+        """
+         :return: Sum of all animal instances in mainland cells
+         :rtype: int
+        """
+        return sum(
+            [cell.animal_count for cell in self.landscape.values() if cell.is_mainland]
+        )
 
     @property
     def total_herb_count(self):
-        return sum([cell.herb_count for cell in self.landscape.values() if cell.is_mainland])
+        """
+         :return: Sum of all herbivore instances in mainland cells
+         :rtype: int
+        """
+        return sum(
+            [cell.herb_count for cell in self.landscape.values() if cell.is_mainland]
+        )
 
     @property
     def total_carn_count(self):
-        return sum([cell.carn_count for cell in self.landscape.values() if cell.is_mainland])
+        """
+         :return: Sum of all carnivore instances in mainland cells
+         :rtype: int
+        """
+        return sum(
+            [cell.carn_count for cell in self.landscape.values() if cell.is_mainland]
+        )
 
     def run_year_cycle(self):
         """
@@ -121,15 +134,17 @@ class Simulation:
                     self.landscape[(loc[0] - 1, loc[1])],
                     self.landscape[(loc[0], loc[1] + 1)],
                     self.landscape[(loc[0] + 1, loc[1])],
-                    self.landscape[(loc[0], loc[1] - 1)]
+                    self.landscape[(loc[0], loc[1] - 1)],
                 ]
 
                 removed_animals = []
                 for animal in cell.animals:
                     if animal.migrate():
-                        available_neighbors = [neighbor for neighbor in neighbor_cells
-                                               if neighbor.is_mainland
-                                               ]
+                        available_neighbors = [
+                            neighbor
+                            for neighbor in neighbor_cells
+                            if neighbor.is_mainland
+                        ]
 
                         if len(available_neighbors) > 0:
                             chosen_cell = np.random.choice(available_neighbors)
@@ -164,7 +179,7 @@ class Simulation:
                 self.year += 1  # Add year to simulation
 
     def run_simulation(self, num_years):
-        """
+        """ Runs yearly cycle function for the given number of years
         :param num_years: number of years to simulate
         """
         self._y_herb = [np.nan for _ in range(num_years)]
@@ -194,7 +209,9 @@ class Simulation:
         ax.legend(["Herbivore count", "Carnivore count"])  # Insert legend into plot
         ax.set_xlabel("Simulation year")  # Define x-label
         ax.set_ylabel("Animal count")  # Define y-label
-        ax.set_xlim([0, num_years])  # x-limit is set permanently to amount of years to simulate
+        ax.set_xlim(
+            [0, num_years]
+        )  # x-limit is set permanently to amount of years to simulate
 
         plt.ion()  # Activate interactive mode
 
@@ -206,7 +223,9 @@ class Simulation:
         :param ax: pyplot axis
         :type ax: object
         """
-        if max(self._y_herb) >= max(self._y_carn):  # Find the biggest count value in either y_herb or y_carn
+        if max(self._y_herb) >= max(
+            self._y_carn
+        ):  # Find the biggest count value in either y_herb or y_carn
             ax.set_ylim([0, max(self._y_herb) + 20])  # Set the y-lim to this max
         else:
             ax.set_ylim([0, max(self._y_carn) + 20])  #
@@ -233,33 +252,33 @@ class Simulation:
 
         for row_coord, cell_row in enumerate(map_str.splitlines()):
             for col_coord, cell in enumerate(cell_row.strip()):
-                coord = (row_coord+1, col_coord+1)
-                if cell == 'W':
+                coord = (row_coord + 1, col_coord + 1)
+                if cell == "W":
                     map_dict[coord] = Water()
-                elif cell == 'L':
+                elif cell == "L":
                     map_dict[coord] = Lowland()
-                elif cell == 'H':
+                elif cell == "H":
                     map_dict[coord] = Highland()
-                elif cell == 'D':
+                elif cell == "D":
                     map_dict[coord] = Desert()
                 else:
-                    raise ValueError('Map strings need to be either W, L, H or D!')
+                    raise ValueError("Map strings need to be either W, L, H or D!")
         return map_dict
 
 
 if __name__ == "__main__":
-    geogr = """WWWWWW
-            WLLLLW
-            WWWWWW"""
+    geogr = """WWW
+            WLW
+            WWW"""
     sim = Simulation(ini_geogr=geogr)  # Create simple simulation instance
 
-    sim.landscape[(2, 2)].add_animals([Herbivore(age=5, weight=20) for _ in range(200)])
-    sim.landscape[(2, 2)].add_animals([Carnivore(age=5, weight=20) for _ in range(40)])
+    sim.landscape[(2, 2)].add_animals([Herbivore(age=5, weight=20) for _ in range(50)])
+    # sim.landscape[(2, 2)].add_animals([Carnivore(age=5, weight=20) for _ in range(20)])
 
     # Test multi-cell sim
-    sim.landscape[(2, 3)].add_animals([Herbivore(age=5, weight=20) for _ in range(20)])
+    # sim.landscape[(2, 3)].add_animals([Herbivore(age=5, weight=20) for _ in range(20)])
 
-    sim.run_simulation(num_years=200)
+    sim.run_simulation(num_years=250)
 
     input("Press enter...")
     # print([herb.fitness for herb in cell.sorted_herbivores])

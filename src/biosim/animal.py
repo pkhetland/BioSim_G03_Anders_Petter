@@ -58,8 +58,8 @@ class Animal:
         """
         Returns bool indicating whether animal will migrate
         """
-        move_prob = self.p['mu'] * self.fitness
-        return np.random.choice([True, False], p=[move_prob, 1-move_prob])
+        move_prob = self.p["mu"] * self.fitness
+        return np.random.choice([True, False], p=[move_prob, 1 - move_prob])
 
     def lose_weight(self):
         """
@@ -77,7 +77,9 @@ class Animal:
         else:
             if self.death_prob is None:
                 self.death_prob = self.p["omega"] * (1 - self.fitness)
-                death = np.random.choice([True, False], p=[self.death_prob, 1 - self.death_prob])
+                death = np.random.choice(
+                    [True, False], p=[self.death_prob, 1 - self.death_prob]
+                )
                 self.death_prob = None
 
         return death
@@ -155,10 +157,14 @@ class Herbivore(Animal):
         """
         When an animal eats, its weight increases
         """
-        consumption_amount = self.p["beta"] * self.p["F"]  # Calculate amount of fodder consumed
+        consumption_amount = (
+            self.p["beta"] * self.p["F"]
+        )  # Calculate amount of fodder consumed
         if consumption_amount <= cell.fodder:
             self.weight += consumption_amount  # Eat fodder
-            cell.fodder -= consumption_amount  # Removes consumed fodder from cell object
+            cell.fodder -= (
+                consumption_amount  # Removes consumed fodder from cell object
+            )
 
         elif consumption_amount > cell.fodder > 0:
             self.weight += cell.fodder  # Eat fodder
@@ -221,7 +227,9 @@ class Carnivore(Animal):
 
                 elif 0 < fitness_diff < self.p["DeltaPhiMax"]:
                     kill_prob = fitness_diff / self.p["DeltaPhiMax"]
-                    kill_prey = np.random.choice([True, False], p=[kill_prob, 1 - kill_prob])
+                    kill_prey = np.random.choice(
+                        [True, False], p=[kill_prob, 1 - kill_prob]
+                    )
 
                 else:
                     kill_prey = True
@@ -232,10 +240,11 @@ class Carnivore(Animal):
                     )  # Add herb weight to consumption_weight variable
                     herbs_killed.append(herb)
 
-        if consumption_weight > self.p["F"]:  # Auto-adjust consumption_weight to be <= F-parameter
+        if (
+            consumption_weight > self.p["F"]
+        ):  # Auto-adjust consumption_weight to be <= F-parameter
             consumption_weight = self.p["F"]
 
         self.weight += consumption_weight * self.p["beta"]  # Add weight to carnivore
 
         return herbs_killed
-
