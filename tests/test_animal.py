@@ -6,6 +6,9 @@ Tests for animal class.
 from src.biosim.animal import Herbivore, Carnivore, Animal
 from src.biosim.interface import Simulation
 from src.biosim.landscape import Lowland
+import random as random
+import math
+import scipy.stats as stats
 
 import pytest
 
@@ -25,7 +28,6 @@ class TestAnimal:
         """
 
 
-
     def test_certain_death(self):
         """
         Test that the animal always must die given death_prob = 1
@@ -37,7 +39,29 @@ class TestAnimal:
         h.weight = 0
         assert h.death()
 
+    def test_death_z_test(self):
 
+        """
+        Souce: biolab/test_bacteria.py
+
+        Probabilistic test of death function. Test the number of deaths is
+        normally distributed for large number of animals. And the death probability is
+        significant with a p-value of 0.01.
+        """
+
+        b = Herbivore(age=0, weight=10)
+        # Set mocking parameter of the death probability of the animal
+        p = 0.3
+        # 100 animals
+        N = 100
+        n = sum(b.death() for _ in range(N))
+        # print([b.death() for _ in range(10)])
+
+        mean = N * p * (1-p)
+        var = N * p * (1-p)
+        Z = (n-mean) / math.sqrt(var)
+        phi = 2 * stats.norm.cdf(-abs(Z))
+        assert phi > 0.01
 
     def test_constructor(self):
         """

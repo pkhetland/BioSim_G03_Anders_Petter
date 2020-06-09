@@ -22,7 +22,7 @@ class Animal:
         self.species = self.__class__.__name__
         self.death_prob = None
 
-        # np.random.seed(123)
+        np.random.seed(123)
 
     def aging(self):
         """
