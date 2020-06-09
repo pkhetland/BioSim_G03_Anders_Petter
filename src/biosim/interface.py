@@ -14,6 +14,8 @@ import numpy as np
 import random as random
 import operator
 import matplotlib.pyplot as plt
+import matplotlib.gridspec as gridspec
+import seaborn as sns
 
 
 class Simulation:
@@ -23,14 +25,15 @@ class Simulation:
 
     def __init__(self, seed=1, randomize_animals=True, ini_geogr=None):
 
-        if ini_geogr is None:
+        self.map_str = ini_geogr
+        if self.map_str is None:
             self.landscape = self.map_from_str(
                 """WWW
                 WLW
                 WWW"""
             )
-        elif type(ini_geogr) == str:
-            self.landscape = self.map_from_str(ini_geogr)
+        elif type(self.map_str) == str:
+            self.landscape = self.map_from_str(self.map_str)
         else:
             print("Map string needs to be of type str!")
 
@@ -40,10 +43,25 @@ class Simulation:
         self._randomize_animals = randomize_animals
 
         # Arguments for plotting
+        self.herb_pop_matrix = None
+        self.carn_pop_matrix = None
+
         self._y_herb = None
         self._y_carn = None
         self._herb_line = None
         self._carn_line = None
+        self._herb_fitness_list = None
+        self._carn_fitness_list = None
+        self._herb_fitness_line = None
+        self._carn_fitness_line = None
+
+    @property
+    def unique_rows(self):
+        return list(set([coord[0] for coord in self.landscape.keys()]))
+
+    @property
+    def unique_cols(self):
+        return list(set([coord[1] for coord in self.landscape.keys()]))
 
     @property
     def all_animals(self):
@@ -56,6 +74,30 @@ class Simulation:
             if cell.is_mainland:
                 total_animals.extend(cell.animals)
         return total_animals
+
+    @property
+    def all_herbivores(self):
+        """
+        :return: A list containing all animals in the mainland cells
+        :rtype: list
+        """
+        all_herbivores = []
+        for cell in self.landscape.values():
+            if cell.is_mainland:
+                all_herbivores.extend(cell.herbivores)
+        return all_herbivores
+
+    @property
+    def all_carnivores(self):
+        """
+        :return: A list containing all animals in the mainland cells
+        :rtype: list
+        """
+        all_carnivores = []
+        for cell in self.landscape.values():
+            if cell.is_mainland:
+                all_carnivores.extend(cell.carnivores)
+        return all_carnivores
 
     @property
     def total_animal_count(self):
@@ -184,16 +226,20 @@ class Simulation:
         """
         self._y_herb = [np.nan for _ in range(num_years)]
         self._y_carn = [np.nan for _ in range(num_years)]
+        self._herb_fitness_list = []
+        self._carn_fitness_list = []
 
-        ax = self.init_plot(num_years)
+        ax_main, axhm_herb, axhm_carn = self.init_plot(num_years)
 
         for year in range(num_years):
             self.run_year_cycle()
 
             self._y_herb[year] = self.total_herb_count
             self._y_carn[year] = self.total_carn_count
+            self._herb_fitness_list = [herb.fitness for herb in self.all_herbivores]
+            self._carn_fitness_list = [carn.fitness for carn in self.all_carnivores]
 
-            self.update_plot(ax)
+            self.update_plot(ax_main, axhm_herb, axhm_carn)
 
         print("Simulation complete.")
 
@@ -202,40 +248,102 @@ class Simulation:
         :param num_years: Number of years to run sim for x-axis
         :type num_years: int
         """
-        fig = plt.figure()  # Initiate pyplot
-        ax = fig.add_subplot(111)  # Add a single subplot
-        (self._herb_line,) = ax.plot(self._y_herb)  # Initiate the herbivore line
-        (self._carn_line,) = ax.plot(self._y_carn)  # Initiate the carnivore line
-        ax.legend(["Herbivore count", "Carnivore count"])  # Insert legend into plot
-        ax.set_xlabel("Simulation year")  # Define x-label
-        ax.set_ylabel("Animal count")  # Define y-label
-        ax.set_xlim(
+
+        fig = plt.figure(figsize=(8, 6), constrained_layout=True)  # Initiate pyplot
+        gs = fig.add_gridspec(4, 4)
+        main_ax = fig.add_subplot(gs[:2, :])  # Add the main subplot
+        axhm_herb = fig.add_subplot(gs[3, 0])
+        axhm_carn = fig.add_subplot(gs[3, 1])
+        axim = fig.add_subplot(gs[3, -2:-1])  # Add support subplot
+        axlg = fig.add_subplot(gs[3, -1])
+
+        self.plot_map(self.map_str, axim, axlg)
+        self.plot_heatmap(axhm_herb, axhm_carn)
+
+        (self._herb_line,) = main_ax.plot(self._y_herb)  # Initiate the herbivore line
+        (self._carn_line,) = main_ax.plot(self._y_carn)  # Initiate the carnivore line
+        # self._herb_fitness_line = ax_2.hist(self._herb_fitness_list)
+        # self._carn_fitness_line = ax_2.hist(self._carn_fitness_list)
+        main_ax.legend(["Herbivore count", "Carnivore count"])  # Insert legend into plot
+        main_ax.set_xlabel("Simulation year")  # Define x-label
+        main_ax.set_ylabel("Animal count")  # Define y-label
+        main_ax.set_xlim(
             [0, num_years]
         )  # x-limit is set permanently to amount of years to simulate
 
         plt.ion()  # Activate interactive mode
 
-        return ax
+        return main_ax, axhm_herb, axhm_carn
 
-    def update_plot(self, ax):
+    def update_plot(self, ax_1, axhm_herb, axhm_carn):
         """Redraw plot with updated values
 
-        :param ax: pyplot axis
-        :type ax: object
+        :param ax_1: pyplot axis
+        :type ax_1: object
         """
         if max(self._y_herb) >= max(
             self._y_carn
         ):  # Find the biggest count value in either y_herb or y_carn
-            ax.set_ylim([0, max(self._y_herb) + 20])  # Set the y-lim to this max
+            ax_1.set_ylim([0, max(self._y_herb) + 20])  # Set the y-lim to this max
         else:
-            ax.set_ylim([0, max(self._y_carn) + 20])  #
+            ax_1.set_ylim([0, max(self._y_carn) + 20])  #
 
         self._herb_line.set_ydata(self._y_herb)
         self._herb_line.set_xdata(range(len(self._y_herb)))
         self._carn_line.set_ydata(self._y_carn)
         self._carn_line.set_xdata(range(len(self._y_carn)))
 
+        if self.year % 10 == 0:
+            for row in self.unique_rows[1:-1]:
+                for col in self.unique_cols[1:-1]:
+                    cell = self.landscape[(row, col)]
+                    if cell.is_mainland:
+                        self.herb_pop_matrix[row-1][col-1] = cell.herb_count
+                        self.carn_pop_matrix[row-1][col-1] = cell.carn_count
+
+            print(self.herb_pop_matrix)
+            axhm_herb.imshow(self.herb_pop_matrix)
+            axhm_carn.imshow(self.carn_pop_matrix)
+
         plt.pause(1e-6)
+
+    @staticmethod
+    def plot_map(map_str, axim, axlg):
+        """Author: Hans
+
+        """
+
+        #                   R    G    B
+        rgb_value = {'W': (0.0, 0.0, 1.0),  # blue
+                     'L': (0.0, 0.6, 0.0),  # dark green
+                     'H': (0.5, 1.0, 0.5),  # light green
+                     'D': (1.0, 1.0, 0.5)}  # light yellow
+
+        kart_rgb = [[rgb_value[column] for column in row.strip()]
+                    for row in map_str.splitlines()]
+
+        axim.imshow(kart_rgb)
+        axim.set_xticks(range(len(kart_rgb[0])))
+        axim.set_xticklabels(range(1, 1 + len(kart_rgb[0])))
+        axim.set_yticks(range(len(kart_rgb)))
+        axim.set_yticklabels(range(1, 1 + len(kart_rgb)))
+
+        axlg.axis('off')
+        for ix, name in enumerate(('Water', 'Lowland',
+                                   'Highland', 'Desert')):
+            axlg.add_patch(plt.Rectangle((0., ix * 0.2), 0.3, 0.1,
+                                         edgecolor='none',
+                                         facecolor=rgb_value[name[0]]))
+            axlg.text(0.35, ix * 0.2, name, transform=axlg.transAxes)
+
+    def plot_heatmap(self, axhm_herb, axhm_carn):
+        """Create matrix for population and create heatmap
+        """
+        self.herb_pop_matrix = [[0 for _ in self.unique_cols] for _ in self.unique_rows]
+        self.carn_pop_matrix = [[0 for _ in self.unique_cols] for _ in self.unique_rows]
+
+        axhm_herb.imshow(self.herb_pop_matrix)
+        axhm_carn.imshow(self.carn_pop_matrix)
 
     @staticmethod
     def map_from_str(map_str):
@@ -262,13 +370,14 @@ class Simulation:
 
 
 if __name__ == "__main__":
-    geogr = """WWWWWW
-            WLLLLW
-            WWWWWWW"""
+    geogr = """WWWWW
+    WLDHW
+    WLDHW
+    WWWWW"""
     sim = Simulation(ini_geogr=geogr)  # Create simple simulation instance
 
-    sim.landscape[(2, 2)].add_animals([Herbivore(age=5, weight=20) for _ in range(50)])
-    sim.landscape[(2, 2)].add_animals([Carnivore(age=5, weight=20) for _ in range(20)])
+    sim.landscape[(2, 2)].add_animals([Herbivore(age=5, weight=20) for _ in range(150)])
+    # sim.landscape[(2, 2)].add_animals([Carnivore(age=5, weight=20) for _ in range(20)])
 
     # Test multi-cell sim
     # sim.landscape[(2, 3)].add_animals([Herbivore(age=5, weight=20) for _ in range(20)])
