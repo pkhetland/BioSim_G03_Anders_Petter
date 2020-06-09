@@ -22,7 +22,7 @@ class Animal:
         self.species = self.__class__.__name__
         self.death_prob = None
 
-        np.random.seed(123)
+        # np.random.seed(123)
 
     def aging(self):
         """
@@ -36,7 +36,7 @@ class Animal:
         """
         birth_prob = self.p["gamma"] * self.fitness * n_same - 1
         if self.weight < self.p["zeta"] * (self.p["w_birth"] + self.p["sigma_birth"]):
-            return False  # Return false if weight of mother is less than birth
+            return False, None  # Return false if weight of mother is less than birth
         elif birth_prob >= 1:
             give_birth = True
         elif 0 < birth_prob < 1:
@@ -48,11 +48,11 @@ class Animal:
             birth_weight = self.birth_weight
             if birth_weight < self.weight:
                 self.weight -= self.p["xi"] * birth_weight
-                return True
+                return True, birth_weight
             else:
-                return False
+                return False, None
         else:
-            return False
+            return False, None
 
     def migrate(self):
         """
@@ -136,9 +136,8 @@ class Herbivore(Animal):
         else:
             self.p = p
 
-        self.count_herbivore()
-
         super().__init__(weight, age)
+        self.count_herbivore()
 
     @classmethod
     def count_herbivore(cls):
@@ -147,6 +146,10 @@ class Herbivore(Animal):
     @classmethod
     def subtract_herbivore(cls):
         cls.herbivore_instance_count -= 1
+
+    @classmethod
+    def instance_count(cls):
+        return cls.herbivore_instance_count
 
     def eat_fodder(self, cell):
         """
@@ -191,9 +194,8 @@ class Carnivore(Animal):
         else:
             self.p = p
 
-        self.count_carnivore()
-
         super().__init__(weight, age)
+        self.count_carnivore()
 
     @classmethod
     def count_carnivore(cls):
@@ -202,6 +204,10 @@ class Carnivore(Animal):
     @classmethod
     def subtract_carnivore(cls):
         cls.carnivore_instance_count -= 1
+
+    @classmethod
+    def instance_count(cls):
+        return cls.carnivore_instance_count
 
     def kill_prey(self, sorted_herbivores):
         consumption_weight = 0

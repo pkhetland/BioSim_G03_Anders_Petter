@@ -21,22 +21,24 @@ class Simulation:
     Main interface class for BioSim
     """
 
-    def __init__(self, seed=123, randomize_animals=True):
+    def __init__(self, seed=123, randomize_animals=True, ini_geogr=None):
 
-        self.landscape = {  # Hard-coded map
-            (1, 1): Water(),
-            (1, 2): Water(),
-            (1, 3): Water(),
-            (1, 4): Water(),
-            (2, 1): Water(),
-            (2, 2): Water(),  # Mid cell
-            (2, 3): Lowland(),  # Mid cell
-            (2, 4): Water(),
-            (3, 1): Water(),
-            (3, 2): Water(),
-            (3, 3): Water(),
-            (3, 4): Water()
-        }
+        if ini_geogr is None:
+            self.landscape = {  # Hard-coded map
+                (1, 1): Water(),
+                (1, 2): Water(),
+                (1, 3): Water(),
+                (1, 4): Water(),
+                (2, 1): Water(),
+                (2, 2): Lowland(),  # Mid cell
+                (2, 3): Water(),  # Mid cell
+                (2, 4): Water(),
+                (3, 1): Water(),
+                (3, 2): Water(),
+                (3, 3): Water(),
+                (3, 4): Water()}
+        elif type(ini_geogr) == str:
+            self.landscape = self.map_from_str(ini_geogr)
 
         self.year = 0
 
@@ -49,15 +51,18 @@ class Simulation:
         self._herb_line = None
         self._carn_line = None
 
-    @ property
+    @property
     def all_animals(self):
+        """
+
+        """
         total_animals = []
         for cell in self.landscape.values():
             if cell.is_mainland:
                 total_animals.extend(cell.animals)
         return total_animals
 
-    @ property
+    @property
     def total_animal_count(self):
         return sum([cell.animal_count for cell in self.landscape.values() if cell.is_mainland])
 
@@ -82,7 +87,8 @@ class Simulation:
                     cell.randomize_herbs()
 
                 for herb in cell.herbivores:  # Herbivores eat first
-                    if not cell.is_empty:
+                    # if not cell.is_empty:
+                    if cell.fodder != 0:
                         herb.eat_fodder(cell)
 
                 for carn in cell.carnivores:  # Carnivores eat last
@@ -93,18 +99,23 @@ class Simulation:
 
                 #  2. Procreation
                 new_animals = []
+                n_herbs, n_carns = cell.herb_count, cell.carn_count
 
                 for herb in cell.herbivores:  # Herbivores give birth)
-                    if herb.give_birth(cell.herb_count):
-                        new_animals.append(Herbivore(weight=herb.birth_weight, age=0))
+                    give_birth, birth_weight = herb.give_birth(n_herbs)
+
+                    if give_birth:
+                        new_animals.append(Herbivore(weight=birth_weight, age=0))
 
                 for carn in cell.carnivores:  # Carnivores give birth
-                    if carn.give_birth(cell.carn_count):
-                        new_animals.append(Carnivore(weight=carn.birth_weight, age=0))
+                    give_birth, birth_weight = carn.give_birth(n_carns)
+
+                    if give_birth:
+                        new_animals.append(Carnivore(weight=birth_weight, age=0))
 
                 cell.add_animals(new_animals)  # Add new animals to cell
 
-                #  3. Migration
+                # 3. Migration
                 # Define neighbor cells once:
                 neighbor_cells = [
                     self.landscape[(loc[0] - 1, loc[1])],
@@ -137,11 +148,17 @@ class Simulation:
 
                 #  6. Death
                 dead_animals = []
-                for animal in cell.animals:
-                    if animal.death():
-                        dead_animals.append(animal)
 
-                print(cell.animals)
+                for herb in cell.herbivores:
+                    if herb.death():
+                        Herbivore.subtract_herbivore()
+                        dead_animals.append(herb)
+
+                for carn in cell.carnivores:
+                    if carn.death():
+                        Carnivore.subtract_carnivore()
+                        dead_animals.append(carn)
+
                 cell.remove_animals(dead_animals)
 
                 self.year += 1  # Add year to simulation
@@ -156,8 +173,6 @@ class Simulation:
         ax = self.init_plot(num_years)
 
         for year in range(num_years):
-            print(Herbivore.herbivore_instance_count)
-            print(Carnivore.carnivore_instance_count)
             self.run_year_cycle()
 
             self._y_herb[year] = self.total_herb_count
@@ -170,6 +185,7 @@ class Simulation:
     def init_plot(self, num_years):
         """
         :param num_years: Number of years to run sim for x-axis
+        :type num_years: int
         """
         fig = plt.figure()  # Initiate pyplot
         ax = fig.add_subplot(111)  # Add a single subplot
@@ -202,16 +218,38 @@ class Simulation:
 
         plt.pause(1e-6)
 
+    @staticmethod
+    def map_from_str(map_str):
+        map_dict = {}
+        map_str = map_str.splitlines()
+
+        for row_coord, cell_row in enumerate(map_str):
+            for col_coord, cell in enumerate(cell_row):
+                coord = (row_coord+1, col_coord+1)
+                if cell == 'W':
+                    map_dict[coord] = Water()
+                elif cell == 'L':
+                    map_dict[coord] = Lowland()
+                elif cell == 'H':
+                    map_dict[coord] = Highland()
+                elif cell == 'D':
+                    map_dict[coord] = Desert()
+                else:
+                    raise ValueError('Map strings need to be W, L, H og D!')
+        return map_dict
+
 
 if __name__ == "__main__":
+    geogr = """WWWW
+WLHW
+WWWW"""
+    sim = Simulation(ini_geogr=geogr)  # Create simple simulation instance
 
-    sim = Simulation()  # Create simple simulation instance
-
-    sim.landscape[(2, 3)].add_animals([Herbivore(age=5, weight=20) for _ in range(150)])
-    sim.landscape[(2, 3)].add_animals([Carnivore(age=5, weight=20) for _ in range(40)])
+    sim.landscape[(2, 2)].add_animals([Herbivore(age=5, weight=20) for _ in range(200)])
+    sim.landscape[(2, 2)].add_animals([Carnivore(age=5, weight=20) for _ in range(40)])
 
     # Test multi-cell sim
-    # sim.landscape[(2, 3)].add_animals([Herbivore(age=5, weight=20) for _ in range(50)])
+    # sim.landscape[(2, 3)].add_animals([Herbivore(age=5, weight=20) for _ in range(500)])
 
     sim.run_simulation(num_years=200)
 

@@ -101,6 +101,15 @@ class TestHerbivore:
         """
         pass
 
+    def test_instance_count(self):
+        herb = Herbivore()
+
+        assert herb.herbivore_instance_count == 1
+
+        Herbivore.subtract_herbivore()
+
+        assert Herbivore.herbivore_instance_count == 0
+
 
 class TestCarnivore:
     """
@@ -111,5 +120,16 @@ class TestCarnivore:
         killed_herbivores = carn.kill_prey([Herbivore(age=10, weight=10), Herbivore(age=5, weight=80)])
         assert len(killed_herbivores) > 0
         assert carn.weight > 40
+
+    def test_instance_count(self):
+        """
+        Test that classmethods for counting instances work
+        """
+        carnivores = [Carnivore() for _ in range(5)]
+
+        Carnivore.subtract_carnivore()
+        Carnivore.subtract_carnivore()
+
+        assert Carnivore.carnivore_instance_count == 3
 
 

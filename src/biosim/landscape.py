@@ -22,14 +22,19 @@ class Landscape:
         self.herbivores = []
         self.carnivores = []
 
+        # np.random.seed(123)
+
     def add_animals(self, animal_list):
         """Adds a list of animals to the cell class
 
         :param animal_list: A list containing animal objects
         :type animal_list: list
         """
-        self.herbivores.extend([animal for animal in animal_list if animal.species == 'Herbivore'])
-        self.carnivores.extend([animal for animal in animal_list if animal.species == 'Carnivore'])
+        for animal in animal_list:  # Iterate through animals in list
+            if animal.species == 'Herbivore':
+                self.herbivores.append(animal)
+            elif animal.species == 'Carnivore':
+                self.carnivores.append(animal)
 
     def remove_animals(self, animal_list):
         """Removes a list of animal objects from the cell class

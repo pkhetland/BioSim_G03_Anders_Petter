@@ -58,5 +58,7 @@ def test_lowland_location():
     lowland = Lowland(location=(1, 2))
     assert lowland.location == (1, 2)
 
+
 def test_ocean_instance():
-    ocean = Ocean()
+    ocean = Water()
+    assert ocean.is_mainland == False
