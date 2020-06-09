@@ -64,6 +64,62 @@ class Simulation:
         return list(set([coord[1] for coord in self.landscape.keys()]))
 
     @property
+    def update_pop_matrix(self):
+        for row in self.unique_rows[1:-1]:  # First and last cell is water
+            for col in self.unique_cols[1:-1]:  # First and last cell is water
+                cell = self.landscape[(row, col)]
+                if cell.is_mainland:
+                    # print(cell)
+                    self.herb_pop_matrix[row - 1][col - 1] = cell.herb_count
+                    self.carn_pop_matrix[row - 1][col - 1] = cell.carn_count
+
+    @property
+    def animal_weights(self):
+        herb_weights = []
+        carn_weights = []
+        for cell in self.landscape.values():
+            if cell.is_mainland:
+                for herb in cell.herbivores:
+                    herb_weights.append(herb.weight)
+                for carn in cell.carnivores:
+                    carn_weights.append(carn.weight)
+
+        return [herb_weights, carn_weights]
+
+    @property
+    def animal_ages(self):
+        herb_ages = []
+        carn_ages = []
+        for cell in self.landscape.values():
+            if cell.is_mainland:
+                for herb in cell.herbivores:
+                    herb_ages.append(herb.age)
+                for carn in cell.carnivores:
+                    carn_ages.append(carn.age)
+
+        return [herb_ages, carn_ages]
+
+    @property
+    def animal_fitness(self):
+        herb_fits = []
+        carn_fits = []
+        for cell in self.landscape.values():
+            if cell.is_mainland:
+                for herb in cell.herbivores:
+                    herb_fits.append(herb.fitness)
+                for carn in cell.carnivores:
+                    carn_fits.append(carn.fitness)
+
+        return [herb_fits, carn_fits]
+
+    @property
+    def carn_weights(self):
+        return np.array([
+            [carn.weight for carn in cell.herbivores]
+            for cell in self.landscape.values() if cell.is_mainland
+        ]).flatten()
+
+    @property
     def all_animals(self):
         """
         :return: A list containing all animals in the mainland cells
@@ -229,7 +285,7 @@ class Simulation:
         self._herb_fitness_list = []
         self._carn_fitness_list = []
 
-        ax_main, axhm_herb, axhm_carn = self.init_plot(num_years)
+        ax_main, ax_weight, ax_fitness, ax_age, axhm_herb, axhm_carn = self.init_plot(num_years)
 
         for year in range(num_years):
             self.run_year_cycle()
@@ -239,7 +295,7 @@ class Simulation:
             self._herb_fitness_list = [herb.fitness for herb in self.all_herbivores]
             self._carn_fitness_list = [carn.fitness for carn in self.all_carnivores]
 
-            self.update_plot(ax_main, axhm_herb, axhm_carn)
+            self.update_plot(ax_main, ax_weight, ax_fitness, ax_age, axhm_herb, axhm_carn)
 
         print("Simulation complete.")
 
@@ -249,33 +305,39 @@ class Simulation:
         :type num_years: int
         """
 
-        fig = plt.figure(figsize=(8, 6), constrained_layout=True)  # Initiate pyplot
-        gs = fig.add_gridspec(4, 4)
-        main_ax = fig.add_subplot(gs[:2, :])  # Add the main subplot
-        axhm_herb = fig.add_subplot(gs[3, 0])
-        axhm_carn = fig.add_subplot(gs[3, 1])
+        fig = plt.figure(figsize=(12, 7), constrained_layout=True)  # Initiate pyplot
+        gs = fig.add_gridspec(4, 6)
+        ax_main = fig.add_subplot(gs[:2, :])  # Add the main subplot
+        ax_weight = fig.add_subplot(gs[2, :2])
+
+        ax_fitness = fig.add_subplot(gs[2, 2:4])
+
+        ax_age = fig.add_subplot(gs[2, 4:])
+
+        axhm_herb = fig.add_subplot(gs[3, :2])
+        axhm_carn = fig.add_subplot(gs[3, 2:4])
         axim = fig.add_subplot(gs[3, -2:-1])  # Add support subplot
         axlg = fig.add_subplot(gs[3, -1])
 
         self.plot_map(self.map_str, axim, axlg)
         self.plot_heatmap(axhm_herb, axhm_carn)
 
-        (self._herb_line,) = main_ax.plot(self._y_herb)  # Initiate the herbivore line
-        (self._carn_line,) = main_ax.plot(self._y_carn)  # Initiate the carnivore line
+        (self._herb_line,) = ax_main.plot(self._y_herb)  # Initiate the herbivore line
+        (self._carn_line,) = ax_main.plot(self._y_carn)  # Initiate the carnivore line
         # self._herb_fitness_line = ax_2.hist(self._herb_fitness_list)
         # self._carn_fitness_line = ax_2.hist(self._carn_fitness_list)
-        main_ax.legend(["Herbivore count", "Carnivore count"])  # Insert legend into plot
-        main_ax.set_xlabel("Simulation year")  # Define x-label
-        main_ax.set_ylabel("Animal count")  # Define y-label
-        main_ax.set_xlim(
+        ax_main.legend(["Herbivore count", "Carnivore count"])  # Insert legend into plot
+        ax_main.set_xlabel("Simulation year")  # Define x-label
+        ax_main.set_ylabel("Animal count")  # Define y-label
+        ax_main.set_xlim(
             [0, num_years]
         )  # x-limit is set permanently to amount of years to simulate
 
         plt.ion()  # Activate interactive mode
 
-        return main_ax, axhm_herb, axhm_carn
+        return ax_main, ax_weight, ax_fitness, ax_age, axhm_herb, axhm_carn
 
-    def update_plot(self, ax_1, axhm_herb, axhm_carn):
+    def update_plot(self, ax_1, ax_weight, ax_fitness, ax_age, axhm_herb, axhm_carn):
         """Redraw plot with updated values
 
         :param ax_1: pyplot axis
@@ -293,18 +355,26 @@ class Simulation:
         self._carn_line.set_ydata(self._y_carn)
         self._carn_line.set_xdata(range(len(self._y_carn)))
 
-        if self.year % 10 == 0:
-            for row in self.unique_rows[1:-1]:  # First and last cell is water
-                for col in self.unique_cols[1:-1]:  # First and last cell is water
-                    cell = self.landscape[(row, col)]
-                    if cell.is_mainland:
-                        # print(cell)
-                        self.herb_pop_matrix[row-1][col-1] = cell.herb_count
-                        self.carn_pop_matrix[row-1][col-1] = cell.carn_count
+        ax_weight.clear()
+        ax_weight.hist(self.animal_weights, bins=10)
 
-            # print(self.herb_pop_matrix)
-            axhm_herb.imshow(self.herb_pop_matrix)
-            axhm_carn.imshow(self.carn_pop_matrix)
+        ax_fitness.clear()
+        ax_fitness.hist(self.animal_fitness, bins=10)
+
+        ax_age.clear()
+        ax_age.hist(self.animal_ages, bins=10)
+
+        ax_weight.set_title('Weight distribution')
+        ax_fitness.set_title('Fitness distribution')
+        ax_age.set_title('Age distribution')
+
+        if self.year % 5 == 1:
+            self.update_pop_matrix
+            axhm_herb.clear(), axhm_carn.clear()
+            axhm_herb.imshow(self.herb_pop_matrix, cmap='hot')
+            axhm_carn.imshow(self.carn_pop_matrix, cmap='hot')
+            axhm_herb.set_title('Herbivore density')
+            axhm_carn.set_title('Carnivore density')
 
         plt.pause(1e-6)
 
@@ -345,6 +415,16 @@ class Simulation:
 
         axhm_herb.imshow(self.herb_pop_matrix)
         axhm_carn.imshow(self.carn_pop_matrix)
+        axhm_herb.set_title('Herbivore density')
+        axhm_carn.set_title('Carnivore density')
+        axhm_carn.set_xticks(range(len(self.unique_cols)))
+        axhm_carn.set_xticklabels(range(1, len(self.unique_cols)+1))
+        axhm_carn.set_yticks(range(len(self.unique_rows)))
+        axhm_carn.set_yticklabels(range(1, len(self.unique_rows)+1))
+        axhm_herb.set_xticks(range(len(self.unique_cols)))
+        axhm_herb.set_xticklabels(range(1, len(self.unique_cols)+1))
+        axhm_herb.set_yticks(range(len(self.unique_rows)))
+        axhm_herb.set_yticklabels(range(1, len(self.unique_rows)+1))
 
     @staticmethod
     def map_from_str(map_str):
@@ -358,7 +438,6 @@ class Simulation:
         :rtype: dict
         """
         map_dict = {}
-        symbol_to_class = {'W': Water(), 'L': Lowland(), 'H': Highland(), 'D': Desert()}
 
         for row_coord, cell_row in enumerate(map_str.splitlines()):
             for col_coord, cell in enumerate(cell_row.strip()):
@@ -377,17 +456,17 @@ class Simulation:
 
 
 if __name__ == "__main__":
-    geogr = """WWWW
-    WLDW
-    WLDW
-    WWWW"""
+    geogr = """WWWWWW
+    WLWDLW
+    WHDWDW
+    WWWWWW"""
     sim = Simulation(ini_geogr=geogr)  # Create simple simulation instance
 
     sim.landscape[(2, 2)].add_animals([Herbivore(age=5, weight=20) for _ in range(150)])
     sim.landscape[(2, 2)].add_animals([Carnivore(age=5, weight=20) for _ in range(40)])
 
     # Test multi-cell sim
-    # sim.landscape[(2, 3)].add_animals([Herbivore(age=5, weight=20) for _ in range(20)])
+    sim.landscape[(2, 5)].add_animals([Herbivore(age=5, weight=20) for _ in range(20)])
 
     sim.run_simulation(num_years=250)
 
