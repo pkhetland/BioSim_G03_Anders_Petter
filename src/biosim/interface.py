@@ -220,11 +220,19 @@ class Simulation:
 
     @staticmethod
     def map_from_str(map_str):
-        map_dict = {}
-        map_str = map_str.splitlines()
+        """The sim takes in a map str and converts it into a dictionary of
+        coord keys and class values
 
-        for row_coord, cell_row in enumerate(map_str):
-            for col_coord, cell in enumerate(cell_row):
+        :param map_str: A multi-line string representing cell classes and coordinates
+        :type map_str: str
+
+        :return: The landscape for the simulation with initiated landscape classes
+        :rtype: dict
+        """
+        map_dict = {}
+
+        for row_coord, cell_row in enumerate(map_str.splitlines()):
+            for col_coord, cell in enumerate(cell_row.strip()):
                 coord = (row_coord+1, col_coord+1)
                 if cell == 'W':
                     map_dict[coord] = Water()
@@ -235,21 +243,21 @@ class Simulation:
                 elif cell == 'D':
                     map_dict[coord] = Desert()
                 else:
-                    raise ValueError('Map strings need to be W, L, H og D!')
+                    raise ValueError('Map strings need to be either W, L, H or D!')
         return map_dict
 
 
 if __name__ == "__main__":
-    geogr = """WWWW
-WLHW
-WWWW"""
+    geogr = """WWWWWW
+            WLLLLW
+            WWWWWW"""
     sim = Simulation(ini_geogr=geogr)  # Create simple simulation instance
 
     sim.landscape[(2, 2)].add_animals([Herbivore(age=5, weight=20) for _ in range(200)])
     sim.landscape[(2, 2)].add_animals([Carnivore(age=5, weight=20) for _ in range(40)])
 
     # Test multi-cell sim
-    # sim.landscape[(2, 3)].add_animals([Herbivore(age=5, weight=20) for _ in range(500)])
+    sim.landscape[(2, 3)].add_animals([Herbivore(age=5, weight=20) for _ in range(20)])
 
     sim.run_simulation(num_years=200)
 
