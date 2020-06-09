@@ -9,7 +9,6 @@ from src.biosim.landscape import Lowland
 import random as random
 import math
 import scipy.stats as stats
-
 import pytest
 
 
@@ -39,6 +38,18 @@ class TestAnimal:
         h.weight = 0
         assert h.death()
 
+    def test_death_binom(self):
+        """
+        Test if the death function is statistical significant
+        """
+        h = Herbivore(age=0, weight=10)
+        p = 0.1
+        N = 100
+        n = sum(h.death() for _ in range(N))
+        print("Number of deaths:", n)
+        assert stats.binom_test(h.death(), n, p, alternative='two-sided') > 0.01
+
+
     def test_death_z_test(self):
 
         """
@@ -48,28 +59,29 @@ class TestAnimal:
         normally distributed for large number of animals. And the death probability is
         significant with a p-value of 0.01.
         """
-
+        # Spm: Bruker seeden fra animal.py. Er det OK?
         b = Herbivore(age=0, weight=10)
         # Set mocking parameter of the death probability of the animal
-        p = 0.3
+        p = 0.1
         # 100 animals
         N = 100
         n = sum(b.death() for _ in range(N))
         # print([b.death() for _ in range(10)])
 
-        mean = N * p * (1-p)
+        mean = N * p
         var = N * p * (1-p)
         Z = (n-mean) / math.sqrt(var)
         phi = 2 * stats.norm.cdf(-abs(Z))
         assert phi > 0.01
 
+
     def test_constructor(self):
-        """
-        Herbivore can be created
-        """
-        herb = Herbivore(weight=10, age=0)
-        carn = Carnivore()
-        assert isinstance(herb, Herbivore), isinstance(carn, Carnivore)
+            """
+            Herbivore can be created
+            """
+            herb = Herbivore(weight=10, age=0)
+            carn = Carnivore()
+            assert isinstance(herb, Herbivore), isinstance(carn, Carnivore)
 
     def test_aging(self):
         """
