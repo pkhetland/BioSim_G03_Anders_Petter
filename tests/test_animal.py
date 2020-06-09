@@ -140,10 +140,9 @@ class TestCarnivore:
     Test for carnivore class
     """
     def test_kill_prey(self):
-        carn = Carnivore(age=5, weight=90)
-        killed_herbivores = carn.kill_prey([Herbivore(age=10, weight=10), Herbivore(age=5, weight=80)])
+        carn = Carnivore(age=5, weight=900)
+        killed_herbivores = carn.kill_prey([Herbivore(age=10, weight=1), Herbivore(age=5, weight=80)])
         assert len(killed_herbivores) > 0
-        assert carn.weight > 40
 
     def test_instance_count(self):
         """

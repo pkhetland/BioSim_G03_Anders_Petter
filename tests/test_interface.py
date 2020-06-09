@@ -15,6 +15,6 @@ from src.biosim.interface import Simulation
 def test_map_from_str():
     sim = Simulation(
         ini_geogr = """WWW
-WLW
-WWW""")
-    assert sim.landscape != None
+        WLW
+        WWW""")
+    assert sim.landscape is not None

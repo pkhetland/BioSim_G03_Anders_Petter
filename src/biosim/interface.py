@@ -21,7 +21,7 @@ class Simulation:
     Main interface class for BioSim
     """
 
-    def __init__(self, seed=1234, randomize_animals=True, ini_geogr=None):
+    def __init__(self, seed=1, randomize_animals=True, ini_geogr=None):
 
         if ini_geogr is None:
             self.landscape = self.map_from_str(
@@ -262,13 +262,13 @@ class Simulation:
 
 
 if __name__ == "__main__":
-    geogr = """WWWS
-            WLW
-            WWW"""
+    geogr = """WWWWWW
+            WLLLLW
+            WWWWWWW"""
     sim = Simulation(ini_geogr=geogr)  # Create simple simulation instance
 
     sim.landscape[(2, 2)].add_animals([Herbivore(age=5, weight=20) for _ in range(50)])
-    # sim.landscape[(2, 2)].add_animals([Carnivore(age=5, weight=20) for _ in range(20)])
+    sim.landscape[(2, 2)].add_animals([Carnivore(age=5, weight=20) for _ in range(20)])
 
     # Test multi-cell sim
     # sim.landscape[(2, 3)].add_animals([Herbivore(age=5, weight=20) for _ in range(20)])

@@ -22,7 +22,7 @@ class Animal:
         self.species = self.__class__.__name__
         self.death_prob = None
 
-        np.random.seed(123)
+        # np.random.seed(123)
 
     def aging(self):
         """
@@ -216,6 +216,14 @@ class Carnivore(Animal):
         return cls.carnivore_instance_count
 
     def kill_prey(self, sorted_herbivores):
+        """Iterates through sorted herbivores and eats until F is met
+
+        :param sorted_herbivores: Herbivores sorted by fitness levels from low to high
+        :type sorted_herbivores: list
+        ...
+        :return: Animals killed by herbivore to be removed from simulation
+        :rtype: list
+        """
         consumption_weight = 0
         herbs_killed = []
 
