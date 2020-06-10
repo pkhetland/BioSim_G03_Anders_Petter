@@ -22,7 +22,7 @@ class Landscape:
         self.herbivores = []
         self.carnivores = []
 
-        # np.random.seed(123)
+        np.random.seed(123)
 
     @property
     def f_max(self):
