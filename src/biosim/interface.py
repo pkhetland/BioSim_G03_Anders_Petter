@@ -239,7 +239,7 @@ class Simulation:
 
         cell.add_animals(new_animals)  # Add new animals to cell
 
-    def migrate(self, loc, cell):
+    def migrate(self, loc, cell, all_migrated_animals):
         """Iterates through each animal in the cell and migrates
 
         :param loc: Coordinate of current cell
@@ -255,26 +255,29 @@ class Simulation:
             self.landscape[(loc[0], loc[1] - 1)],
         ]
 
-        removed_animals = []
+        migrated_animals = []
         for animal in cell.animals:
-            if animal.migrate():
-                available_neighbors = [
-                    neighbor
-                    for neighbor in neighbor_cells
-                    if neighbor.is_mainland
-                ]
+            if animal not in all_migrated_animals:
+                if animal.migrate():
+                    available_neighbors = [
+                        neighbor
+                        for neighbor in neighbor_cells
+                        if neighbor.is_mainland
+                    ]
 
-                if len(available_neighbors) > 0:
-                    chosen_cell = np.random.choice(available_neighbors)
-                    chosen_cell.add_animals([animal])
-                    removed_animals.append(animal)
+                    if len(available_neighbors) > 0:
+                        chosen_cell = np.random.choice(available_neighbors)
+                        chosen_cell.add_animals([animal])
+                        migrated_animals.append(animal)
 
-        cell.remove_animals(removed_animals)
+        cell.remove_animals(migrated_animals)
+        return migrated_animals
 
     def run_year_cycle(self):
         """
         Runs through each of the 6 yearly seasons for all cells
         """
+        all_migrated_animals = []
         for loc, cell in self.landscape.items():
             if cell.is_mainland:
                 #  1. Feeding
@@ -284,7 +287,10 @@ class Simulation:
                 self.procreation(cell)
 
                 # 3. Migration
-                self.migrate(loc, cell)
+                migrated_animals = self.migrate(loc, cell, all_migrated_animals)
+                # print(migrated_animals)
+
+                all_migrated_animals.extend(migrated_animals)
 
                 #  4. Aging
                 for animal in cell.animals:
@@ -319,9 +325,9 @@ class Simulation:
         ax_main, ax_weight, ax_fitness, ax_age, axhm_herb, axhm_carn = self.init_plot(num_years)
 
         for year in range(num_years):
-            print(self.landscape)
-            print("Carnivore instance count: ", Animal.animal_count)
-            print("Herbivore instance count: ", Animal.animal_count)
+            # print("Carnivore instance count: ", Carnivore.animal_instance_count)
+            # print("Herbivore instance count: ", Herbivore.animal_instance_count)
+            # print("Animal instance count: ", Animal.animal_instance_count)
             self.run_year_cycle()
 
             self._y_herb[year] = self.total_herb_count
@@ -398,26 +404,26 @@ class Simulation:
         self._carn_line.set_ydata(self._y_carn)
         self._carn_line.set_xdata(range(len(self._y_carn)))
 
-        # ax_weight.clear()
-        # ax_weight.hist(self.animal_weights, bins=10)
-        #
-        # ax_fitness.clear()
-        # ax_fitness.hist(self.animal_fitness, bins=10)
-        #
-        # ax_age.clear()
-        # ax_age.hist(self.animal_ages, bins=10)
-        #
-        # ax_weight.set_title('Weight distribution')
-        # ax_fitness.set_title('Fitness distribution')
-        # ax_age.set_title('Age distribution')
-        #
-        # if self.year % 5 == 1:
-        #     self.update_pop_matrix
-        #     axhm_herb.clear(), axhm_carn.clear()
-        #     axhm_herb.imshow(self.herb_pop_matrix, cmap='hot')
-        #     axhm_carn.imshow(self.carn_pop_matrix, cmap='hot')
-        #     axhm_herb.set_title('Herbivore density')
-        #     axhm_carn.set_title('Carnivore density')
+        ax_weight.clear()
+        ax_weight.hist(self.animal_weights, bins=10)
+
+        ax_fitness.clear()
+        ax_fitness.hist(self.animal_fitness, bins=10)
+
+        ax_age.clear()
+        ax_age.hist(self.animal_ages, bins=10)
+
+        ax_weight.set_title('Weight distribution')
+        ax_fitness.set_title('Fitness distribution')
+        ax_age.set_title('Age distribution')
+
+        if self.year % 5 == 1:
+            self.update_pop_matrix
+            axhm_herb.clear(), axhm_carn.clear()
+            axhm_herb.imshow(self.herb_pop_matrix, cmap='hot')
+            axhm_carn.imshow(self.carn_pop_matrix, cmap='hot')
+            axhm_herb.set_title('Herbivore density')
+            axhm_carn.set_title('Carnivore density')
 
         plt.pause(1e-6)
 
@@ -467,11 +473,13 @@ class Simulation:
         axhm_herb.imshow(self.herb_pop_matrix)
         axhm_carn.imshow(self.carn_pop_matrix)
         axhm_herb.set_title('Herbivore density')
+
         axhm_carn.set_title('Carnivore density')
         axhm_carn.set_xticks(range(len(self.unique_cols)))
         axhm_carn.set_xticklabels(range(1, len(self.unique_cols)+1))
         axhm_carn.set_yticks(range(len(self.unique_rows)))
         axhm_carn.set_yticklabels(range(1, len(self.unique_rows)+1))
+
         axhm_herb.set_xticks(range(len(self.unique_cols)))
         axhm_herb.set_xticklabels(range(1, len(self.unique_cols)+1))
         axhm_herb.set_yticks(range(len(self.unique_rows)))
@@ -484,7 +492,7 @@ class Simulation:
 
         :param map_str: A multi-line string representing cell classes and coordinates
         :type map_str: str
-
+        ...
         :return: The landscape for the simulation with initiated landscape classes
         :rtype: dict
         """
@@ -507,9 +515,9 @@ class Simulation:
 
 
 if __name__ == "__main__":
-    geogr = """WWW
-    WLW
-    WWW"""
+    geogr = """WWWWW
+    WLDHW
+    WWWWW"""
     sim = Simulation(ini_geogr=geogr)  # Create simple simulation instance
 
     sim.landscape[(2, 2)].add_animals([Herbivore(age=5, weight=20) for _ in range(150)])
