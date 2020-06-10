@@ -15,14 +15,36 @@ class Landscape:
     """
 
     def __init__(self, f_max):
-        self.f_max = f_max  # Set fodder amount for each new year
-        self.fodder = f_max  # Set starting fodder amount to f_max
-        self.is_mainland = True
+        self._f_max = f_max  # Set fodder amount for each new year
+        self._fodder = f_max  # Set starting fodder amount to f_max
+        self._is_mainland = True
 
         self.herbivores = []
         self.carnivores = []
 
         # np.random.seed(123)
+
+    @property
+    def f_max(self):
+        return self._f_max
+
+    @f_max.setter
+    def f_max(self, f_max):
+        if f_max >= 0:
+            self._f_max = f_max
+
+    @property
+    def fodder(self):
+        return self._fodder
+
+    @fodder.setter
+    def fodder(self, fodder):
+        if fodder >= 0:
+            self._fodder = fodder
+
+    @property
+    def is_mainland(self):
+        return self._is_mainland
 
     def add_animals(self, animal_list):
         """Adds a list of animals to the cell class

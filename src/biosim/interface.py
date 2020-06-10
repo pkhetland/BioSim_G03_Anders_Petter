@@ -279,7 +279,7 @@ class Simulation:
         self._herb_fitness_list = []
         self._carn_fitness_list = []
 
-        # ax_main, ax_weight, ax_fitness, ax_age, axhm_herb, axhm_carn = self.init_plot(num_years)
+        ax_main, ax_weight, ax_fitness, ax_age, axhm_herb, axhm_carn = self.init_plot(num_years)
 
         for year in range(num_years):
             print(Carnivore.animal_count)
@@ -289,7 +289,7 @@ class Simulation:
             self._y_herb[year] = self.total_herb_count
             self._y_carn[year] = self.total_carn_count
 
-            # self.update_plot(ax_main, ax_weight, ax_fitness, ax_age, axhm_herb, axhm_carn)
+            self.update_plot(ax_main, ax_weight, ax_fitness, ax_age, axhm_herb, axhm_carn)
 
         print("Simulation complete.")
 
@@ -462,7 +462,7 @@ if __name__ == "__main__":
     # Test multi-cell sim
     sim.landscape[(2, 5)].add_animals([Herbivore(age=5, weight=20) for _ in range(20)])
 
-    sim.run_simulation(num_years=250)
+    sim.run_simulation(num_years=50)
 
     input("Press enter...")
     # print([herb.fitness for herb in cell.sorted_herbivores])
