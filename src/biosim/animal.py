@@ -23,16 +23,16 @@ class Animal:
         self._species = self.__class__.__name__
         self._death_prob = None
 
-        # self.count_animal()
+        self.count_animal()
         np.random.seed(123)
 
-    # @classmethod
-    # def count_animal(cls):
-    #     cls.animal_count += 1
+    @classmethod
+    def count_animal(cls):
+        cls.animal_count += 1
 
-    # @classmethod
-    # def subtract_animal(cls):
-    #     cls.animal_count -= 1
+    @classmethod
+    def subtract_animal(cls):
+        cls.animal_count -= 1
 
     @property
     def weight(self):
@@ -112,8 +112,8 @@ class Animal:
                 )
                 self._death_prob = None
 
-        # if death:
-        #     self.subtract_animal()
+        if death:
+            self.subtract_animal()
 
         return death
 
@@ -172,14 +172,6 @@ class Herbivore(Animal):
             self.p = p
 
         super().__init__(weight, age)
-    #
-    # @classmethod
-    # def subtract_herbivore(cls):
-    #     cls.herbivore_instance_count -= 1
-    #
-    # @classmethod
-    # def instance_count(cls):
-    #     return cls.herbivore_instance_count
 
     def eat_fodder(self, cell):
         """
