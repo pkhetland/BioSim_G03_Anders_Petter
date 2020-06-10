@@ -13,6 +13,7 @@ import pytest
 
 
 class TestAnimal:
+    alpha = 0.01
 
     """
     Tests for animal class
@@ -40,14 +41,28 @@ class TestAnimal:
 
     def test_death_binom(self):
         """
-        Test if the death function is statistical significant
+        Test if the death function is statistical significant under the bionomial test
+        with a given death probability p
         """
         h = Herbivore(age=0, weight=10)
         p = 0.1
         N = 100
         n = sum(h.death() for _ in range(N))
         print("Number of deaths:", n)
-        assert stats.binom_test(h.death(), n, p, alternative='two-sided') > 0.01
+        assert stats.binom_test(h.death(), n, p, alternative='two-sided') > self.alpha
+
+    @pytest.fixture(autouse=True)
+    def create_animals(self):
+        """
+        Based on solution from Bishnu Pudel
+        Create two herbivore objects
+        """
+        h1 = Herbivore(weight=10, age=0)
+        h2 = Herbivore(weight=10, age=0)
+        # set parameters
+        h1.birth_prob = 0.5
+        h2.birth_prob = 0.5
+
 
 
     def test_death_z_test(self):
@@ -59,7 +74,6 @@ class TestAnimal:
         normally distributed for large number of animals. And the death probability is
         significant with a p-value of 0.01.
         """
-        # Spm: Bruker seeden fra animal.py. Er det OK?
         b = Herbivore(age=0, weight=10)
         # Set mocking parameter of the death probability of the animal
         p = 0.1

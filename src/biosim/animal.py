@@ -18,9 +18,9 @@ class Animal:
         else:
             self.weight = weight
         self.age = age
-
         self.species = self.__class__.__name__
         self.death_prob = None
+        self.birth_prob = None
 
         # np.random.seed(123)
 
