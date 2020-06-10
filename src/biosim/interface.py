@@ -185,6 +185,83 @@ class Simulation:
             [cell.carn_count for cell in self.landscape.values() if cell.is_mainland]
         )
 
+    def feeding(self, cell):
+        """Iterates through each animal in the cell and feeds it according to species
+
+        :param cell: Current cell object
+        :type cell: object
+        """
+        cell.fodder = cell.f_max
+        # Randomize animals before feeding
+        if self._randomize_animals:
+            cell.randomize_herbs()
+
+        for herb in cell.herbivores:  # Herbivores eat first
+            # if not cell.is_empty:
+            if cell.fodder != 0:
+                herb.eat_fodder(cell)
+
+        for carn in cell.carnivores:  # Carnivores eat last
+            herbs_killed = carn.kill_prey(
+                cell.sorted_herbivores
+            )  # Carnivore hunts for herbivores
+            cell.remove_animals(herbs_killed)  # Remove killed animals from cell
+
+    def procreation(self, cell):
+        """Iterates through each animal in the cell and procreates
+
+        :param cell: Current cell object
+        :type cell: object
+        """
+        new_animals = []
+        n_herbs, n_carns = cell.herb_count, cell.carn_count
+
+        for herb in cell.herbivores:  # Herbivores give birth)
+            give_birth, birth_weight = herb.give_birth(n_herbs)
+
+            if give_birth:
+                new_animals.append(Herbivore(weight=birth_weight, age=0))
+
+        for carn in cell.carnivores:  # Carnivores give birth
+            give_birth, birth_weight = carn.give_birth(n_carns)
+
+            if give_birth:
+                new_animals.append(Carnivore(weight=birth_weight, age=0))
+
+        cell.add_animals(new_animals)  # Add new animals to cell
+
+    def migrate(self, loc, cell):
+        """Iterates through each animal in the cell and migrates
+
+        :param loc: Coordinate of current cell
+        :type loc: tuple
+        :param cell: Current cell object
+        :type cell: object
+        """
+        # Define neighbor cells once:
+        neighbor_cells = [
+            self.landscape[(loc[0] - 1, loc[1])],
+            self.landscape[(loc[0], loc[1] + 1)],
+            self.landscape[(loc[0] + 1, loc[1])],
+            self.landscape[(loc[0], loc[1] - 1)],
+        ]
+
+        removed_animals = []
+        for animal in cell.animals:
+            if animal.migrate():
+                available_neighbors = [
+                    neighbor
+                    for neighbor in neighbor_cells
+                    if neighbor.is_mainland
+                ]
+
+                if len(available_neighbors) > 0:
+                    chosen_cell = np.random.choice(available_neighbors)
+                    chosen_cell.add_animals([animal])
+                    removed_animals.append(animal)
+
+        cell.remove_animals(removed_animals)
+
     def run_year_cycle(self):
         """
         Runs through each of the 6 yearly seasons for all cells
@@ -192,64 +269,13 @@ class Simulation:
         for loc, cell in self.landscape.items():
             if cell.is_mainland:
                 #  1. Feeding
-                cell.fodder = cell.f_max
-                # Randomize animals before feeding
-                if self._randomize_animals:
-                    cell.randomize_herbs()
-
-                for herb in cell.herbivores:  # Herbivores eat first
-                    # if not cell.is_empty:
-                    if cell.fodder != 0:
-                        herb.eat_fodder(cell)
-
-                for carn in cell.carnivores:  # Carnivores eat last
-                    herbs_killed = carn.kill_prey(
-                        cell.sorted_herbivores
-                    )  # Carnivore hunts for herbivores
-                    cell.remove_animals(herbs_killed)  # Remove killed animals from cell
+                self.feeding(cell)
 
                 #  2. Procreation
-                new_animals = []
-                n_herbs, n_carns = cell.herb_count, cell.carn_count
-
-                for herb in cell.herbivores:  # Herbivores give birth)
-                    give_birth, birth_weight = herb.give_birth(n_herbs)
-
-                    if give_birth:
-                        new_animals.append(Herbivore(weight=birth_weight, age=0))
-
-                for carn in cell.carnivores:  # Carnivores give birth
-                    give_birth, birth_weight = carn.give_birth(n_carns)
-
-                    if give_birth:
-                        new_animals.append(Carnivore(weight=birth_weight, age=0))
-
-                cell.add_animals(new_animals)  # Add new animals to cell
+                self.procreation(cell)
 
                 # 3. Migration
-                # Define neighbor cells once:
-                neighbor_cells = [
-                    self.landscape[(loc[0] - 1, loc[1])],
-                    self.landscape[(loc[0], loc[1] + 1)],
-                    self.landscape[(loc[0] + 1, loc[1])],
-                    self.landscape[(loc[0], loc[1] - 1)],
-                ]
-
-                removed_animals = []
-                for animal in cell.animals:
-                    if animal.migrate():
-                        available_neighbors = [
-                            neighbor
-                            for neighbor in neighbor_cells
-                            if neighbor.is_mainland
-                        ]
-
-                        if len(available_neighbors) > 0:
-                            chosen_cell = np.random.choice(available_neighbors)
-                            chosen_cell.add_animals([animal])
-                            removed_animals.append(animal)
-
-                cell.remove_animals(removed_animals)
+                self.migrate(loc, cell)
 
                 #  4. Aging
                 for animal in cell.animals:
@@ -282,8 +308,8 @@ class Simulation:
         ax_main, ax_weight, ax_fitness, ax_age, axhm_herb, axhm_carn = self.init_plot(num_years)
 
         for year in range(num_years):
-            print(Carnivore.animal_count)
-            print(Herbivore.animal_count)
+            print("Carnivore instance count: ", Carnivore.animal_count)
+            print("Herbivore instance count: ", Herbivore.animal_count)
             self.run_year_cycle()
 
             self._y_herb[year] = self.total_herb_count
