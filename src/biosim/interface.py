@@ -23,21 +23,21 @@ class Simulation:
     Main interface class for BioSim
     """
 
-    def __init__(self, seed=1, randomize_animals=True, ini_geogr=None):
+    def __init__(self, seed=1234, randomize_animals=True, ini_geogr=None):
 
         self.map_str = ini_geogr
         if self.map_str is None:
-            self.landscape = self.map_from_str(
+            self._landscape = self.map_from_str(
                 """WWW
                 WLW
                 WWW"""
             )
         elif type(self.map_str) == str:
-            self.landscape = self.map_from_str(self.map_str)
+            self._landscape = self.map_from_str(self.map_str)
         else:
             print("Map string needs to be of type str!")
 
-        self.year = 0
+        self._year = 0
 
         random.seed(seed)
         self._randomize_animals = randomize_animals
@@ -54,6 +54,14 @@ class Simulation:
         self._carn_fitness_list = None
         self._herb_fitness_line = None
         self._carn_fitness_line = None
+
+    @property
+    def year(self):
+        return self._year
+
+    @property
+    def landscape(self):
+        return self._landscape
 
     @property
     def unique_rows(self):
@@ -207,7 +215,8 @@ class Simulation:
             )  # Carnivore hunts for herbivores
             cell.remove_animals(herbs_killed)  # Remove killed animals from cell
 
-    def procreation(self, cell):
+    @staticmethod
+    def procreation(cell):
         """Iterates through each animal in the cell and procreates
 
         :param cell: Current cell object
@@ -294,7 +303,7 @@ class Simulation:
 
                 cell.remove_animals(dead_animals)
 
-                self.year += 1  # Add year to simulation
+                self._year += 1  # Add year to simulation
 
     def run_simulation(self, num_years):
         """ Runs yearly cycle function for the given number of years
@@ -310,8 +319,9 @@ class Simulation:
         ax_main, ax_weight, ax_fitness, ax_age, axhm_herb, axhm_carn = self.init_plot(num_years)
 
         for year in range(num_years):
-            print("Carnivore instance count: ", Carnivore.animal_count)
-            print("Herbivore instance count: ", Herbivore.animal_count)
+            print(self.landscape)
+            print("Carnivore instance count: ", Animal.animal_count)
+            print("Herbivore instance count: ", Animal.animal_count)
             self.run_year_cycle()
 
             self._y_herb[year] = self.total_herb_count
@@ -497,17 +507,16 @@ class Simulation:
 
 
 if __name__ == "__main__":
-    geogr = """WWWWWW
-    WLWDLW
-    WHDWDW
-    WWWWWW"""
+    geogr = """WWW
+    WLW
+    WWW"""
     sim = Simulation(ini_geogr=geogr)  # Create simple simulation instance
 
     sim.landscape[(2, 2)].add_animals([Herbivore(age=5, weight=20) for _ in range(150)])
-    sim.landscape[(2, 2)].add_animals([Carnivore(age=5, weight=20) for _ in range(40)])
+    sim.landscape[(2, 2)].add_animals([Carnivore(age=5, weight=20) for _ in range(15)])
 
     # Test multi-cell sim
-    sim.landscape[(2, 5)].add_animals([Herbivore(age=5, weight=20) for _ in range(20)])
+    # sim.landscape[(2, 5)].add_animals([Herbivore(age=5, weight=20) for _ in range(20)])
 
     sim.run_simulation(num_years=50)
 

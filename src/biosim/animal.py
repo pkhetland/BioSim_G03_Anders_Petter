@@ -17,14 +17,20 @@ class Animal:
         if weight is None:
             self._weight = self.birth_weight
         else:
-            self._weight = weight
+            self._weight = float(weight)
         self._age = age
 
         self._species = self.__class__.__name__
         self._death_prob = None
 
         self.count_animal()
-        np.random.seed(123)
+        np.random.seed(1234)
+
+    def __repr__(self):
+        return '{}({} years, {:.3} kg)'.format(self._species, self._age, self._weight)
+
+    def __str__(self):
+        return '{}({} years, {:.3} kg)'.format(self._species, self._age, self._weight)
 
     @classmethod
     def count_animal(cls):

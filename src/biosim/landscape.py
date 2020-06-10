@@ -24,6 +24,12 @@ class Landscape:
 
         np.random.seed(123)
 
+    def __repr__(self):
+        return '{}(f_max: {})'.format(self.__class__.__name__, self._f_max)
+
+    def __str__(self):
+        return '{}(f_max: {})'.format(self.__class__.__name__, self._f_max)
+
     @property
     def f_max(self):
         return self._f_max
@@ -188,3 +194,9 @@ class Water:
 
     def __init__(self):
         self.is_mainland = False
+
+    def __repr__(self):
+        return 'Water cell'
+
+    def __str__(self):
+        return 'Water cell'
