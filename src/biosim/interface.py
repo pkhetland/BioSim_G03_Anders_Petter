@@ -262,15 +262,9 @@ class Simulation:
                 #  6. Death
                 dead_animals = []
 
-                for herb in cell.herbivores:
-                    if herb.death():
-                        Herbivore.subtract_herbivore()
-                        dead_animals.append(herb)
-
-                for carn in cell.carnivores:
-                    if carn.death():
-                        Carnivore.subtract_carnivore()
-                        dead_animals.append(carn)
+                for animal in cell.animals:
+                    if animal.death():
+                        dead_animals.append(animal)
 
                 cell.remove_animals(dead_animals)
 
@@ -288,12 +282,12 @@ class Simulation:
         ax_main, ax_weight, ax_fitness, ax_age, axhm_herb, axhm_carn = self.init_plot(num_years)
 
         for year in range(num_years):
+            print(Carnivore.animal_count)
+            print(Herbivore.animal_count)
             self.run_year_cycle()
 
             self._y_herb[year] = self.total_herb_count
             self._y_carn[year] = self.total_carn_count
-            self._herb_fitness_list = [herb.fitness for herb in self.all_herbivores]
-            self._carn_fitness_list = [carn.fitness for carn in self.all_carnivores]
 
             self.update_plot(ax_main, ax_weight, ax_fitness, ax_age, axhm_herb, axhm_carn)
 
@@ -355,26 +349,26 @@ class Simulation:
         self._carn_line.set_ydata(self._y_carn)
         self._carn_line.set_xdata(range(len(self._y_carn)))
 
-        ax_weight.clear()
-        ax_weight.hist(self.animal_weights, bins=10)
-
-        ax_fitness.clear()
-        ax_fitness.hist(self.animal_fitness, bins=10)
-
-        ax_age.clear()
-        ax_age.hist(self.animal_ages, bins=10)
-
-        ax_weight.set_title('Weight distribution')
-        ax_fitness.set_title('Fitness distribution')
-        ax_age.set_title('Age distribution')
-
-        if self.year % 5 == 1:
-            self.update_pop_matrix
-            axhm_herb.clear(), axhm_carn.clear()
-            axhm_herb.imshow(self.herb_pop_matrix, cmap='hot')
-            axhm_carn.imshow(self.carn_pop_matrix, cmap='hot')
-            axhm_herb.set_title('Herbivore density')
-            axhm_carn.set_title('Carnivore density')
+        # ax_weight.clear()
+        # ax_weight.hist(self.animal_weights, bins=10)
+        #
+        # ax_fitness.clear()
+        # ax_fitness.hist(self.animal_fitness, bins=10)
+        #
+        # ax_age.clear()
+        # ax_age.hist(self.animal_ages, bins=10)
+        #
+        # ax_weight.set_title('Weight distribution')
+        # ax_fitness.set_title('Fitness distribution')
+        # ax_age.set_title('Age distribution')
+        #
+        # if self.year % 5 == 1:
+        #     self.update_pop_matrix
+        #     axhm_herb.clear(), axhm_carn.clear()
+        #     axhm_herb.imshow(self.herb_pop_matrix, cmap='hot')
+        #     axhm_carn.imshow(self.carn_pop_matrix, cmap='hot')
+        #     axhm_herb.set_title('Herbivore density')
+        #     axhm_carn.set_title('Carnivore density')
 
         plt.pause(1e-6)
 
@@ -468,7 +462,7 @@ if __name__ == "__main__":
     # Test multi-cell sim
     sim.landscape[(2, 5)].add_animals([Herbivore(age=5, weight=20) for _ in range(20)])
 
-    sim.run_simulation(num_years=250)
+    sim.run_simulation(num_years=50)
 
     input("Press enter...")
     # print([herb.fitness for herb in cell.sorted_herbivores])

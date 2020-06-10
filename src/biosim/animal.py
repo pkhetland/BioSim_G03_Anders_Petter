@@ -11,18 +11,48 @@ class Animal:
     """
     Super class for Herbivores and Carnivores
     """
+    animal_count = 0
 
     def __init__(self, weight, age):
         if weight is None:
-            self.weight = self.birth_weight
+            self._weight = self.birth_weight
         else:
-            self.weight = weight
-        self.age = age
-        self.species = self.__class__.__name__
-        self.death_prob = None
-        self.birth_prob = None
+            self._weight = weight
+        self._age = age
 
-        # np.random.seed(123)
+        self._species = self.__class__.__name__
+        self._death_prob = None
+
+        self.count_animal()
+        np.random.seed(123)
+
+    @classmethod
+    def count_animal(cls):
+        cls.animal_count += 1
+
+    @classmethod
+    def subtract_animal(cls):
+        cls.animal_count -= 1
+
+    @property
+    def weight(self):
+        return self._weight
+
+    @weight.setter
+    def weight(self, weight):
+        self._weight = weight
+
+    @property
+    def age(self):
+        return self._age
+
+    @age.setter
+    def age(self, age):
+        self._age = age
+
+    @property
+    def species(self):
+        return self._species
 
     def aging(self):
         """
@@ -75,12 +105,15 @@ class Animal:
         if self.weight <= 0:
             death = True
         else:
-            if self.death_prob is None:
-                self.death_prob = self.p["omega"] * (1 - self.fitness)
+            if self._death_prob is None:
+                self._death_prob = self.p["omega"] * (1 - self.fitness)
                 death = np.random.choice(
-                    [True, False], p=[self.death_prob, 1 - self.death_prob]
+                    [True, False], p=[self._death_prob, 1 - self._death_prob]
                 )
-                self.death_prob = None
+                self._death_prob = None
+
+        if death:
+            self.subtract_animal()
 
         return death
 
@@ -139,19 +172,6 @@ class Herbivore(Animal):
             self.p = p
 
         super().__init__(weight, age)
-        self.count_herbivore()
-
-    @classmethod
-    def count_herbivore(cls):
-        cls.herbivore_instance_count += 1
-
-    @classmethod
-    def subtract_herbivore(cls):
-        cls.herbivore_instance_count -= 1
-
-    @classmethod
-    def instance_count(cls):
-        return cls.herbivore_instance_count
 
     def eat_fodder(self, cell):
         """
@@ -176,7 +196,7 @@ class Carnivore(Animal):
     Carnivore class
     """
 
-    carnivore_instance_count = 0
+    # carnivore_instance_count = 0
 
     def __init__(self, weight=None, age=0, p=None):
         if p is None:  # If no parameters are specified
@@ -201,19 +221,19 @@ class Carnivore(Animal):
             self.p = p
 
         super().__init__(weight, age)
-        self.count_carnivore()
+        # self.count_carnivore()
+    #
+    # @classmethod
+    # def count_carnivore(cls):
+    #     cls.carnivore_instance_count += 1
+    #
+    # @classmethod
+    # def subtract_animal(cls):
+    #     super(Herbivore, cls).animal_count -= 1
 
-    @classmethod
-    def count_carnivore(cls):
-        cls.carnivore_instance_count += 1
-
-    @classmethod
-    def subtract_carnivore(cls):
-        cls.carnivore_instance_count -= 1
-
-    @classmethod
-    def instance_count(cls):
-        return cls.carnivore_instance_count
+    # @classmethod
+    # def instance_count(cls):
+    #     return cls.carnivore_instance_count
 
     def kill_prey(self, sorted_herbivores):
         """Iterates through sorted herbivores and eats until F is met
