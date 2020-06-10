@@ -298,7 +298,9 @@ class Simulation:
 
     def run_simulation(self, num_years):
         """ Runs yearly cycle function for the given number of years
+
         :param num_years: number of years to simulate
+        :type num_years: int
         """
         self._y_herb = [np.nan for _ in range(num_years)]
         self._y_carn = [np.nan for _ in range(num_years)]
@@ -320,7 +322,8 @@ class Simulation:
         print("Simulation complete.")
 
     def init_plot(self, num_years):
-        """
+        """ Initialize the plot at the beginning of the simulation
+
         :param num_years: Number of years to run sim for x-axis
         :type num_years: int
         """
@@ -357,18 +360,28 @@ class Simulation:
 
         return ax_main, ax_weight, ax_fitness, ax_age, axhm_herb, axhm_carn
 
-    def update_plot(self, ax_1, ax_weight, ax_fitness, ax_age, axhm_herb, axhm_carn):
+    def update_plot(self, ax_main, ax_weight, ax_fitness, ax_age, axhm_herb, axhm_carn):
         """Redraw plot with updated values
 
-        :param ax_1: pyplot axis
-        :type ax_1: object
+        :param ax_main: pyplot axis for line plots
+        :type ax_main: object
+        :param ax_weight: pyplot axis weight histogram
+        :type ax_weight: object
+        :param ax_fitness: pyplot axis for fitness histogram
+        :type ax_fitness: object
+        :param ax_age: pyplot axis for age histogram
+        :type ax_age: object
+        :param axhm_herb: pyplot axis for herbivore density heatmap
+        :type axhm_herb: object
+        :param axhm_carn: pyplot axis for carnivore density heatmap
+        :type axhm_carn: object
         """
         if max(self._y_herb) >= max(
             self._y_carn
         ):  # Find the biggest count value in either y_herb or y_carn
-            ax_1.set_ylim([0, max(self._y_herb) + 20])  # Set the y-lim to this max
+            ax_main.set_ylim([0, max(self._y_herb) + 20])  # Set the y-lim to this max
         else:
-            ax_1.set_ylim([0, max(self._y_carn) + 20])  #
+            ax_main.set_ylim([0, max(self._y_carn) + 20])  #
 
         self._herb_line.set_ydata(self._y_herb)
         self._herb_line.set_xdata(range(len(self._y_herb)))
@@ -402,6 +415,12 @@ class Simulation:
     def plot_map(map_str, axim, axlg):
         """Author: Hans
 
+        :param map_str: Multi-line string containing letters symbolizing the landscape
+        :type map_str: str
+        :param axim: Image axis for plotting map
+        :type axim: object
+        :param axlg: Legend axis for plotting legend blocks
+        :type axlg: object
         """
 
         #                   R    G    B
@@ -429,6 +448,8 @@ class Simulation:
 
     def plot_heatmap(self, axhm_herb, axhm_carn):
         """Create matrix for population and create heatmap
+
+        Create self.axhm_herb and self.axhm_carn?
         """
         self.herb_pop_matrix = [[0 for _ in self.unique_cols] for _ in self.unique_rows]
         self.carn_pop_matrix = [[0 for _ in self.unique_cols] for _ in self.unique_rows]
