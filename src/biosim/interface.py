@@ -262,15 +262,9 @@ class Simulation:
                 #  6. Death
                 dead_animals = []
 
-                for herb in cell.herbivores:
-                    if herb.death():
-                        Herbivore.subtract_herbivore()
-                        dead_animals.append(herb)
-
-                for carn in cell.carnivores:
-                    if carn.death():
-                        Carnivore.subtract_carnivore()
-                        dead_animals.append(carn)
+                for animal in cell.animals:
+                    if animal.death():
+                        dead_animals.append(animal)
 
                 cell.remove_animals(dead_animals)
 
@@ -285,17 +279,17 @@ class Simulation:
         self._herb_fitness_list = []
         self._carn_fitness_list = []
 
-        ax_main, ax_weight, ax_fitness, ax_age, axhm_herb, axhm_carn = self.init_plot(num_years)
+        # ax_main, ax_weight, ax_fitness, ax_age, axhm_herb, axhm_carn = self.init_plot(num_years)
 
         for year in range(num_years):
+            print(Carnivore.animal_count)
+            print(Herbivore.animal_count)
             self.run_year_cycle()
 
             self._y_herb[year] = self.total_herb_count
             self._y_carn[year] = self.total_carn_count
-            self._herb_fitness_list = [herb.fitness for herb in self.all_herbivores]
-            self._carn_fitness_list = [carn.fitness for carn in self.all_carnivores]
 
-            self.update_plot(ax_main, ax_weight, ax_fitness, ax_age, axhm_herb, axhm_carn)
+            # self.update_plot(ax_main, ax_weight, ax_fitness, ax_age, axhm_herb, axhm_carn)
 
         print("Simulation complete.")
 
