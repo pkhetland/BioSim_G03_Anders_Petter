@@ -71,7 +71,8 @@ class Animal:
         elif birth_prob >= 1:
             give_birth = True
         elif 0 < birth_prob < 1:
-            give_birth = np.random.choice([True, False], p=[birth_prob, 1 - birth_prob])
+            give_birth = True if random.random() <= birth_prob else False
+            # give_birth = random.choice([True, False], weights=[birth_prob, 1 - birth_prob])
         else:
             give_birth = False
 
@@ -90,7 +91,8 @@ class Animal:
         Returns bool indicating whether animal will migrate
         """
         move_prob = self.p["mu"] * self.fitness
-        return np.random.choice([True, False], p=[move_prob, 1 - move_prob])
+        return True if random.random() <= move_prob else False
+        # return np.random.choice([True, False], p=[move_prob, 1 - move_prob])
 
     def lose_weight(self):
         """
@@ -109,9 +111,10 @@ class Animal:
             if self._death_prob is None:
                 self._death_prob = self.p["omega"] * (1 - self.fitness)
 
-            death = np.random.choice(
-                [True, False], p=[self._death_prob, 1 - self._death_prob]
-            )
+            death = True if random.random() <= self._death_prob else False
+            # death = random.choice(
+            #     [True, False], weights=[self._death_prob, 1 - self._death_prob]
+            # )
             self._death_prob = None
 
         if death:
@@ -252,9 +255,10 @@ class Carnivore(Animal):
 
                 elif 0 < fitness_diff < self.p["DeltaPhiMax"]:
                     kill_prob = fitness_diff / self.p["DeltaPhiMax"]
-                    kill_prey = np.random.choice(
-                        [True, False], p=[kill_prob, 1 - kill_prob]
-                    )
+                    kill_prey = True if random.random() <= kill_prob else False
+                    # kill_prey = random.choice(
+                    #     [True, False], weights=[kill_prob, 1 - kill_prob]
+                    # )
 
                 else:
                     kill_prey = True

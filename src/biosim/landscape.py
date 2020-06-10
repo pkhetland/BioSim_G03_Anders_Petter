@@ -9,6 +9,60 @@ import operator
 import random
 
 
+class Island:
+    """
+    Island collects all landscape cells in the map
+    """
+
+    def __init__(self, map_str):
+        self.landscape = self.map_from_str(map_str)
+        self.land_cells = self.get_land_cells
+        self.map_str = map_str
+
+    @property
+    def get_land_cells(self):
+        return {loc: cell for loc, cell in self.landscape.items() if cell.is_mainland}
+
+    @property
+    def unique_rows(self):
+        return list(set([coord[0] for coord in self.landscape]))
+
+    @property
+    def unique_cols(self):
+        return list(set([coord[1] for coord in self.landscape]))
+
+    def add_animals(self, animal_list):
+        pass
+
+    @staticmethod
+    def map_from_str(map_str):
+        """The sim takes in a map str and converts it into a dictionary of
+        coord keys and class values
+
+        :param map_str: A multi-line string representing cell classes and coordinates
+        :type map_str: str
+        ...
+        :return: The landscape for the simulation with initiated landscape classes
+        :rtype: dict
+        """
+        map_dict = {}
+
+        for row_coord, cell_row in enumerate(map_str.splitlines()):
+            for col_coord, cell in enumerate(cell_row.strip()):
+                coord = (row_coord + 1, col_coord + 1)
+                if cell == 'W':
+                    map_dict[coord] = Water()
+                elif cell == 'L':
+                    map_dict[coord] = Lowland()
+                elif cell == 'H':
+                    map_dict[coord] = Highland()
+                elif cell == 'D':
+                    map_dict[coord] = Desert()
+                else:
+                    print("Map strings need to be either W, L, H or D! Try setting map again.")
+        return map_dict
+
+
 class Landscape:
     """
     Parent class for landscape cells
