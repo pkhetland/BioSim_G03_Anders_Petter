@@ -5,13 +5,14 @@ __email__ = "anders.molmen.host@nmbu.no, petter.storesund.hetland@nmbu.no"
 
 import numpy as np
 import random as random
+from math import e
 
 
 class Animal:
     """
     Super class for Herbivores and Carnivores
     """
-    animal_instance_count = 0
+    instance_count = 0
 
     def __init__(self, weight, age):
         if weight is None:
@@ -23,9 +24,9 @@ class Animal:
         self._species = self.__class__.__name__
         self._death_prob = None
 
-        np.random.seed(1234)  # Set seed - Will be moved to interface
+        np.random.seed(123)  # Set seed - Will be moved to interface
 
-        self.count_animal()  #
+        Animal.instance_count += 1
 
     def __repr__(self):
         return '{}({} years, {:.3} kg)'.format(self._species, self._age, self._weight)
@@ -33,13 +34,6 @@ class Animal:
     def __str__(self):
         return '{}({} years, {:.3} kg)'.format(self._species, self._age, self._weight)
 
-    @classmethod
-    def count_animal(cls):
-        cls.animal_instance_count += 1
-
-    @classmethod
-    def subtract_animal(cls):
-        cls.animal_instance_count -= 1
 
     @property
     def weight(self):
@@ -121,13 +115,17 @@ class Animal:
             self._death_prob = None
 
         if death:
-            self.subtract_animal()
+            Animal.instance_count -= 1
+            if self.species == 'Herbivore':
+                Herbivore.instance_count -= 1
+            elif self.species == 'Carnivore':
+                Carnivore.instance_count -= 1
 
         return death
 
     @staticmethod
     def q(sgn, x, x_half, phi):
-        return 1.0 / (1.0 + np.exp(sgn * phi * (x - x_half)))
+        return 1.0 / (1.0 + e**(sgn * phi * (x - x_half)))
 
     @property
     def fitness(self):
@@ -155,7 +153,7 @@ class Animal:
 
 class Herbivore(Animal):
 
-    herbivore_instance_count = 0
+    instance_count = 0
 
     def __init__(self, weight=None, age=0, p=None):
 
@@ -181,11 +179,7 @@ class Herbivore(Animal):
 
         super().__init__(weight, age)
 
-        # super().count_animal()
-
-    # @classmethod
-    # def animal_count(cls):
-    #     return super(Herbivore, cls).animal_count
+        Herbivore.instance_count += 1
 
     def eat_fodder(self, cell):
         """
@@ -210,7 +204,7 @@ class Carnivore(Animal):
     Carnivore class
     """
 
-    # carnivore_instance_count = 0
+    instance_count = 0
 
     def __init__(self, weight=None, age=0, p=None):
         if p is None:  # If no parameters are specified
@@ -235,19 +229,8 @@ class Carnivore(Animal):
             self.p = p
 
         super().__init__(weight, age)
-        # self.count_carnivore()
-    #
-    # @classmethod
-    # def count_carnivore(cls):
-    #     cls.carnivore_instance_count += 1
-    #
-    # @classmethod
-    # def subtract_animal(cls):
-    #     super(Herbivore, cls).animal_count -= 1
 
-    # @classmethod
-    # def instance_count(cls):
-    #     return cls.carnivore_instance_count
+        Carnivore.instance_count += 1
 
     def kill_prey(self, sorted_herbivores):
         """Iterates through sorted herbivores and eats until F is met
@@ -281,6 +264,9 @@ class Carnivore(Animal):
                         herb.weight
                     )  # Add herb weight to consumption_weight variable
                     herbs_killed.append(herb)
+
+                    Animal.instance_count -= 1
+                    Herbivore.instance_count -= 1
 
         if (
             consumption_weight > self.p["F"]

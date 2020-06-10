@@ -14,8 +14,6 @@ import numpy as np
 import random as random
 import operator
 import matplotlib.pyplot as plt
-import matplotlib.gridspec as gridspec
-import seaborn as sns
 
 
 class Simulation:
@@ -23,7 +21,7 @@ class Simulation:
     Main interface class for BioSim
     """
 
-    def __init__(self, seed=1234, randomize_animals=True, ini_geogr=None):
+    def __init__(self, seed=123, randomize_animals=True, ini_geogr=None):
 
         self.map_str = ini_geogr
         if self.map_str is None:
@@ -205,7 +203,6 @@ class Simulation:
             cell.randomize_herbs()
 
         for herb in cell.herbivores:  # Herbivores eat first
-            # if not cell.is_empty:
             if cell.fodder != 0:
                 herb.eat_fodder(cell)
 
@@ -322,18 +319,22 @@ class Simulation:
         self._herb_fitness_list = []
         self._carn_fitness_list = []
 
-        ax_main, ax_weight, ax_fitness, ax_age, axhm_herb, axhm_carn = self.init_plot(num_years)
+        # ax_main, ax_weight, ax_fitness, ax_age, axhm_herb, axhm_carn = self.init_plot(num_years)
 
         for year in range(num_years):
             # print("Carnivore instance count: ", Carnivore.animal_instance_count)
             # print("Herbivore instance count: ", Herbivore.animal_instance_count)
             # print("Animal instance count: ", Animal.animal_instance_count)
             self.run_year_cycle()
+            print(f'{self.year}')
+            print(Animal.instance_count)
+            print(Herbivore.instance_count)
+            print(Carnivore.instance_count)
 
-            self._y_herb[year] = self.total_herb_count
-            self._y_carn[year] = self.total_carn_count
+            self._y_herb[year] = Herbivore.instance_count
+            self._y_carn[year] = Carnivore.instance_count
 
-            self.update_plot(ax_main, ax_weight, ax_fitness, ax_age, axhm_herb, axhm_carn)
+            # self.update_plot(ax_main, ax_weight, ax_fitness, ax_age, axhm_herb, axhm_carn)
 
         print("Simulation complete.")
 
@@ -403,27 +404,30 @@ class Simulation:
         self._herb_line.set_xdata(range(len(self._y_herb)))
         self._carn_line.set_ydata(self._y_carn)
         self._carn_line.set_xdata(range(len(self._y_carn)))
-
-        ax_weight.clear()
-        ax_weight.hist(self.animal_weights, bins=10)
-
-        ax_fitness.clear()
-        ax_fitness.hist(self.animal_fitness, bins=10)
-
-        ax_age.clear()
-        ax_age.hist(self.animal_ages, bins=10)
-
-        ax_weight.set_title('Weight distribution')
-        ax_fitness.set_title('Fitness distribution')
-        ax_age.set_title('Age distribution')
-
-        if self.year % 5 == 1:
-            self.update_pop_matrix
-            axhm_herb.clear(), axhm_carn.clear()
-            axhm_herb.imshow(self.herb_pop_matrix, cmap='hot')
-            axhm_carn.imshow(self.carn_pop_matrix, cmap='hot')
-            axhm_herb.set_title('Herbivore density')
-            axhm_carn.set_title('Carnivore density')
+        #
+        # ax_weight.clear()
+        # ax_weight.hist(self.animal_weights, bins=10)
+        # ax_weight.set_xlim([0, 100])
+        #
+        # ax_fitness.clear()
+        # ax_fitness.hist(self.animal_fitness, bins=10)
+        # ax_fitness.set_xlim([0, 1])
+        #
+        # ax_age.clear()
+        # ax_age.hist(self.animal_ages, bins=10)
+        # ax_age.set_xlim([0, 30])
+        #
+        # ax_weight.set_title('Weight distribution')
+        # ax_fitness.set_title('Fitness distribution')
+        # ax_age.set_title('Age distribution')
+        #
+        # if self.year % 5 == 1:
+        #     self.update_pop_matrix
+        #     axhm_herb.clear(), axhm_carn.clear()
+        #     axhm_herb.imshow(self.herb_pop_matrix, cmap='hot')
+        #     axhm_carn.imshow(self.carn_pop_matrix, cmap='hot')
+        #     axhm_herb.set_title('Herbivore density')
+        #     axhm_carn.set_title('Carnivore density')
 
         plt.pause(1e-6)
 
@@ -469,21 +473,21 @@ class Simulation:
         """
         self.herb_pop_matrix = [[0 for _ in self.unique_cols] for _ in self.unique_rows]
         self.carn_pop_matrix = [[0 for _ in self.unique_cols] for _ in self.unique_rows]
-
-        axhm_herb.imshow(self.herb_pop_matrix)
-        axhm_carn.imshow(self.carn_pop_matrix)
-        axhm_herb.set_title('Herbivore density')
-
-        axhm_carn.set_title('Carnivore density')
-        axhm_carn.set_xticks(range(len(self.unique_cols)))
-        axhm_carn.set_xticklabels(range(1, len(self.unique_cols)+1))
-        axhm_carn.set_yticks(range(len(self.unique_rows)))
-        axhm_carn.set_yticklabels(range(1, len(self.unique_rows)+1))
-
-        axhm_herb.set_xticks(range(len(self.unique_cols)))
-        axhm_herb.set_xticklabels(range(1, len(self.unique_cols)+1))
-        axhm_herb.set_yticks(range(len(self.unique_rows)))
-        axhm_herb.set_yticklabels(range(1, len(self.unique_rows)+1))
+        #
+        # axhm_herb.imshow(self.herb_pop_matrix)
+        # axhm_carn.imshow(self.carn_pop_matrix)
+        # axhm_herb.set_title('Herbivore density')
+        #
+        # axhm_carn.set_title('Carnivore density')
+        # axhm_carn.set_xticks(range(len(self.unique_cols)))
+        # axhm_carn.set_xticklabels(range(1, len(self.unique_cols)+1))
+        # axhm_carn.set_yticks(range(len(self.unique_rows)))
+        # axhm_carn.set_yticklabels(range(1, len(self.unique_rows)+1))
+        #
+        # axhm_herb.set_xticks(range(len(self.unique_cols)))
+        # axhm_herb.set_xticklabels(range(1, len(self.unique_cols)+1))
+        # axhm_herb.set_yticks(range(len(self.unique_rows)))
+        # axhm_herb.set_yticklabels(range(1, len(self.unique_rows)+1))
 
     @staticmethod
     def map_from_str(map_str):
@@ -515,19 +519,19 @@ class Simulation:
 
 
 if __name__ == "__main__":
-    geogr = """WWWWW
-    WLDHW
-    WWWWW"""
+    geogr = """WWW
+    WLW
+    WWW"""
     sim = Simulation(ini_geogr=geogr)  # Create simple simulation instance
 
-    sim.landscape[(2, 2)].add_animals([Herbivore(age=5, weight=20) for _ in range(150)])
-    sim.landscape[(2, 2)].add_animals([Carnivore(age=5, weight=20) for _ in range(15)])
+    sim.landscape[(2, 2)].add_animals([Herbivore(age=5, weight=20) for _ in range(50)])
+    sim.landscape[(2, 2)].add_animals([Carnivore(age=5, weight=20) for _ in range(20)])
 
     # Test multi-cell sim
-    # sim.landscape[(2, 5)].add_animals([Herbivore(age=5, weight=20) for _ in range(20)])
+    # sim.landscape[(2, 3)].add_animals([Herbivore(age=5, weight=20) for _ in range(20)])
 
-    sim.run_simulation(num_years=50)
+    sim.run_simulation(num_years=250)
 
-    input("Press enter...")
+    # input("Press enter...")
     # print([herb.fitness for herb in cell.sorted_herbivores])
     # print([carn.fitness for carn in cell.sorted_carnivores])

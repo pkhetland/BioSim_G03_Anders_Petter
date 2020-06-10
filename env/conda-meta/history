@@ -184,3 +184,8 @@
 # conda version: 4.8.3
 +defaults/osx-64::cython-0.29.17-py38h0a44026_0
 # update specs: ['cython']
+==> 2020-06-09 12:54:21 <==
+# cmd: /Users/petter/opt/anaconda3/bin/conda install -p /Users/petter/Projects/school/INF200/inf200_exam/env seaborn -y
+# conda version: 4.8.3
++defaults/noarch::seaborn-0.10.1-py_0
+# update specs: ['seaborn']
