@@ -1,0 +1,37 @@
+{
+  "build": "0",
+  "build_number": 0,
+  "channel": "https://repo.anaconda.com/pkgs/main/noarch",
+  "constrains": [],
+  "depends": [
+    "importlib-metadata >=1.6.0,<1.6.1.0a0"
+  ],
+  "extracted_package_dir": "/Users/petter/opt/anaconda3/pkgs/importlib_metadata-1.6.0-0",
+  "features": "",
+  "files": [],
+  "fn": "importlib_metadata-1.6.0-0.conda",
+  "legacy_bz2_md5": "0cfd0a5659744b2095417901ab85d5ed",
+  "license": "Apache-2.0",
+  "license_family": "APACHE",
+  "link": {
+    "source": "/Users/petter/opt/anaconda3/pkgs/importlib_metadata-1.6.0-0",
+    "type": 1
+  },
+  "md5": "c19fa5ecb97c20f1804af88313225465",
+  "name": "importlib_metadata",
+  "noarch": "generic",
+  "package_tarball_full_path": "/Users/petter/opt/anaconda3/pkgs/importlib_metadata-1.6.0-0.conda",
+  "package_type": "noarch_generic",
+  "paths_data": {
+    "paths": [],
+    "paths_version": 1
+  },
+  "requested_spec": "None",
+  "sha256": "2b99096112a8d61915703a461587f962ef080cbbbe1dde772df441db49acbc38",
+  "size": 11003,
+  "subdir": "noarch",
+  "timestamp": 1590498419701,
+  "track_features": "",
+  "url": "https://repo.anaconda.com/pkgs/main/noarch/importlib_metadata-1.6.0-0.conda",
+  "version": "1.6.0"
+}

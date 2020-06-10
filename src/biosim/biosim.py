@@ -3,15 +3,16 @@
 
 class BioSim:
     def __init__(
-            self,
-            island_map,
-            ini_pop,
-            seed,
-            ymax_animals=None,
-            cmax_animals=None,
-            hist_specs=None,
-            img_base=None,
-            img_fmt='png'):
+        self,
+        island_map,
+        ini_pop,
+        seed,
+        ymax_animals=None,
+        cmax_animals=None,
+        hist_specs=None,
+        img_base=None,
+        img_fmt="png",
+    ):
         """
         :param island_map: Multi-line string specifying island geography
         :param ini_pop: List of dictionaries specifying initial population
