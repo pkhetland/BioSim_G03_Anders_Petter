@@ -38,9 +38,21 @@ class Animal:
     def weight(self):
         return self._weight
 
+    @weight.setter
+    def weight(self, weight):
+        self._weight = weight
+
     @property
     def age(self):
         return self._age
+
+    @age.setter
+    def age(self, age):
+        self._age = age
+
+    @property
+    def species(self):
+        return self._species
 
     def aging(self):
         """
@@ -93,12 +105,12 @@ class Animal:
         if self.weight <= 0:
             death = True
         else:
-            if self.death_prob is None:
-                self.death_prob = self.p["omega"] * (1 - self.fitness)
+            if self._death_prob is None:
+                self._death_prob = self.p["omega"] * (1 - self.fitness)
                 death = np.random.choice(
-                    [True, False], p=[self.death_prob, 1 - self.death_prob]
+                    [True, False], p=[self._death_prob, 1 - self._death_prob]
                 )
-                self.death_prob = None
+                self._death_prob = None
 
         # if death:
         #     self.subtract_animal()
@@ -223,9 +235,9 @@ class Carnivore(Animal):
     # def count_carnivore(cls):
     #     cls.carnivore_instance_count += 1
     #
-    @classmethod
-    def subtract_animal(cls):
-        super(Herbivore, cls).animal_count -= 1
+    # @classmethod
+    # def subtract_animal(cls):
+    #     super(Herbivore, cls).animal_count -= 1
 
     # @classmethod
     # def instance_count(cls):
