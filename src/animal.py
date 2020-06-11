@@ -13,7 +13,7 @@ class Animal:
     p = {}
 
     """
-    Super class for Herbivores and Carnivores
+    Super class for Herbivores and Carnivores. TEST
     """
     instance_count = 0
 
