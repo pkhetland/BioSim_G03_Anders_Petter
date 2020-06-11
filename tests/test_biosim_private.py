@@ -9,12 +9,12 @@ import pytest
 
 from src.biosim.animal import Herbivore, Carnivore
 from src.biosim.landscape import Lowland, Highland, Water, Desert
-from src.biosim.interface import Simulation
+from src.biosim.biosim import BioSim
 
 
 def test_map_from_str():
-    sim = Simulation(
-        ini_geogr = """WWW
+    sim = BioSim(
+        island_map = """WWW
         WLW
         WWW""")
     assert sim.landscape is not None

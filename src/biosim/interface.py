@@ -12,7 +12,7 @@ if __name__ == "__main__":
     WLHDLHW
     WWWWWWW"""
 
-    ini_herbs = [
+    ini_pop = [
         {
             "loc": (2, 2),
             "pop": [{"species": "Herbivore", "age": 5, "weight": 20} for _ in range(150)]
@@ -21,10 +21,10 @@ if __name__ == "__main__":
     ]
 
     sim = BioSim(
-        seed=123, ini_pop=ini_herbs, island_map=geogr, plot_graph=False
+        seed=123, ini_pop=ini_pop, island_map=geogr, plot_graph=False
     )  # Create simple simulation instance
 
-    sim.set_landscape_parameters('H', {'f_max': 2000.0})
+    sim.set_landscape_parameters('H', {'f_max': 200.0})
 
     sim.simulate(num_years=200)
     # input("Press enter...")
