@@ -87,19 +87,16 @@ class BioSim:
         :param population: List of dictionaries specifying population
         """
         for loc_dict in population:  # This loop will be replaced with a more elegant iteration
-            for animal_dict in loc_dict['pop']:
-                animal_age = animal_dict['age']
-                animal_weight = animal_dict['weight']
-                if animal_dict['species'] == 'Herbivore':
-                    self._island.landscape[loc_dict['loc']].add_animals(
-                        [Herbivore(age=animal_age, weight=animal_weight)]
-                    )
-                else:
-                    self._island.landscape[loc_dict['loc']].add_animals(
-                        [Carnivore(age=animal_age, weight=animal_weight)]
-                    )
+            self._island.landscape[loc_dict['loc']].add_animals(
+                [
+                    Herbivore.from_dict(animal_dict)
+                    if animal_dict['species'] == 'Herbivore'
+                    else Carnivore.from_dict(animal_dict)
+                    for animal_dict in loc_dict['pop']]
+            )
 
-    def feeding(self, cell):
+    @staticmethod
+    def feeding(cell):
         """Iterates through each animal in the cell and feeds it according to species
 
         :param cell: Current cell object
@@ -243,7 +240,7 @@ class BioSim:
 
         finish_time = time.time()
         print("Simulation complete.")
-        print("Elapsed time: ", (finish_time - start_time))
+        print("Elapsed time: {:.3}".format(finish_time - start_time))
 
     @property
     def year(self):

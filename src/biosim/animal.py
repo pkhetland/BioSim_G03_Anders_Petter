@@ -15,6 +15,12 @@ class Animal:
     instance_count = 0
 
     def __init__(self, weight, age):
+        """
+        :param weight: Weight of animal
+        :type weight: float
+        :param age: Age of animal
+        :type age: int
+        """
         if weight is None:
             self._weight = self.birth_weight
         else:
@@ -34,6 +40,16 @@ class Animal:
     def __str__(self):
         return '{}({} years, {:.3} kg)'.format(self._species, self._age, self._weight)
 
+    @classmethod
+    def from_dict(cls, animal_dict):
+        """Allows the sim to add instances directly from dictionaries when adding pop
+
+        :param animal_dict: Dict with format {'species': 'Herbivore', 'age': 5, 'weight': 20}
+        :type animal_dict: dict
+        """
+        class_weight = animal_dict['weight']
+        class_age = animal_dict['age']
+        return cls(age=class_age, weight=class_weight)
 
     @property
     def weight(self):
