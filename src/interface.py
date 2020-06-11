@@ -8,31 +8,34 @@ from src.biosim import BioSim
 
 if __name__ == "__main__":
     geogr = """WWWWWWW
-               WDLDLDW
-               WLHHLHW
+               WDDDDDW
+               WDDDDDW
+               WDDDDDW
+               WDDDDDW
+               WDDDDDW
                WWWWWWW"""
 
     ini_herbs = [{
-            "loc": (2, 2),
-            "pop": [{"species": "Herbivore", "age": 5, "weight": 20} for _ in range(150)]
+            "loc": (4, 4),
+            "pop": [{"species": "Herbivore", "age": 5, "weight": 20} for _ in range(1000)]
     }]
 
     ini_carns = [{
-        "loc": (2, 2),
+        "loc": (3, 3),
         "pop": [{"species": "Carnivore", "age": 5, "weight": 20} for _ in range(40)]
     }]
 
     sim = BioSim(
-        seed=123, ini_pop=ini_herbs, island_map=geogr, plot_graph=False
+        seed=123, ini_pop=ini_herbs, island_map=geogr, plot_graph=True
     )  # Create simple simulation instance
 
-    sim.add_population(ini_carns)
+    # sim.add_population(ini_carns)
 
-    # sim.set_animal_parameters('Carnivore', {'omega': 0, 'xi': 1.8})
-    # sim.set_animal_parameters('Herbivore', {'omega': 0, 'xi': 1.8})
+    sim.set_animal_parameters('Carnivore', {'omega': 0})
+    sim.set_animal_parameters('Herbivore', {'omega': 0})
 
     # sim.set_landscape_parameters('L', {'f_max': 800.0})
 
-    sim.simulate(num_years=20)
+    sim.simulate(num_years=1000)
 
-    sim.simulate(num_years=20)
+    # sim.simulate(num_years=20)
