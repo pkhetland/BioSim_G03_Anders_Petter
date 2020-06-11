@@ -280,3 +280,16 @@ class Carnivore(Animal):
         self.weight += consumption_weight * self.p["beta"]  # Add weight to carnivore
 
         return herbs_killed
+
+if __name__ == "__main__":
+    herb1 = Herbivore()
+    # Set weight at birth for herb1
+    herb1.p["w_birth:"] = 10
+    # new instance with default parameters
+    herb2 = Herbivore()
+
+    print(herb1.p["w_birth:"])
+    # Output 10. OK
+    print(herb2.p["w_birth:"])
+    # KeyError. Expected 8. Comments?
+
