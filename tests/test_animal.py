@@ -51,11 +51,16 @@ class TestAnimal:
         """
         h = Herbivore(age=0, weight=10)
         p = 0.3
+<<<<<<< HEAD
+        # Comment test fails for high values of p. In biolab bacteria example p can be "anything"
+=======
         # Comment test fails for high values of p
+>>>>>>> migration_milestone
         N = 100
         n = sum(h.death() for _ in range(N))
         print("Number of deaths:", n)
-        assert stats.binom_test(h.death(), n, p, alternative='two-sided') > self.alpha
+        # Output 27 deaths
+        assert stats.binom_test(h.death(), n, p, "two-sided") > self.alpha
 
     @pytest.fixture(autouse=True)
     def create_animals(self):

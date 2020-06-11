@@ -41,6 +41,8 @@ class Animal:
     def set_params(cls, new_params):
         """
         Set parameter for animal classes
+
+        :param new_params: dict
         """
         for key in new_params:
             if key not in cls.p:
@@ -55,7 +57,9 @@ class Animal:
     @classmethod
     def get_params(cls):
         """
-        Return dictionary with parameters
+
+        :return dictionary with parameters
+        :r_type: dict
         """
         return cls.p
 

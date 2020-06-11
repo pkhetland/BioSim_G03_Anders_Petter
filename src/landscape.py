@@ -32,7 +32,8 @@ class Island:
         elif landscape == 'H':
             Highland.set_params(params)
         else:
-            print('Only params in Lowland and Highland can be changed! No params set.')
+            raise AttributeError('Only params in Lowland and Highland can be changed! '
+                                 'No params set.')
 
     @property
     def land_cells(self):
