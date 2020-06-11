@@ -25,6 +25,13 @@ class Island:
         self._herb_fitness_list = []
         self._carn_fitness_list = []
 
+    @staticmethod
+    def set_landscape_params(landscape, params):
+        if landscape == 'L':
+            Lowland.set_params(params)
+        elif landscape == 'H':
+            Highland.set_params(params)
+
     @property
     def land_cells(self):
         if self._land_cells is None:
@@ -148,9 +155,8 @@ class LandscapeCell:
     Parent class for landscape cells
     """
 
-    def __init__(self, f_max):
-        self._f_max = f_max  # Set fodder amount for each new year
-        self._fodder = f_max  # Set starting fodder amount to f_max
+    def __init__(self):
+        self._fodder = self.f_max()
         self._is_mainland = True
 
         self.herbivores = []
@@ -164,23 +170,25 @@ class LandscapeCell:
     def __str__(self):
         return "{}(f_max: {})".format(self.__class__.__name__, self._f_max)
 
-    @property
-    def f_max(self):
-        return self._f_max
+    @classmethod
+    def set_params(cls, param_dict):
+        for param in param_dict:
+            if param in cls.params:
+                cls.params[param] = param_dict[param]
+            else:
+                print('Invalid param dict!')
 
-    @f_max.setter
-    def f_max(self, f_max):
-        if f_max >= 0:
-            self._f_max = f_max
+    @classmethod
+    def f_max(cls):
+        return cls.params['f_max']
 
     @property
     def fodder(self):
         return self._fodder
 
     @fodder.setter
-    def fodder(self, fodder):
-        if fodder >= 0:
-            self._fodder = fodder
+    def fodder(self, new_fodder):
+        self._fodder = new_fodder
 
     @property
     def is_mainland(self):
@@ -293,18 +301,30 @@ class Lowland(LandscapeCell):
     """
     Lowland class for cells
     """
+    params = {'f_max': 800.0}
 
-    def __init__(self, f_max=800.0, location=None):
-        super().__init__(f_max)  # Initialise landscape class
+    def __init__(self):
+        super().__init__()  # Initialise landscape class
+
+    @classmethod
+    def set_f_max(cls, f_max):
+        if f_max >= 0:
+            cls._f_max = f_max
 
 
 class Highland(LandscapeCell):
     """
     Highland class for cells
     """
+    params = {'f_max': 300.0}
 
-    def __init__(self, f_max=300.0, location=None):
-        super().__init__(f_max)  # Initialise landscape class
+    def __init__(self, location=None):
+        super().__init__()  # Initialise landscape class
+
+    @classmethod
+    def set_f_max(cls, f_max):
+        if f_max >= 0:
+            cls._f_max = f_max
 
 
 class Desert(LandscapeCell):
@@ -312,9 +332,10 @@ class Desert(LandscapeCell):
     Desert class for cells.
     No fodder available for herbivores, but carnivores may kill herbivores
     """
+    params = {'f_max': 0.0}
 
     def __init__(self):
-        super().__init__(f_max=0.0)  # Forces fodder to be 0
+        super().__init__()  # Initialise landscape class
 
 
 class Water:

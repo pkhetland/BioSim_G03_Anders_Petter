@@ -79,7 +79,7 @@ class BioSim:
         :param landscape: String, code letter for landscape
         :param params: Dict with valid parameter specification for landscape
         """
-        pass
+        self._island.set_landscape_params(landscape, params)
 
     def add_population(self, population):
         """
@@ -103,12 +103,12 @@ class BioSim:
         :param cell: Current cell object
         :type cell: object
         """
-        cell.fodder = cell.f_max
+        cell.fodder = cell.f_max()
         # Randomize animals before feeding
         cell.randomize_herbs()
 
         for herb in cell.herbivores:  # Herbivores eat first
-            if cell.fodder != 0:
+            if cell.fodder > 0:
                 herb.eat_fodder(cell)
 
         for carn in cell.carnivores:  # Carnivores eat last
@@ -146,6 +146,8 @@ class BioSim:
         :type loc: tuple
         :param cell: Current cell object
         :type cell: object
+        :param all_migrated_animals: Updated list of animals that have migrated the current year
+        :type all_migrated_animals: list
         """
         # Define neighbor cells once:
         neighbor_cells = [

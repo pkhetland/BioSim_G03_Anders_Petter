@@ -54,13 +54,13 @@ class Plotting:
         gs = fig.add_gridspec(4, 6)
 
         self._ax_main = fig.add_subplot(gs[:2, :])  # Add the main subplot
-        self._ax_weight = fig.add_subplot(gs[2, :2])
-        self._ax_fitness = fig.add_subplot(gs[2, 2:4])
-        self._ax_age = fig.add_subplot(gs[2, 4:])
-        self._axhm_herb = fig.add_subplot(gs[3, :2])
-        self._axhm_carn = fig.add_subplot(gs[3, 2:4])
-        self._axim = fig.add_subplot(gs[3, -2:-1])  # Add support subplot
-        self._axlg = fig.add_subplot(gs[3, -1])
+        self._ax_weight = fig.add_subplot(gs[2, :2])  # Add weight subplot
+        self._ax_fitness = fig.add_subplot(gs[2, 2:4])  # Add fitness subplot
+        self._ax_age = fig.add_subplot(gs[2, 4:])  # Add age subplot
+        self._axhm_herb = fig.add_subplot(gs[3, :2])  # Add herb heatmap subplot
+        self._axhm_carn = fig.add_subplot(gs[3, 2:4])  # Add carn heatmap subplot
+        self._axim = fig.add_subplot(gs[3, -2:-1])  # Add map subplot
+        self._axlg = fig.add_subplot(gs[3, -1])  # Add map legend subplot
 
         self._plot_map(self._island.map_str)
         self._plot_heatmap()

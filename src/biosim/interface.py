@@ -21,8 +21,10 @@ if __name__ == "__main__":
     ]
 
     sim = BioSim(
-        seed=123, ini_pop=ini_herbs, island_map=geogr, plot_graph=True
+        seed=123, ini_pop=ini_herbs, island_map=geogr, plot_graph=False
     )  # Create simple simulation instance
+
+    sim.set_landscape_parameters('H', {'f_max': 2000.0})
 
     sim.simulate(num_years=200)
     # input("Press enter...")
