@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-from src.biosim.animal import Herbivore, Carnivore, Animal
-from src.biosim.landscape import Island
-from src.biosim.plotting import Plotting
+from src.animal import Herbivore, Carnivore, Animal
+from src.landscape import Island
+from src.plotting import Plotting
 
 import random as random
 import time
