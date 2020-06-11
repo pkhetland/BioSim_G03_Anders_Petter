@@ -9,6 +9,9 @@ from math import e
 
 
 class Animal:
+    # Empty dictionaries to set parameters
+    p = {}
+
     """
     Super class for Herbivores and Carnivores
     """
@@ -27,6 +30,19 @@ class Animal:
         random.seed(123)  # Set seed - Will be moved to interface
 
         Animal.instance_count += 1
+
+    @classmethod
+    def set_params(cls, new_params):
+        for key in new_params:
+            if key not in tuple(cls.p):
+                raise KeyError("Invalid key name: " + key)
+
+        for key in tuple(cls.p):
+            if key in new_params:
+                if new_params[key] < 0:
+                    raise ValueError("Parameter must be positive")
+                cls.p.update(new_params)
+
 
     def __repr__(self):
         return '{}({} years, {:.3} kg)'.format(self._species, self._age, self._weight)
@@ -157,11 +173,24 @@ class Animal:
 class Herbivore(Animal):
 
     instance_count = 0
+    p = {"w_birth": 8.0,
+                "sigma_birth": 1.5,
+                "beta": 0.9,
+                "eta": 0.05,
+                "a_half": 40.0,
+                "phi_age": 0.6,
+                "w_half": 10.0,
+                "phi_weight": 0.1,
+                "mu": 0.25,
+                "gamma": 0.2,
+                "zeta": 3.5,
+                "xi": 1.2,
+                "omega": 0.4,
+                "F": 10.0,}
 
-    def __init__(self, weight=None, age=0, p=None):
-
+    def __init__(self, params):
         if p is None:  # If no parameters are specified
-            self.p = {  # Insert default values for species
+            super().p.update({  # Insert default values for species
                 "w_birth": 8.0,
                 "sigma_birth": 1.5,
                 "beta": 0.9,
@@ -176,9 +205,9 @@ class Herbivore(Animal):
                 "xi": 1.2,
                 "omega": 0.4,
                 "F": 10.0,
-            }
+            })
         else:
-            self.p = p
+            super().p.update(params)
 
         super().__init__(weight, age)
 
@@ -284,14 +313,14 @@ class Carnivore(Animal):
 
 
 if __name__ == "__main__":
-    herb1 = Herbivore()
+    #herb1 = Herbivore(params)
     # Set weight at birth for herb1
-    herb1.p["w_birth"] = 10
+    #herb1.p["w_birth"] = 10
     # new instance with default parameters
-    herb2 = Herbivore()
+    #herb2 = Herbivore()
 
-    print(herb1.p["w_birth"])
+    #print(herb1.p["w_birth"])
     # Output 10. OK
-    print(herb2.p["w_birth"])
+    #print(herb2.p["w_birth"])
     # KeyError. Expected 8. Comments?
 
