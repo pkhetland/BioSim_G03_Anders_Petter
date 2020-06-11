@@ -7,7 +7,7 @@ Test set for the initial Lowland class.
 
 import pytest
 
-from src import BioSim
+from src.biosim import BioSim
 
 
 def test_map_from_str():

@@ -66,13 +66,19 @@ class BioSim:
 
         random.seed(seed)
 
-    def set_animal_parameters(self, species, params):
+    @staticmethod
+    def set_animal_parameters(species, params):
         """
         Set parameters for animal species.
         :param species: String, name of animal species
         :param params: Dict with valid parameter specification for species
         """
-        pass
+        if species == 'Herbivore':
+            Herbivore.set_params(params)
+        elif species == 'Carnivore':
+            Carnivore.set_params(params)
+        else:
+            print('species needs to be either Herbivore or Carnivore!')
 
     def set_landscape_parameters(self, landscape, params):
         """

@@ -26,10 +26,13 @@ if __name__ == "__main__":
         seed=123, ini_pop=ini_herbs, island_map=geogr, plot_graph=False
     )  # Create simple simulation instance
 
-    sim.set_landscape_parameters('L', {'f_max': 800.0})
-
-    sim.simulate(num_years=50)
-
     sim.add_population(ini_carns)
 
-    sim.simulate(num_years=200)
+    # sim.set_animal_parameters('Carnivore', {'omega': 0, 'xi': 1.8})
+    # sim.set_animal_parameters('Herbivore', {'omega': 0, 'xi': 1.8})
+
+    # sim.set_landscape_parameters('L', {'f_max': 800.0})
+
+    sim.simulate(num_years=20)
+
+    sim.simulate(num_years=20)
