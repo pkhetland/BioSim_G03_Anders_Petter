@@ -240,6 +240,7 @@ class BioSim:
         finish_time = time.time()
         print("Simulation complete.")
         print("Elapsed time: {:.3} seconds".format(finish_time - start_time))
+        input('Press enter to continue')
 
     @property
     def year(self):
