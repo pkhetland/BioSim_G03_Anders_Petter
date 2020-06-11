@@ -19,8 +19,8 @@ class Island:
         self.map_str = map_str
         self._land_cells = None
 
-        self.herb_pop_matrix = [[np.nan for col in self.unique_cols] for row in self.unique_rows]
-        self.carn_pop_matrix = [[np.nan for col in self.unique_cols] for row in self.unique_rows]
+        self.herb_pop_matrix = [[0 for col in self.unique_cols] for row in self.unique_rows]
+        self.carn_pop_matrix = [[0 for col in self.unique_cols] for row in self.unique_rows]
 
         self._herb_fitness_list = []
         self._carn_fitness_list = []
@@ -99,14 +99,14 @@ class Island:
                     print("Map strings need to be either W, L, H or D! Try setting map again.")
         return map_dict
 
-    def update_pop_matrix(self, herb_count, carn_count):
+    def update_pop_matrix(self):
         for row in self.unique_rows[1:-1]:  # First and last cell is water
             for col in self.unique_cols[1:-1]:  # First and last cell is water
                 cell = self.landscape[(row, col)]
                 if cell.is_mainland:
                     # print(cell)
-                    self.herb_pop_matrix[row - 1][col - 1] = herb_count
-                    self.carn_pop_matrix[row - 1][col - 1] = carn_count
+                    self.herb_pop_matrix[row - 1][col - 1] = cell.herb_count
+                    self.carn_pop_matrix[row - 1][col - 1] = cell.carn_count
 
     @property
     def animal_weights(self):

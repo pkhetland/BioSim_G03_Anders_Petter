@@ -168,8 +168,8 @@ class Simulation:
 
         if self._plot:
             plot = Plotting(self.island)
-            self.island.update_pop_matrix(Herbivore.instance_count, Carnivore.instance_count)
-            ax_main, ax_weight, ax_fitness, ax_age, axhm_herb, axhm_carn = plot.init_plot(num_years)
+            self.island.update_pop_matrix()
+            plot.init_plot(num_years)
 
         for year in range(num_years):
             self.run_year_cycle()
@@ -179,31 +179,27 @@ class Simulation:
             print(f'Carnivore: {Carnivore.instance_count}')
 
             if self._plot:
-                plot._y_herb[year] = Herbivore.instance_count
-                plot._y_carn[year] = Carnivore.instance_count
-                plot.update_plot(self._year,
-                                 ax_main,
-                                 ax_weight,
-                                 ax_fitness,
-                                 ax_age,
-                                 axhm_herb,
-                                 axhm_carn)
+                self.island.update_pop_matrix()
+                plot.y_herb[year] = Herbivore.instance_count
+                plot.y_carn[year] = Carnivore.instance_count
+                plot.update_plot(self._year)
 
         print("Simulation complete.")
 
 
 if __name__ == "__main__":
-    geogr = """WWW
-    WLW
-    WWW"""
+    geogr = """WWWWWWW
+    WLHDLDW
+    WLHDLHW
+    WLDLHDW
+    WLHLLDW
+    WLDHLLW
+    WWWWWWW"""
 
-    sim = Simulation(ini_geogr=geogr, plot_graph=False)  # Create simple simulation instance
+    sim = Simulation(ini_geogr=geogr, plot_graph=True)  # Create simple simulation instance
     #
-    sim.island.landscape[(2, 2)].add_animals([Herbivore(age=5, weight=20) for _ in range(50)])
-    sim.island.landscape[(2, 2)].add_animals([Carnivore(age=5, weight=20) for _ in range(20)])
-
-    # Test multi-cell sim
-    # sim.landscape[(2, 3)].add_animals([Herbivore(age=5, weight=20) for _ in range(20)])
+    sim.island.landscape[(4, 4)].add_animals([Herbivore(age=5, weight=20) for _ in range(150)])
+    sim.island.landscape[(4, 4)].add_animals([Carnivore(age=5, weight=20) for _ in range(20)])
 
     sim.run_simulation(num_years=200)
     # input("Press enter...")

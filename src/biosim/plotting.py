@@ -9,18 +9,31 @@ import numpy as np
 
 
 class Plotting:
-    def __init__(self, island):
+    def __init__(self, island, img_base=None):
         # Arguments for plotting
         self._island = island
+        self._img_base = None
+        self._img_counter = None
 
-        self._y_herb = None
-        self._y_carn = None
+        self.y_herb = None
+        self.y_carn = None
         self._herb_line = None
         self._carn_line = None
         self._herb_fitness_list = None
         self._carn_fitness_list = None
         self._herb_fitness_line = None
         self._carn_fitness_line = None
+
+        self._ax_main = None
+        self._ax_weight = None
+        self._ax_fitness = None
+        self._ax_age = None
+        self._axhm_herb = None
+        self._imax_herb = None
+        self._axhm_carn = None
+        self._imax_carn = None
+        self._axim = None
+        self._axlg = None
 
     def init_plot(self, num_years):
         """ Initialize the plot at the beginning of the simulation
@@ -29,46 +42,38 @@ class Plotting:
         :type num_years: int
         """
 
-        self._y_herb = [np.nan for _ in range(num_years)]
-        self._y_carn = [np.nan for _ in range(num_years)]
+        self.y_herb = [np.nan for _ in range(num_years)]
+        self.y_carn = [np.nan for _ in range(num_years)]
 
         fig = plt.figure(figsize=(10, 7), constrained_layout=True)  # Initiate pyplot
         gs = fig.add_gridspec(4, 6)
 
-        ax_main = fig.add_subplot(gs[:2, :])  # Add the main subplot
-        ax_weight = fig.add_subplot(gs[2, :2])
-        ax_fitness = fig.add_subplot(gs[2, 2:4])
-        ax_age = fig.add_subplot(gs[2, 4:])
-        axhm_herb = fig.add_subplot(gs[3, :2])
-        axhm_carn = fig.add_subplot(gs[3, 2:4])
-        axim = fig.add_subplot(gs[3, -2:-1])  # Add support subplot
-        axlg = fig.add_subplot(gs[3, -1])
+        self._ax_main = fig.add_subplot(gs[:2, :])  # Add the main subplot
+        self._ax_weight = fig.add_subplot(gs[2, :2])
+        self._ax_fitness = fig.add_subplot(gs[2, 2:4])
+        self._ax_age = fig.add_subplot(gs[2, 4:])
+        self._axhm_herb = fig.add_subplot(gs[3, :2])
+        self._axhm_carn = fig.add_subplot(gs[3, 2:4])
+        self._axim = fig.add_subplot(gs[3, -2:-1])  # Add support subplot
+        self._axlg = fig.add_subplot(gs[3, -1])
 
-        self.plot_map(self._island.map_str, axim, axlg)
-        self.plot_heatmap(axhm_herb, axhm_carn)
+        self._plot_map(self._island.map_str)
+        self._plot_heatmap()
 
-        (self._herb_line,) = ax_main.plot(self._y_herb)  # Initiate the herbivore line
-        (self._carn_line,) = ax_main.plot(self._y_carn)  # Initiate the carnivore line
+        (self._herb_line,) = self._ax_main.plot(self.y_herb)  # Initiate the herbivore line
+        (self._carn_line,) = self._ax_main.plot(self.y_carn)  # Initiate the carnivore line
 
-        ax_main.legend(["Herbivore count", "Carnivore count"])  # Insert legend into plot
-        ax_main.set_xlabel("Simulation year")  # Define x-label
-        ax_main.set_ylabel("Animal count")  # Define y-label
-        ax_main.set_xlim(
+        self._ax_main.legend(["Herbivore count", "Carnivore count"])  # Insert legend into plot
+        self._ax_main.set_xlabel("Simulation year")  # Define x-label
+        self._ax_main.set_ylabel("Animal count")  # Define y-label
+        self._ax_main.set_xlim(
             [0, num_years]
         )  # x-limit is set permanently to amount of years to simulate
 
         plt.ion()  # Activate interactive mode
 
-        return ax_main, ax_weight, ax_fitness, ax_age, axhm_herb, axhm_carn
-
     def update_plot(self,
-                    year,
-                    ax_main,
-                    ax_weight,
-                    ax_fitness,
-                    ax_age,
-                    axhm_herb,
-                    axhm_carn):
+                    year):
         """Redraw plot with updated values
 
         :param ax_main: pyplot axis for line plots
@@ -84,47 +89,41 @@ class Plotting:
         :param axhm_carn: pyplot axis for carnivore density heatmap
         :type axhm_carn: object
         """
-        if max(self._y_herb) >= max(
-                self._y_carn
+        if max(self.y_herb) >= max(
+                self.y_carn
         ):  # Find the biggest count value in either y_herb or y_carn
-            ax_main.set_ylim([0, max(self._y_herb) + 20])  # Set the y-lim to this max
+            self._ax_main.set_ylim([0, max(self.y_herb) + 20])  # Set the y-lim to this max
         else:
-            ax_main.set_ylim([0, max(self._y_carn) + 20])  #
+            self._ax_main.set_ylim([0, max(self.y_carn) + 20])  #
 
-        self._herb_line.set_ydata(self._y_herb)
-        self._herb_line.set_xdata(range(len(self._y_herb)))
-        self._carn_line.set_ydata(self._y_carn)
-        self._carn_line.set_xdata(range(len(self._y_carn)))
+        self._herb_line.set_ydata(self.y_herb)
+        self._herb_line.set_xdata(range(len(self.y_herb)))
+        self._carn_line.set_ydata(self.y_carn)
+        self._carn_line.set_xdata(range(len(self.y_carn)))
 
-        ax_weight.clear()
-        ax_weight.hist(self._island.animal_weights, bins=10)
-        ax_weight.set_xlim([0, 100])
+        self._ax_weight.clear()
+        self._ax_weight.hist(self._island.animal_weights, bins=10)
+        self._ax_weight.set_xlim([0, 100])
 
-        ax_fitness.clear()
-        ax_fitness.hist(self._island.animal_fitness, bins=10)
-        ax_fitness.set_xlim([0, 1])
+        self._ax_fitness.clear()
+        self._ax_fitness.hist(self._island.animal_fitness, bins=10)
+        self._ax_fitness.set_xlim([0, 1])
 
-        ax_age.clear()
-        ax_age.hist(self._island.animal_ages, bins=10)
-        ax_age.set_xlim([0, 30])
+        self._ax_age.clear()
+        self._ax_age.hist(self._island.animal_ages, bins=10)
+        self._ax_age.set_xlim([0, 30])
 
-        ax_weight.set_title('Weight distribution')
-        ax_fitness.set_title('Fitness distribution')
-        ax_age.set_title('Age distribution')
+        self._ax_weight.set_title('Weight distribution')
+        self._ax_fitness.set_title('Fitness distribution')
+        self._ax_age.set_title('Age distribution')
 
-        if year % 5 == 0:
+        self._imax_herb.set_data(self._island.herb_pop_matrix)
+        self._imax_carn.set_data(self._island.carn_pop_matrix)
 
-            axhm_herb.clear(), axhm_carn.clear()
-            axhm_herb.imshow(self._island.herb_pop_matrix, cmap='hot')
-            axhm_carn.imshow(self._island.carn_pop_matrix, cmap='hot')
-            axhm_herb.set_title('Herbivore density')
-            axhm_carn.set_title('Carnivore density')
 
         plt.pause(1e-6)
 
-
-    @staticmethod
-    def plot_map(map_str, axim, axlg):
+    def _plot_map(self, map_str):
         """Author: Hans
 
         :param map_str: Multi-line string containing letters symbolizing the landscape
@@ -144,39 +143,51 @@ class Plotting:
         kart_rgb = [[rgb_value[column] for column in row.strip()]
                     for row in map_str.splitlines()]
 
-        axim.imshow(kart_rgb)
-        axim.set_xticks(range(len(kart_rgb[0])))
-        axim.set_xticklabels(range(1, 1 + len(kart_rgb[0])))
-        axim.set_yticks(range(len(kart_rgb)))
-        axim.set_yticklabels(range(1, 1 + len(kart_rgb)))
+        self._axim.imshow(kart_rgb)
+        self._axim.set_xticks(range(len(kart_rgb[0])))
+        self._axim.set_xticklabels(range(1, 1 + len(kart_rgb[0])))
+        self._axim.set_yticks(range(len(kart_rgb)))
+        self._axim.set_yticklabels(range(1, 1 + len(kart_rgb)))
 
-        axlg.axis('off')
+        self._axlg.axis('off')
         for ix, name in enumerate(('Water', 'Lowland',
                                    'Highland', 'Desert')):
-            axlg.add_patch(plt.Rectangle((0., ix * 0.2), 0.3, 0.1,
+            self._axlg.add_patch(plt.Rectangle((0., ix * 0.2), 0.3, 0.1,
                                          edgecolor='none',
                                          facecolor=rgb_value[name[0]]))
-            axlg.text(0.35, ix * 0.2, name, transform=axlg.transAxes)
+            self._axlg.text(0.35, ix * 0.2, name, transform=self._axlg.transAxes)
 
-    def plot_heatmap(self, axhm_herb, axhm_carn):
+    def _plot_heatmap(self):
         """Create matrix for population and create heatmap
 
-        Create self.axhm_herb and self.axhm_carn?
+        Create self._axhm_herb and self._axhm_carn?
         """
         self.herb_pop_matrix = [[0 for _ in self._island.unique_cols] for _ in self._island.unique_rows]
         self.carn_pop_matrix = [[0 for _ in self._island.unique_cols] for _ in self._island.unique_rows]
 
-        axhm_herb.imshow(self.herb_pop_matrix)
-        axhm_carn.imshow(self.carn_pop_matrix)
-        axhm_herb.set_title('Herbivore density')
+        self._imax_herb = self._axhm_herb.imshow(self._island.herb_pop_matrix,
+                               cmap='viridis', interpolation='nearest', vmax=200)
+        self._imax_carn = self._axhm_carn.imshow(self._island.carn_pop_matrix,
+                               cmap='cividis', interpolation='nearest', vmax=50)
+        self._axhm_herb.set_title('Herbivore density')
+        self._axhm_carn.set_title('Carnivore density')
 
-        axhm_carn.set_title('Carnivore density')
-        axhm_carn.set_xticks(range(len(self._island.unique_cols)))
-        axhm_carn.set_xticklabels(range(1, len(self._island.unique_cols) +1))
-        axhm_carn.set_yticks(range(len(self._island.unique_rows)))
-        axhm_carn.set_yticklabels(range(1, len(self._island.unique_rows) +1))
+        plt.colorbar(self._imax_herb,
+                     ax=self._axhm_herb,
+                     orientation='vertical')
 
-        axhm_herb.set_xticks(range(len(self._island.unique_cols)))
-        axhm_herb.set_xticklabels(range(1, len(self._island.unique_cols ) +1))
-        axhm_herb.set_yticks(range(len(self._island.unique_rows)))
-        axhm_herb.set_yticklabels(range(1, len(self._island.unique_rows ) +1))
+        plt.colorbar(self._imax_carn,
+                     ax=self._axhm_carn,
+                     orientation='vertical')
+
+
+    def _save_graphics(self):
+        """Saves graphics to file if file name given. From randviz sim."""
+
+        if self._img_base is None:
+            return
+
+        plt.savefig('{base}_{num:05d}.{type}'.format(base=self._img_base,
+                                                     num=self._img_ctr,
+                                                     type=self._img_fmt))
+        self._img_ctr += 1
