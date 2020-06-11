@@ -16,8 +16,21 @@ class Island:
 
     def __init__(self, map_str):
         self.landscape = self.map_from_str(map_str)
-        self.land_cells = self.get_land_cells
         self.map_str = map_str
+        self._land_cells = None
+
+        self.herb_pop_matrix = [[np.nan for col in self.unique_cols] for row in self.unique_rows]
+        self.carn_pop_matrix = [[np.nan for col in self.unique_cols] for row in self.unique_rows]
+
+        self._herb_fitness_list = []
+        self._carn_fitness_list = []
+
+
+    @property
+    def land_cells(self):
+        if self._land_cells is None:
+            self._land_cells = self.get_land_cells
+        return self._land_cells
 
     @property
     def get_land_cells(self):
@@ -33,6 +46,30 @@ class Island:
 
     def add_animals(self, animal_list):
         pass
+
+    @property
+    def all_animals(self):
+        """
+        :return: A list containing all animals in the mainland cells
+        :rtype: list
+        """
+        return [cell.animals for cell in self.land_cells.values()]
+
+    @property
+    def all_herbivores(self):
+        """
+        :return: A list containing all animals in the mainland cells
+        :rtype: list
+        """
+        return [cell.herbivores for cell in self.land_cells.values()]
+
+    @property
+    def all_carnivores(self):
+        """
+        :return: A list containing all animals in the mainland cells
+        :rtype: list
+        """
+        return [cell.carnivores for cell in self.land_cells.values()]
 
     @staticmethod
     def map_from_str(map_str):
@@ -62,8 +99,52 @@ class Island:
                     print("Map strings need to be either W, L, H or D! Try setting map again.")
         return map_dict
 
+    def update_pop_matrix(self, herb_count, carn_count):
+        for row in self.unique_rows[1:-1]:  # First and last cell is water
+            for col in self.unique_cols[1:-1]:  # First and last cell is water
+                cell = self.landscape[(row, col)]
+                if cell.is_mainland:
+                    # print(cell)
+                    self.herb_pop_matrix[row - 1][col - 1] = herb_count
+                    self.carn_pop_matrix[row - 1][col - 1] = carn_count
 
-class Landscape:
+    @property
+    def animal_weights(self):
+        herb_weights = []
+        carn_weights = []
+        for cell in self.land_cells.values():
+            for herb in cell.herbivores:
+                herb_weights.append(herb.weight)
+            for carn in cell.carnivores:
+                carn_weights.append(carn.weight)
+
+        return [herb_weights, carn_weights]
+
+    @property
+    def animal_ages(self):
+        herb_ages = []
+        carn_ages = []
+        for cell in self.land_cells.values():
+            for herb in cell.herbivores:
+                herb_ages.append(herb.age)
+            for carn in cell.carnivores:
+                carn_ages.append(carn.age)
+        return [herb_ages, carn_ages]
+
+    @property
+    def animal_fitness(self):
+        herb_fits = []
+        carn_fits = []
+        for cell in self.land_cells.values():
+            for herb in cell.herbivores:
+                herb_fits.append(herb.fitness)
+            for carn in cell.carnivores:
+                carn_fits.append(carn.fitness)
+
+        return [herb_fits, carn_fits]
+
+
+class LandscapeCell:
     """
     Parent class for landscape cells
     """
@@ -188,7 +269,7 @@ class Landscape:
         return sorted_carnivores
 
     @property
-    def sorted_herbivores(self):  # Will probably be moved to landscape classes
+    def sorted_herbivores(self):
         """Sorts all `herbivores` by `fitness` from lower to higher
 
         :return: Sorted carnivores
@@ -213,7 +294,7 @@ class Landscape:
         return self.fodder == 0
 
 
-class Lowland(Landscape):
+class Lowland(LandscapeCell):
     """
     Lowland class for cells
     """
@@ -222,7 +303,7 @@ class Lowland(Landscape):
         super().__init__(f_max)  # Initialise landscape class
 
 
-class Highland(Landscape):
+class Highland(LandscapeCell):
     """
     Highland class for cells
     """
@@ -231,10 +312,10 @@ class Highland(Landscape):
         super().__init__(f_max)  # Initialise landscape class
 
 
-class Desert(Landscape):
+class Desert(LandscapeCell):
     """
     Desert class for cells.
-    No fodder available for herbivores, but carnivores may kill herbivores.
+    No fodder available for herbivores, but carnivores may kill herbivores
     """
 
     def __init__(self):
@@ -243,7 +324,7 @@ class Desert(Landscape):
 
 class Water:
     """
-    Water class for cells. Does not do anything.
+    Water class for cells
     """
 
     def __init__(self):

@@ -112,7 +112,7 @@ class Animal:
                 self._death_prob = self.p["omega"] * (1 - self.fitness)
 
             death = True if random.random() <= self._death_prob else False
-            # death = random.choice(
+            # death = np.random.choice(
             #     [True, False], weights=[self._death_prob, 1 - self._death_prob]
             # )
             self._death_prob = None
@@ -246,10 +246,11 @@ class Carnivore(Animal):
         """
         consumption_weight = 0
         herbs_killed = []
+        fitness = self.fitness
 
         for herb in sorted_herbivores:
             if consumption_weight < self.p["F"]:
-                fitness_diff = self.fitness - herb.fitness
+                fitness_diff = fitness - herb.fitness
                 if fitness_diff <= 0:
                     kill_prey = False
 
