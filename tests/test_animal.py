@@ -55,7 +55,8 @@ class TestAnimal:
         N = 100
         n = sum(h.death() for _ in range(N))
         print("Number of deaths:", n)
-        assert stats.binom_test(h.death(), n, p, alternative='two-sided') > self.alpha
+        # Output 27 deaths
+        assert stats.binom_test(h.death(), n, p, "two-sided") > self.alpha
 
     @pytest.fixture(autouse=True)
     def create_animals(self):
