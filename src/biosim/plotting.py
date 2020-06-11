@@ -180,7 +180,6 @@ class Plotting:
                      ax=self._axhm_carn,
                      orientation='vertical')
 
-
     def _save_graphics(self):
         """Saves graphics to file if file name given. From randviz sim."""
 

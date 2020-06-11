@@ -1,5 +1,11 @@
 # -*- coding: utf-8 -*-
 
+from src.biosim.animal import Herbivore, Carnivore, Animal
+from src.biosim.landscape import Island
+from src.biosim.plotting import Plotting
+
+import random as random
+import time
 
 class BioSim:
     def __init__(
@@ -62,7 +68,29 @@ class BioSim:
             :param img_years: years between visualizations saved to files (default: vis_years)
             Image files will be numbered consecutively.
             """
-            pass
+            start_time = time.time()
+
+            if self._plot:
+                plot = Plotting(self.island)
+                self.island.update_pop_matrix()
+                plot.init_plot(num_years)
+
+            for year in range(num_years):
+                self.run_year_cycle()
+                print(f'Year: {self.year}')
+                print(f'Animals: {Animal.instance_count}')
+                print(f'Herbivores: {Herbivore.instance_count}')
+                print(f'Carnivore: {Carnivore.instance_count}')
+
+                if self._plot:
+                    self.island.update_pop_matrix()
+                    plot.y_herb[year] = Herbivore.instance_count
+                    plot.y_carn[year] = Carnivore.instance_count
+                    plot.update_plot(self._year)
+
+            finish_time = time.time()
+            print("Simulation complete.")
+            print("Elapsed time: ", (finish_time - start_time))
 
         def add_population(self, population):
             """
