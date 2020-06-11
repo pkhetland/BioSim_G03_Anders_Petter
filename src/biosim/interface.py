@@ -11,7 +11,7 @@ from src.biosim.plotting import Plotting
 
 import numpy as np
 import random as random
-
+import time
 
 class Simulation:
     """
@@ -165,6 +165,7 @@ class Simulation:
         :param num_years: number of years to simulate
         :type num_years: int
         """
+        start_time = time.time()
 
         if self._plot:
             plot = Plotting(self.island)
@@ -184,7 +185,9 @@ class Simulation:
                 plot.y_carn[year] = Carnivore.instance_count
                 plot.update_plot(self._year)
 
+        finish_time = time.time()
         print("Simulation complete.")
+        print("Elapsed time: ", (finish_time-start_time))
 
 
 if __name__ == "__main__":

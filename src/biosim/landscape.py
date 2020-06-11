@@ -157,7 +157,7 @@ class LandscapeCell:
         self.herbivores = []
         self.carnivores = []
 
-        np.random.seed(123)
+        random.seed(123)
 
     def __repr__(self):
         return '{}(f_max: {})'.format(self.__class__.__name__, self._f_max)
