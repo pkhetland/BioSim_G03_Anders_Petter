@@ -3,8 +3,8 @@
 """
 Tests for animal class.
 """
-from src import Herbivore, Carnivore
-from src import Lowland
+from src.animal import Herbivore, Carnivore
+from src.landscape import Lowland
 import math
 import scipy.stats as stats
 import pytest
@@ -39,11 +39,19 @@ class TestAnimal:
 
     def test_death_binom(self):
         """
-        Test if the death function is statistical significant under the bionomial test
-        with a given death probability p
+        Test if the death function returns statistical significant results
+        under the bionomial test, with a given death probability p.
+
+        : param p: The hypothesized probability
+        : type p: float
+        : param N: The number of animals
+        : type N: int
+        : param n: The number of deaths
+        : type n: int
         """
         h = Herbivore(age=0, weight=10)
-        p = 0.1
+        p = 0.3
+        # Comment test fails for high values of p
         N = 100
         n = sum(h.death() for _ in range(N))
         print("Number of deaths:", n)
