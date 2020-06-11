@@ -12,15 +12,17 @@ if __name__ == "__main__":
     WLHDLHW
     WWWWWWW"""
 
-    ini_herbs = [{
-        'loc': (2, 2),
-        'pop': [{'species': 'Herbivore', 'age': 5, 'weight': 20}
-                for _ in range(150)] +
-               [{'species': 'Carnivore', 'age': 5, 'weight': 20}
-                for _ in range(40)]
-    }]
+    ini_herbs = [
+        {
+            "loc": (2, 2),
+            "pop": [{"species": "Herbivore", "age": 5, "weight": 20} for _ in range(150)]
+            + [{"species": "Carnivore", "age": 5, "weight": 20} for _ in range(40)],
+        }
+    ]
 
-    sim = BioSim(seed=123, ini_pop=ini_herbs, island_map=geogr, plot_graph=False)  # Create simple simulation instance
+    sim = BioSim(
+        seed=123, ini_pop=ini_herbs, island_map=geogr, plot_graph=True
+    )  # Create simple simulation instance
 
     sim.simulate(num_years=200)
     # input("Press enter...")

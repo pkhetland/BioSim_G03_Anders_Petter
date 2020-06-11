@@ -21,7 +21,7 @@ class BioSim:
         hist_specs=None,
         img_base=None,
         img_fmt="png",
-        plot_graph=False
+        plot_graph=False,
     ):
         """
         :param island_map: Multi-line string specifying island geography
@@ -87,12 +87,13 @@ class BioSim:
         :param population: List of dictionaries specifying population
         """
         for loc_dict in population:  # This loop will be replaced with a more elegant iteration
-            self._island.landscape[loc_dict['loc']].add_animals(
+            self._island.landscape[loc_dict["loc"]].add_animals(
                 [
                     Herbivore.from_dict(animal_dict)
-                    if animal_dict['species'] == 'Herbivore'
+                    if animal_dict["species"] == "Herbivore"
                     else Carnivore.from_dict(animal_dict)
-                    for animal_dict in loc_dict['pop']]
+                    for animal_dict in loc_dict["pop"]
+                ]
             )
 
     @staticmethod
@@ -111,9 +112,7 @@ class BioSim:
                 herb.eat_fodder(cell)
 
         for carn in cell.carnivores:  # Carnivores eat last
-            herbs_killed = carn.kill_prey(
-                cell.sorted_herbivores
-            )  # Carnivore hunts for herbivores
+            herbs_killed = carn.kill_prey(cell.sorted_herbivores)  # Carnivore hunts for herbivores
             cell.remove_animals(herbs_killed)  # Remove killed animals from cell
 
     @staticmethod
@@ -161,9 +160,7 @@ class BioSim:
             if animal not in all_migrated_animals:
                 if animal.migrate():
                     available_neighbors = [
-                        neighbor
-                        for neighbor in neighbor_cells
-                        if neighbor.is_mainland
+                        neighbor for neighbor in neighbor_cells if neighbor.is_mainland
                     ]
 
                     if len(available_neighbors) > 0:
@@ -227,10 +224,10 @@ class BioSim:
 
         for year in range(num_years):
             self.run_year_cycle()
-            print(f'Year: {self.year}')
-            print(f'Animals: {Animal.instance_count}')
-            print(f'Herbivores: {Herbivore.instance_count}')
-            print(f'Carnivore: {Carnivore.instance_count}')
+            print(f"Year: {self.year}")
+            print(f"Animals: {Animal.instance_count}")
+            print(f"Herbivores: {Herbivore.instance_count}")
+            print(f"Carnivore: {Carnivore.instance_count}")
 
             if self._plot:
                 self._island.update_pop_matrix()
@@ -240,7 +237,7 @@ class BioSim:
 
         finish_time = time.time()
         print("Simulation complete.")
-        print("Elapsed time: {:.3}".format(finish_time - start_time))
+        print("Elapsed time: {:.3} seconds".format(finish_time - start_time))
 
     @property
     def year(self):
@@ -255,7 +252,7 @@ class BioSim:
     @property
     def num_animals_per_species(self):
         """Number of animals per species in island, as dictionary."""
-        return {'Herbivore': Herbivore.instance_count, 'Carnivore': Carnivore.instance_count}
+        return {"Herbivore": Herbivore.instance_count, "Carnivore": Carnivore.instance_count}
 
     def make_movie(self):
         """Create MPEG4 movie from visualization images saved."""

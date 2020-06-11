@@ -25,7 +25,6 @@ class Island:
         self._herb_fitness_list = []
         self._carn_fitness_list = []
 
-
     @property
     def land_cells(self):
         if self._land_cells is None:
@@ -87,13 +86,13 @@ class Island:
         for row_coord, cell_row in enumerate(map_str.splitlines()):
             for col_coord, cell in enumerate(cell_row.strip()):
                 coord = (row_coord + 1, col_coord + 1)
-                if cell == 'W':
+                if cell == "W":
                     map_dict[coord] = Water()
-                elif cell == 'L':
+                elif cell == "L":
                     map_dict[coord] = Lowland()
-                elif cell == 'H':
+                elif cell == "H":
                     map_dict[coord] = Highland()
-                elif cell == 'D':
+                elif cell == "D":
                     map_dict[coord] = Desert()
                 else:
                     print("Map strings need to be either W, L, H or D! Try setting map again.")
@@ -160,10 +159,10 @@ class LandscapeCell:
         random.seed(123)
 
     def __repr__(self):
-        return '{}(f_max: {})'.format(self.__class__.__name__, self._f_max)
+        return "{}(f_max: {})".format(self.__class__.__name__, self._f_max)
 
     def __str__(self):
-        return '{}(f_max: {})'.format(self.__class__.__name__, self._f_max)
+        return "{}(f_max: {})".format(self.__class__.__name__, self._f_max)
 
     @property
     def f_max(self):
@@ -262,9 +261,7 @@ class LandscapeCell:
         fitness_dict = dict([(carn, carn.fitness) for carn in self.carnivores])
         sorted_carnivores = [
             pair[0]
-            for pair in sorted(
-                fitness_dict.items(), key=operator.itemgetter(1), reverse=True
-            )
+            for pair in sorted(fitness_dict.items(), key=operator.itemgetter(1), reverse=True)
         ]
         return sorted_carnivores
 
@@ -278,9 +275,7 @@ class LandscapeCell:
         fitness_dict = dict([(herb, herb.fitness) for herb in self.herbivores])
         sorted_herbivores = [
             pair[0]
-            for pair in sorted(
-                fitness_dict.items(), key=operator.itemgetter(1), reverse=False
-            )
+            for pair in sorted(fitness_dict.items(), key=operator.itemgetter(1), reverse=False)
         ]
         return sorted_herbivores
 
@@ -331,7 +326,7 @@ class Water:
         self.is_mainland = False
 
     def __repr__(self):
-        return 'Water cell'
+        return "Water cell"
 
     def __str__(self):
-        return 'Water cell'
+        return "Water cell"
