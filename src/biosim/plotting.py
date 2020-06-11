@@ -13,6 +13,7 @@ import numpy as np
 class Plotting:
     def __init__(self, island, img_base=None):
         # Arguments for plotting
+
         self._island = island
         self._img_base = None
         self._img_counter = None
@@ -46,7 +47,6 @@ class Plotting:
         :param num_years: Number of years to run sim for x-axis
         :type num_years: int
         """
-
         self.y_herb = [np.nan for _ in range(num_years)]
         self.y_carn = [np.nan for _ in range(num_years)]
 
@@ -92,7 +92,7 @@ class Plotting:
 
         self._ax_weight.clear()
         self._weight_hist = self._ax_weight.hist(self._island.animal_weights, bins=10)
-        self._ax_weight.set_xlim([0, 100])
+        # self._ax_weight.set_xlim([0, 100])
 
         self._ax_fitness.clear()
         self._ax_fitness.hist(self._island.animal_fitness, bins=10)
@@ -100,7 +100,7 @@ class Plotting:
 
         self._ax_age.clear()
         self._ax_age.hist(self._island.animal_ages, bins=10)
-        self._ax_age.set_xlim([0, 30])
+        # self._ax_age.set_xlim([0, 30])
 
         self._herb_line.set_ydata(self.y_herb)
         self._herb_line.set_xdata(range(len(self.y_herb)))
@@ -125,8 +125,8 @@ class Plotting:
         :type map_str: str
         """
 
-        #                   R    G    B
         rgb_value = {
+            #      R    G    B
             "W": (0.0, 0.0, 1.0),  # blue
             "L": (0.0, 0.6, 0.0),  # dark green
             "H": (0.5, 1.0, 0.5),  # light green

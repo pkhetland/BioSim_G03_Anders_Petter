@@ -61,7 +61,8 @@ class BioSim:
         self.add_population(ini_pop)
 
         self._year = 0
-        self._plot = plot_graph
+        self._plot_bool = plot_graph
+        self._plot = None
 
         random.seed(seed)
 
@@ -219,10 +220,10 @@ class BioSim:
         """
         start_time = time.time()
 
-        if self._plot:
-            plot = Plotting(self._island)
+        if self._plot_bool and self._plot is None:
+            self._plot = Plotting(self._island)
             self._island.update_pop_matrix()
-            plot.init_plot(num_years)
+            self._plot.init_plot(num_years)
 
         for year in range(num_years):
             self.run_year_cycle()
@@ -231,11 +232,11 @@ class BioSim:
             print(f"Herbivores: {Herbivore.instance_count}")
             print(f"Carnivore: {Carnivore.instance_count}")
 
-            if self._plot:
+            if self._plot_bool:
                 self._island.update_pop_matrix()
-                plot.y_herb[year] = Herbivore.instance_count
-                plot.y_carn[year] = Carnivore.instance_count
-                plot.update_plot(self._year)
+                self._plot.y_herb[year] = Herbivore.instance_count
+                self._plot.y_carn[year] = Carnivore.instance_count
+                self._plot.update_plot(self._year)
 
         finish_time = time.time()
         print("Simulation complete.")

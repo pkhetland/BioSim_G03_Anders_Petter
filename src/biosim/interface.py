@@ -8,9 +8,9 @@ from src.biosim.biosim import BioSim
 
 if __name__ == "__main__":
     geogr = """WWWWWWW
-    WLHDLDW
-    WLHDLHW
-    WWWWWWW"""
+               WDLDLDW
+               WLHHLHW
+               WWWWWWW"""
 
     ini_herbs = [{
             "loc": (2, 2),
@@ -23,7 +23,7 @@ if __name__ == "__main__":
     }]
 
     sim = BioSim(
-        seed=123, ini_pop=ini_herbs, island_map=geogr, plot_graph=True
+        seed=123, ini_pop=ini_herbs, island_map=geogr, plot_graph=False
     )  # Create simple simulation instance
 
     sim.set_landscape_parameters('L', {'f_max': 800.0})
@@ -33,4 +33,3 @@ if __name__ == "__main__":
     sim.add_population(ini_carns)
 
     sim.simulate(num_years=200)
-    # input("Press enter...")
