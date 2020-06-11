@@ -7,9 +7,7 @@ Test set for the initial Lowland class.
 
 import pytest
 
-from src.biosim.animal import Herbivore, Carnivore
-from src.biosim.landscape import Lowland, Highland, Water, Desert
-from src.biosim.biosim import BioSim
+from src import BioSim
 
 
 def test_map_from_str():
