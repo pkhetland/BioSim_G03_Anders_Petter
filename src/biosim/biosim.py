@@ -7,7 +7,10 @@ from src.biosim.plotting import Plotting
 import random as random
 import time
 
+
 class BioSim:
+    """Main BioSim class for running simulations"""
+
     def __init__(
         self,
         island_map,
@@ -18,6 +21,7 @@ class BioSim:
         hist_specs=None,
         img_base=None,
         img_fmt="png",
+        plot_graph=False
     ):
         """
         :param island_map: Multi-line string specifying island geography
@@ -44,76 +48,218 @@ class BioSim:
         img_base should contain a path and beginning of a file name.
         """
 
-        def set_animal_parameters(self, species, params):
-            """
-            Set parameters for animal species.
-            :param species: String, name of animal species
-            :param params: Dict with valid parameter specification for species
-            """
-            pass
+        if island_map is None:
+            map_str = """WWW
+                         WLW
+                         WWW"""
+            self._island = Island(map_str)
+        elif type(island_map) == str:
+            self._island = Island(island_map)
+        else:
+            print("Map string needs to be of type str!")
 
-        def set_landscape_parameters(self, landscape, params):
-            """
-            Set parameters for landscape type.
-            :param landscape: String, code letter for landscape
-            :param params: Dict with valid parameter specification for landscape
-            """
-            pass
+        self.add_population(ini_pop)
 
-        def simulate(self, num_years, vis_years=1, img_years=None):
-            """
-            Run simulation while visualizing the result.
-            :param num_years: number of years to simulate
-            :param vis_years: years between visualization updates
-            :param img_years: years between visualizations saved to files (default: vis_years)
-            Image files will be numbered consecutively.
-            """
-            start_time = time.time()
+        self._year = 0
+        self._plot = plot_graph
+
+        random.seed(seed)
+
+    def set_animal_parameters(self, species, params):
+        """
+        Set parameters for animal species.
+        :param species: String, name of animal species
+        :param params: Dict with valid parameter specification for species
+        """
+        pass
+
+    def set_landscape_parameters(self, landscape, params):
+        """
+        Set parameters for landscape type.
+        :param landscape: String, code letter for landscape
+        :param params: Dict with valid parameter specification for landscape
+        """
+        pass
+
+    def add_population(self, population):
+        """
+        Add a population to the island
+        :param population: List of dictionaries specifying population
+        """
+        for loc_dict in population:  # This loop will be replaced with a more elegant iteration
+            for animal_dict in loc_dict['pop']:
+                animal_age = animal_dict['age']
+                animal_weight = animal_dict['weight']
+                if animal_dict['species'] == 'Herbivore':
+                    self._island.landscape[loc_dict['loc']].add_animals(
+                        [Herbivore(age=animal_age, weight=animal_weight)]
+                    )
+                else:
+                    self._island.landscape[loc_dict['loc']].add_animals(
+                        [Carnivore(age=animal_age, weight=animal_weight)]
+                    )
+
+    def feeding(self, cell):
+        """Iterates through each animal in the cell and feeds it according to species
+
+        :param cell: Current cell object
+        :type cell: object
+        """
+        cell.fodder = cell.f_max
+        # Randomize animals before feeding
+        cell.randomize_herbs()
+
+        for herb in cell.herbivores:  # Herbivores eat first
+            if cell.fodder != 0:
+                herb.eat_fodder(cell)
+
+        for carn in cell.carnivores:  # Carnivores eat last
+            herbs_killed = carn.kill_prey(
+                cell.sorted_herbivores
+            )  # Carnivore hunts for herbivores
+            cell.remove_animals(herbs_killed)  # Remove killed animals from cell
+
+    @staticmethod
+    def procreation(cell):
+        """Iterates through each animal in the cell and procreates
+
+        :param cell: Current cell object
+        :type cell: object
+        """
+        new_animals = []
+        n_herbs, n_carns = cell.herb_count, cell.carn_count
+
+        for herb in cell.herbivores:  # Herbivores give birth)
+            give_birth, birth_weight = herb.give_birth(n_herbs)
+
+            if give_birth:
+                new_animals.append(Herbivore(weight=birth_weight, age=0))
+
+        for carn in cell.carnivores:  # Carnivores give birth
+            give_birth, birth_weight = carn.give_birth(n_carns)
+
+            if give_birth:
+                new_animals.append(Carnivore(weight=birth_weight, age=0))
+
+        cell.add_animals(new_animals)  # Add new animals to cell
+
+    def migrate(self, loc, cell, all_migrated_animals):
+        """Iterates through each animal in the cell and migrates
+
+        :param loc: Coordinate of current cell
+        :type loc: tuple
+        :param cell: Current cell object
+        :type cell: object
+        """
+        # Define neighbor cells once:
+        neighbor_cells = [
+            self._island.landscape[(loc[0] - 1, loc[1])],
+            self._island.landscape[(loc[0], loc[1] + 1)],
+            self._island.landscape[(loc[0] + 1, loc[1])],
+            self._island.landscape[(loc[0], loc[1] - 1)],
+        ]
+
+        migrated_animals = []
+        for animal in cell.animals:
+            if animal not in all_migrated_animals:
+                if animal.migrate():
+                    available_neighbors = [
+                        neighbor
+                        for neighbor in neighbor_cells
+                        if neighbor.is_mainland
+                    ]
+
+                    if len(available_neighbors) > 0:
+                        chosen_cell = random.choice(available_neighbors)
+                        chosen_cell.add_animals([animal])
+                        migrated_animals.append(animal)
+
+        cell.remove_animals(migrated_animals)
+        return migrated_animals
+
+    def run_year_cycle(self):
+        """
+        Runs through each of the 6 yearly seasons for all cells
+        """
+        all_migrated_animals = []
+        for loc, cell in self._island.land_cells.items():
+            #  1. Feeding
+            self.feeding(cell)
+
+            #  2. Procreation
+            self.procreation(cell)
+
+            # 3. Migration
+            migrated_animals = self.migrate(loc, cell, all_migrated_animals)
+
+            all_migrated_animals.extend(migrated_animals)
+
+            #  4. Aging
+            for animal in cell.animals:
+                animal.aging()
+
+            #  5. Loss of weight
+            for animal in cell.animals:
+                animal.lose_weight()
+
+            #  6. Death
+            dead_animals = []
+
+            for animal in cell.animals:
+                if animal.death():
+                    dead_animals.append(animal)
+
+            cell.remove_animals(dead_animals)
+
+        self._year += 1  # Add year to simulation
+
+    def simulate(self, num_years, vis_years=1, img_years=None):
+        """
+        Run simulation while visualizing the result.
+        :param num_years: number of years to simulate
+        :param vis_years: years between visualization updates
+        :param img_years: years between visualizations saved to files (default: vis_years)
+        Image files will be numbered consecutively.
+        """
+        start_time = time.time()
+
+        if self._plot:
+            plot = Plotting(self._island)
+            self._island.update_pop_matrix()
+            plot.init_plot(num_years)
+
+        for year in range(num_years):
+            self.run_year_cycle()
+            print(f'Year: {self.year}')
+            print(f'Animals: {Animal.instance_count}')
+            print(f'Herbivores: {Herbivore.instance_count}')
+            print(f'Carnivore: {Carnivore.instance_count}')
 
             if self._plot:
-                plot = Plotting(self.island)
-                self.island.update_pop_matrix()
-                plot.init_plot(num_years)
+                self._island.update_pop_matrix()
+                plot.y_herb[year] = Herbivore.instance_count
+                plot.y_carn[year] = Carnivore.instance_count
+                plot.update_plot(self._year)
 
-            for year in range(num_years):
-                self.run_year_cycle()
-                print(f'Year: {self.year}')
-                print(f'Animals: {Animal.instance_count}')
-                print(f'Herbivores: {Herbivore.instance_count}')
-                print(f'Carnivore: {Carnivore.instance_count}')
+        finish_time = time.time()
+        print("Simulation complete.")
+        print("Elapsed time: ", (finish_time - start_time))
 
-                if self._plot:
-                    self.island.update_pop_matrix()
-                    plot.y_herb[year] = Herbivore.instance_count
-                    plot.y_carn[year] = Carnivore.instance_count
-                    plot.update_plot(self._year)
+    @property
+    def year(self):
+        """Last year simulated."""
+        return self._year
 
-            finish_time = time.time()
-            print("Simulation complete.")
-            print("Elapsed time: ", (finish_time - start_time))
+    @property
+    def num_animals(self):
+        """Total number of animals on island."""
+        return Animal.instance_count
 
-        def add_population(self, population):
-            """
-            Add a population to the island
-            :param population: List of dictionaries specifying population
-            """
-            pass
+    @property
+    def num_animals_per_species(self):
+        """Number of animals per species in island, as dictionary."""
+        return {'Herbivore': Herbivore.instance_count, 'Carnivore': Carnivore.instance_count}
 
-        @property
-        def year(self):
-            """Last year simulated."""
-            pass
-
-        @property
-        def num_animals(self):
-            """Total number of animals on island."""
-            pass
-
-        @property
-        def num_animals_per_species(self):
-            """Number of animals per species in island, as dictionary."""
-            pass
-
-        def make_movie(self):
-            """Create MPEG4 movie from visualization images saved."""
-            pass
+    def make_movie(self):
+        """Create MPEG4 movie from visualization images saved."""
+        pass

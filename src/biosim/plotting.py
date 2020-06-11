@@ -72,22 +72,11 @@ class Plotting:
 
         plt.ion()  # Activate interactive mode
 
-    def update_plot(self,
-                    year):
+    def update_plot(self, year):
         """Redraw plot with updated values
 
-        :param ax_main: pyplot axis for line plots
-        :type ax_main: object
-        :param ax_weight: pyplot axis weight histogram
-        :type ax_weight: object
-        :param ax_fitness: pyplot axis for fitness histogram
-        :type ax_fitness: object
-        :param ax_age: pyplot axis for age histogram
-        :type ax_age: object
-        :param axhm_herb: pyplot axis for herbivore density heatmap
-        :type axhm_herb: object
-        :param axhm_carn: pyplot axis for carnivore density heatmap
-        :type axhm_carn: object
+        :param year: year attrbiute to be used when plotting in intervals
+        :type year: int
         """
         if max(self.y_herb) >= max(
                 self.y_carn
@@ -128,10 +117,6 @@ class Plotting:
 
         :param map_str: Multi-line string containing letters symbolizing the landscape
         :type map_str: str
-        :param axim: Image axis for plotting map
-        :type axim: object
-        :param axlg: Legend axis for plotting legend blocks
-        :type axlg: object
         """
 
         #                   R    G    B
