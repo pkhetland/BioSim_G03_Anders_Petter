@@ -288,7 +288,7 @@ class BioSim:
     @property
     def num_animals(self):
         """Total number of animals on island."""
-        return Animal.instance_count
+        return Animal.instance_count # Dette returnerer en klasse variabel. Klasse variabler er statiske og ikke dynamiske. De slettes ikke etter en instans er "drept".
 
     @property
     def num_animals_per_species(self):

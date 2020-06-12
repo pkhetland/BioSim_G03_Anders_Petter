@@ -15,7 +15,8 @@ class Animal:
     """
     Super class for Herbivores and Carnivores.
     """
-    instance_count = 0
+    instance_count = 0 # Instance counten deres er en klasse
+    # variabel.
 
     def __init__(self, weight, age):
         """
