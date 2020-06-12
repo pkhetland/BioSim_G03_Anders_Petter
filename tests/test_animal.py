@@ -3,10 +3,8 @@
 """
 Tests for animal class.
 """
-from src.biosim.animal import Herbivore, Carnivore, Animal
-from src.biosim.interface import Simulation
-from src.biosim.landscape import Lowland
-import random as random
+from src.animal import Herbivore, Carnivore
+from src.landscape import Lowland
 import math
 import scipy.stats as stats
 import pytest
@@ -41,15 +39,27 @@ class TestAnimal:
 
     def test_death_binom(self):
         """
-        Test if the death function is statistical significant under the bionomial test
-        with a given death probability p
+        Test if the death function returns statistical significant results
+        under the bionomial test, with a given death probability p.
+
+        : param p: The hypothesized probability
+        : type p: float
+        : param N: The number of animals
+        : type N: int
+        : param n: The number of deaths
+        : type n: int
         """
         h = Herbivore(age=0, weight=10)
         p = 0.1
+
+        # Comment test fails for high values of p. In biolab bacteria example p can be "anything"
+        # Comment test fails for high values of p
+
         N = 100
         n = sum(h.death() for _ in range(N))
         print("Number of deaths:", n)
-        assert stats.binom_test(h.death(), n, p, alternative='two-sided') > self.alpha
+        # Output 27 deaths
+        assert stats.binom_test(h.death(), n, p, "two-sided") > self.alpha
 
     @pytest.fixture(autouse=True)
     def create_animals(self):
@@ -127,6 +137,14 @@ class TestAnimal:
         """
         herb, carn = Herbivore(), Carnivore()
         assert herb.p != carn.p
+
+    def test_has_moved(self):
+        """
+        Test if the animal only once per year cycle
+        """
+        herb = Herbivore()
+        herb.migrate()
+        assert herb.has_moved() is True
 
 
 class TestHerbivore:

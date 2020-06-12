@@ -51,7 +51,8 @@ if __name__ == '__main__':
                      'max': 1.0, 'delta': 0.05},
                      'age': {'max': 60.0, 'delta': 2},
                      'weight': {'max': 60, 'delta': 2}
-                 })
+                 },
+                 plot_graph=True)
     sim.set_animal_parameters('Herbivore', {'zeta': 3.2, 'xi': 1.8})
     sim.set_animal_parameters('Carnivore', {'a_half': 70, 'phi_age': 0.5,
                                             'omega': 0.3, 'F': 65,

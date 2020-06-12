@@ -196,7 +196,8 @@ def test_figure_saved(figfile_root):
                  ini_pop=[],
                  seed=1,
                  img_base=figfile_root,
-                 img_fmt='png')
+                 img_fmt='png',
+                 plot_graph=True)
     sim.simulate(2, vis_years=1, img_years=1)
 
     assert os.path.isfile(figfile_root + '_00000.png')

@@ -11,3 +11,4 @@ pytest-mock
 coverage
 numba
 cython
+seaborn

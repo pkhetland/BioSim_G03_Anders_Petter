@@ -4,11 +4,8 @@
 Test set for the initial Lowland class.
 """
 
-
-import pytest
-
-from src.biosim.animal import Herbivore, Carnivore
-from src.biosim.landscape import Lowland, Highland, Water, Desert
+from src import Herbivore
+from src import Island, Lowland, Water
 
 
 def test_lowland_instance():
@@ -62,3 +59,9 @@ def test_lowland_location():
 def test_ocean_instance():
     ocean = Water()
     assert ocean.is_mainland == False
+
+def test_island_map():
+    island = Island("""WWW
+                    WLW
+                    WWW""")
+

@@ -5,34 +5,81 @@ __email__ = "anders.molmen.host@nmbu.no, petter.storesund.hetland@nmbu.no"
 
 import numpy as np
 import random as random
+from math import e
 
 
 class Animal:
+    # Empty dictionaries to set parameters
+    p = {}
+
     """
-    Super class for Herbivores and Carnivores
+    Super class for Herbivores and Carnivores.
     """
-    animal_count = 0
+    instance_count = 0
 
     def __init__(self, weight, age):
+        """
+        :param weight: Weight of animal
+        :type weight: float
+        :param age: Age of animal
+        :type age: int
+        """
         if weight is None:
             self._weight = self.birth_weight
         else:
-            self._weight = weight
+            self._weight = float(weight)
         self._age = age
 
         self._species = self.__class__.__name__
         self._death_prob = None
 
-        self.count_animal()
-        np.random.seed(123)
+        random.seed(123)  # Set seed - Will be moved to interface
+
+        Animal.instance_count += 1
+
 
     @classmethod
-    def count_animal(cls):
-        cls.animal_count += 1
+    def set_params(cls, new_params):
+        """
+        Set parameter for animal classes
+
+        :param new_params: dict
+        """
+        for key in new_params:
+            if key not in cls.p:
+                raise KeyError("Invalid key name: " + key)
+
+        for key in cls.p:
+            if key in new_params:
+                if new_params[key] < 0:
+                    raise ValueError("Parameter must be positive")
+                cls.p.update(new_params)
 
     @classmethod
-    def subtract_animal(cls):
-        cls.animal_count -= 1
+    def get_params(cls):
+        """
+
+        :return dictionary with parameters
+        :r_type: dict
+        """
+        return cls.p
+
+    def __repr__(self):
+        return '{}({} years, {:.3} kg)'.format(self._species, self._age, self._weight)
+
+    def __str__(self):
+        return '{}({} years, {:.3} kg)'.format(self._species, self._age, self._weight)
+
+    @classmethod
+    def from_dict(cls, animal_dict):
+        """Allows the sim to add instances directly from dictionaries when adding pop
+
+        :param animal_dict: Dict with format {'species': 'Herbivore', 'age': 5, 'weight': 20}
+        :type animal_dict: dict
+        """
+        class_weight = animal_dict['weight']
+        class_age = animal_dict['age']
+        return cls(age=class_age, weight=class_weight)
 
     @property
     def weight(self):
@@ -70,7 +117,8 @@ class Animal:
         elif birth_prob >= 1:
             give_birth = True
         elif 0 < birth_prob < 1:
-            give_birth = np.random.choice([True, False], p=[birth_prob, 1 - birth_prob])
+            give_birth = True if random.random() < birth_prob else False
+            # give_birth = random.choice([True, False], weights=[birth_prob, 1 - birth_prob])
         else:
             give_birth = False
 
@@ -89,7 +137,20 @@ class Animal:
         Returns bool indicating whether animal will migrate
         """
         move_prob = self.p["mu"] * self.fitness
-        return np.random.choice([True, False], p=[move_prob, 1 - move_prob])
+        if random.random() < move_prob and self.has_moved() is False:
+            return True
+        else:
+            return False
+        # return np.random.choice([True, False], p=[move_prob, 1 - move_prob])
+
+    def has_moved(self):
+        """
+        Checks if animal has migrated during the year cycle
+        """
+        if self.migrate():
+            return True
+        else:
+            return False
 
     def lose_weight(self):
         """
@@ -107,19 +168,25 @@ class Animal:
         else:
             if self._death_prob is None:
                 self._death_prob = self.p["omega"] * (1 - self.fitness)
-                death = np.random.choice(
-                    [True, False], p=[self._death_prob, 1 - self._death_prob]
-                )
-                self._death_prob = None
+
+            death = True if random.random() < self._death_prob else False
+            # death = np.random.choice(
+            #     [True, False], weights=[self._death_prob, 1 - self._death_prob]
+            # )
+            self._death_prob = None
 
         if death:
-            self.subtract_animal()
+            Animal.instance_count -= 1
+            if self.species == 'Herbivore':
+                Herbivore.instance_count -= 1
+            elif self.species == 'Carnivore':
+                Carnivore.instance_count -= 1
 
         return death
 
     @staticmethod
     def q(sgn, x, x_half, phi):
-        return 1.0 / (1.0 + np.exp(sgn * phi * (x - x_half)))
+        return 1.0 / (1.0 + e**(sgn * phi * (x - x_half)))
 
     @property
     def fitness(self):
@@ -147,12 +214,8 @@ class Animal:
 
 class Herbivore(Animal):
 
-    herbivore_instance_count = 0
-
-    def __init__(self, weight=None, age=0, p=None):
-
-        if p is None:  # If no parameters are specified
-            self.p = {  # Insert default values for species
+    instance_count = 0
+    p = {
                 "w_birth": 8.0,
                 "sigma_birth": 1.5,
                 "beta": 0.9,
@@ -166,12 +229,12 @@ class Herbivore(Animal):
                 "zeta": 3.5,
                 "xi": 1.2,
                 "omega": 0.4,
-                "F": 10.0,
-            }
-        else:
-            self.p = p
+                "F": 10.0}
 
+    def __init__(self, weight=10, age=0):
         super().__init__(weight, age)
+
+        Herbivore.instance_count += 1
 
     def eat_fodder(self, cell):
         """
@@ -196,44 +259,27 @@ class Carnivore(Animal):
     Carnivore class
     """
 
-    # carnivore_instance_count = 0
+    instance_count = 0
+    p = {"w_birth": 6.0,
+         "sigma_birth": 1.0,
+         "beta": 0.75,
+         "eta": 0.125,
+         "a_half": 40.0,
+         "phi_age": 0.3,
+         "w_half": 4.0,
+         "phi_weight": 0.4,
+         "mu": 0.4,
+         "gamma": 0.8,
+         "zeta": 3.5,
+         "xi": 1.1,
+         "omega": 0.8,
+         "F": 50.0,
+         "DeltaPhiMax": 10.0}
 
-    def __init__(self, weight=None, age=0, p=None):
-        if p is None:  # If no parameters are specified
-            self.p = {  # Insert default values for species
-                "w_birth": 6.0,
-                "sigma_birth": 1.0,
-                "beta": 0.75,
-                "eta": 0.125,
-                "a_half": 40.0,
-                "phi_age": 0.3,
-                "w_half": 4.0,
-                "phi_weight": 0.4,
-                "mu": 0.4,
-                "gamma": 0.8,
-                "zeta": 3.5,
-                "xi": 1.1,
-                "omega": 0.8,
-                "F": 50.0,
-                "DeltaPhiMax": 10.0,
-            }
-        else:
-            self.p = p
-
+    def __init__(self, weight=None, age=0):
         super().__init__(weight, age)
-        # self.count_carnivore()
-    #
-    # @classmethod
-    # def count_carnivore(cls):
-    #     cls.carnivore_instance_count += 1
-    #
-    # @classmethod
-    # def subtract_animal(cls):
-    #     super(Herbivore, cls).animal_count -= 1
 
-    # @classmethod
-    # def instance_count(cls):
-    #     return cls.carnivore_instance_count
+        Carnivore.instance_count += 1
 
     def kill_prey(self, sorted_herbivores):
         """Iterates through sorted herbivores and eats until F is met
@@ -246,18 +292,20 @@ class Carnivore(Animal):
         """
         consumption_weight = 0
         herbs_killed = []
+        fitness = self.fitness
 
         for herb in sorted_herbivores:
             if consumption_weight < self.p["F"]:
-                fitness_diff = self.fitness - herb.fitness
+                fitness_diff = fitness - herb.fitness
                 if fitness_diff <= 0:
                     kill_prey = False
 
                 elif 0 < fitness_diff < self.p["DeltaPhiMax"]:
                     kill_prob = fitness_diff / self.p["DeltaPhiMax"]
-                    kill_prey = np.random.choice(
-                        [True, False], p=[kill_prob, 1 - kill_prob]
-                    )
+                    kill_prey = True if random.random() <= kill_prob else False
+                    # kill_prey = random.choice(
+                    #     [True, False], weights=[kill_prob, 1 - kill_prob]
+                    # )
 
                 else:
                     kill_prey = True
@@ -268,6 +316,9 @@ class Carnivore(Animal):
                     )  # Add herb weight to consumption_weight variable
                     herbs_killed.append(herb)
 
+                    Animal.instance_count -= 1
+                    Herbivore.instance_count -= 1
+
         if (
             consumption_weight > self.p["F"]
         ):  # Auto-adjust consumption_weight to be <= F-parameter
@@ -276,3 +327,21 @@ class Carnivore(Animal):
         self.weight += consumption_weight * self.p["beta"]  # Add weight to carnivore
 
         return herbs_killed
+
+
+if __name__ == "__main__":
+    Herbivore.set_params({"w_birth": 9.0})
+    print(Herbivore.get_params())
+    print(Herbivore.p)
+    print(Carnivore.get_params())
+    herb1 = Herbivore()
+    herb2 = Herbivore()
+    herb3 = Herbivore()
+    herb1.migrate()
+    print(herb1.has_moved())
+    print(herb3.has_moved())
+    #print(herb1.migrate())
+    # new instance with default parameters
+
+    # Output 10. OK
+
