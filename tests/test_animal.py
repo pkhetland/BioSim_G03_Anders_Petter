@@ -19,36 +19,6 @@ def test_death(mocker):
     assert h.death() is True
 
 
-def test_death_binom():
-    alpha = 0.01
-    """
-    Test if the death function returns statistical significant results
-    under the bionomial test, with a given death probability p.
-    Null hypothesis: The death functions returns correct probability of death of animal
-    Alternative hypothesis: The death function does not return correct.
-    Reject the null hypothesis if and only if the p-value is less than the significance
-    level.
-
-    : param p: The hypothesized probability
-    : type p: float
-    : param N: The number of animals
-    : type N: int
-    : param n: The number of deaths
-    : type n: int
-    """
-    h = Herbivore(age=0, weight=10)
-    p = 0.4
-
-    # Comment two sided test fails for high values of p.
-    # In biolab bacteria example p can be "anything"
-
-    N = 1000
-    n = sum(h.death() for _ in range(N))
-    print("Number of deaths:", n)
-    assert stats.binom_test(h.death(), n, p, "greater") > alpha
-
-
-
 class TestAnimal:
     alpha = 0.01
 
@@ -115,6 +85,7 @@ class TestAnimal:
         # set parameters
         h1.birth_prob = 0.5
         h2.birth_prob = 0.5
+
 
 
 
@@ -241,5 +212,3 @@ class TestCarnivore:
         Carnivore.subtract_carnivore()
 
         assert Carnivore.carnivore_instance_count == 3
-
-
