@@ -50,12 +50,11 @@ class TestAnimal:
         : type n: int
         """
         h = Herbivore(age=0, weight=10)
-        p = 0.3
-<<<<<<< HEAD
+        p = 0.1
+
         # Comment test fails for high values of p. In biolab bacteria example p can be "anything"
-=======
         # Comment test fails for high values of p
->>>>>>> migration_milestone
+
         N = 100
         n = sum(h.death() for _ in range(N))
         print("Number of deaths:", n)
@@ -138,6 +137,14 @@ class TestAnimal:
         """
         herb, carn = Herbivore(), Carnivore()
         assert herb.p != carn.p
+
+    def test_has_moved(self):
+        """
+        Test if the animal only once per year cycle
+        """
+        herb = Herbivore()
+        herb.migrate()
+        assert herb.has_moved() is True
 
 
 class TestHerbivore:

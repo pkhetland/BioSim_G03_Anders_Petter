@@ -13,7 +13,7 @@ class Animal:
     p = {}
 
     """
-    Super class for Herbivores and Carnivores. TEST
+    Super class for Herbivores and Carnivores.
     """
     instance_count = 0
 
@@ -36,6 +36,7 @@ class Animal:
         random.seed(123)  # Set seed - Will be moved to interface
 
         Animal.instance_count += 1
+
 
     @classmethod
     def set_params(cls, new_params):
@@ -136,8 +137,20 @@ class Animal:
         Returns bool indicating whether animal will migrate
         """
         move_prob = self.p["mu"] * self.fitness
-        return True if random.random() < move_prob else False
+        if random.random() < move_prob and self.has_moved() is False:
+            return True
+        else:
+            return False
         # return np.random.choice([True, False], p=[move_prob, 1 - move_prob])
+
+    def has_moved(self):
+        """
+        Checks if animal has migrated during the year cycle
+        """
+        if self.migrate():
+            return True
+        else:
+            return False
 
     def lose_weight(self):
         """
@@ -219,26 +232,6 @@ class Herbivore(Animal):
                 "F": 10.0}
 
     def __init__(self, weight=10, age=0):
-        if self.p is None:  # If no parameters are specified
-            super().p.update({  # Insert default values for species
-                "w_birth": 8.0,
-                "sigma_birth": 1.5,
-                "beta": 0.9,
-                "eta": 0.05,
-                "a_half": 40.0,
-                "phi_age": 0.6,
-                "w_half": 10.0,
-                "phi_weight": 0.1,
-                "mu": 0.25,
-                "gamma": 0.2,
-                "zeta": 3.5,
-                "xi": 1.2,
-                "omega": 0.4,
-                "F": 10.0,
-            })
-        else:
-            super().get_params()
-
         super().__init__(weight, age)
 
         Herbivore.instance_count += 1
@@ -284,27 +277,6 @@ class Carnivore(Animal):
          "DeltaPhiMax": 10.0}
 
     def __init__(self, weight=None, age=0):
-        if self.p is None:  # If no parameters are specified
-            super().p.update({  # Insert default values for species
-                "w_birth": 6.0,
-                "sigma_birth": 1.0,
-                "beta": 0.75,
-                "eta": 0.125,
-                "a_half": 40.0,
-                "phi_age": 0.3,
-                "w_half": 4.0,
-                "phi_weight": 0.4,
-                "mu": 0.4,
-                "gamma": 0.8,
-                "zeta": 3.5,
-                "xi": 1.1,
-                "omega": 0.8,
-                "F": 50.0,
-                "DeltaPhiMax": 10.0,
-            })
-        else:
-            self.p = super().get_params()
-
         super().__init__(weight, age)
 
         Carnivore.instance_count += 1
@@ -362,10 +334,14 @@ if __name__ == "__main__":
     print(Herbivore.get_params())
     print(Herbivore.p)
     print(Carnivore.get_params())
-    Carnivore.set_params({"w_birth": -5.0, "beta": 0.95})
-    print(Carnivore.get_params())
+    herb1 = Herbivore()
+    herb2 = Herbivore()
+    herb3 = Herbivore()
+    herb1.migrate()
+    print(herb1.has_moved())
+    print(herb3.has_moved())
+    #print(herb1.migrate())
     # new instance with default parameters
 
     # Output 10. OK
-    # KeyError. Expected 8. Comments?
 
