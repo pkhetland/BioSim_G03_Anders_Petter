@@ -19,6 +19,7 @@ class Island:
         self.landscape = self.map_from_str(map_str)
         self.map_str = map_str
         self._land_cells = None
+        self.check_border_cells()
 
         self.herb_pop_matrix = [[0 for _ in self.unique_cols] for _ in self.unique_rows]
         self.carn_pop_matrix = [[0 for _ in self.unique_cols] for _ in self.unique_rows]
@@ -94,9 +95,16 @@ class Island:
         """
         map_dict = {}
 
+        # Test row lengths
+        row_lengths = [len(row.strip()) for row in map_str.strip(' ').splitlines()]
+        for i, row in enumerate(row_lengths[:-1]):
+            if row_lengths[i] != row_lengths[i+1]:
+                raise ValueError('Map needs to have uniform row lengths!')
+
         for row_coord, cell_row in enumerate(map_str.splitlines()):
             for col_coord, cell in enumerate(cell_row.strip()):
                 coord = (row_coord + 1, col_coord + 1)
+
                 if cell == "W":
                     map_dict[coord] = Water()
                 elif cell == "L":
@@ -106,8 +114,20 @@ class Island:
                 elif cell == "D":
                     map_dict[coord] = Desert()
                 else:
-                    print("Map strings need to be either W, L, H or D! Try setting map again.")
+                    raise ValueError("Map strings need to be either W, L, H or D! Try setting map again.")
+
         return map_dict
+
+    def check_border_cells(self):
+        for row, col in self.land_cells:
+            if (
+                    row == 1
+                    or row == self.unique_rows[-1]
+                    or col == 1
+                    or col == self.unique_cols[-1]
+            ):
+                print(row, self.unique_rows[-1], col, self.unique_cols[-1])
+                raise ValueError('Only water cells may be border cells!')
 
     def update_pop_matrix(self):
         for row in self.unique_rows[1:-1]:  # First and last cell is water
