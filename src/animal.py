@@ -32,6 +32,7 @@ class Animal:
 
         self._species = self.__class__.__name__
         self._death_prob = None
+        self.has_moved = False
 
         random.seed(123)  # Set seed - Will be moved to interface
 
@@ -137,20 +138,11 @@ class Animal:
         Returns bool indicating whether animal will migrate
         """
         move_prob = self.p["mu"] * self.fitness
-        if random.random() < move_prob and self.has_moved() is False:
+        if random.random() < move_prob:
             return True
         else:
             return False
         # return np.random.choice([True, False], p=[move_prob, 1 - move_prob])
-
-    def has_moved(self):
-        """
-        Checks if animal has migrated during the year cycle
-        """
-        if self.migrate():
-            return True
-        else:
-            return False
 
     def lose_weight(self):
         """

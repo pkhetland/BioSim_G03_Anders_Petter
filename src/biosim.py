@@ -155,7 +155,7 @@ class BioSim:
 
         cell.add_animals(new_animals)  # Add new animals to cell
 
-    def migrate(self, loc, cell, all_migrated_animals):
+    def migrate(self, loc, cell):
         """Iterates through each animal in the cell and migrates
 
         :param loc: Coordinate of current cell
@@ -175,7 +175,7 @@ class BioSim:
 
         migrated_animals = []
         for animal in cell.animals:
-            if animal not in all_migrated_animals:
+            if not animal.has_moved:
                 if animal.migrate():
                     available_neighbors = [
                         neighbor for neighbor in neighbor_cells if neighbor.is_mainland
@@ -186,14 +186,16 @@ class BioSim:
                         chosen_cell.add_animals([animal])
                         migrated_animals.append(animal)
 
+                    animal.has_moved = True
+
         cell.remove_animals(migrated_animals)
-        return migrated_animals
+        for animal in cell.animals:
+            animal.has_moved = False
 
     def run_year_cycle(self):
         """
         Runs through each of the 6 yearly seasons for all cells
         """
-        all_migrated_animals = []
         for loc, cell in self._island.land_cells.items():
             #  1. Feeding
             self.feeding(cell)
@@ -202,10 +204,9 @@ class BioSim:
             self.procreation(cell)
 
             # 3. Migration
-            for animal in cell.animals:
-                animal.migrate()
+            self.migrate(loc, cell)
 
-            #migrated_animals = self.migrate(loc, cell, all_migrated_animals)
+            #migrated_animals =
 
             #all_migrated_animals.extend(migrated_animals)
 
@@ -247,16 +248,12 @@ class BioSim:
             self._plot.y_herb[self._year] = Herbivore.instance_count
             self._plot.y_carn[self._year] = Carnivore.instance_count
 
-        else:
+        elif self._plot_bool:
             self._plot.y_herb += [np.nan for _ in range(num_years)]
             self._plot.y_carn += [np.nan for _ in range(num_years)]
 
         for _ in range(num_years):
             self.run_year_cycle()
-            print(f"Year: {self._year}")
-            print(f"Animals: {Animal.instance_count}")
-            print(f"Herbivores: {Herbivore.instance_count}")
-            print(f"Carnivore: {Carnivore.instance_count}")
             if self._plot_bool:
                 self._plot.y_herb[self._year] = Herbivore.instance_count
                 self._plot.y_carn[self._year] = Carnivore.instance_count
@@ -274,6 +271,11 @@ class BioSim:
                     self._plot.save_graphics(self._img_base, self._img_fmt)
 
         finish_time = time.time()
+
+        print(f"Year: {self._year}")
+        print(f"Animals: {Animal.instance_count}")
+        print(f"Herbivores: {Herbivore.instance_count}")
+        print(f"Carnivore: {Carnivore.instance_count}")
         print("Simulation complete.")
         print("Elapsed time: {:.3} seconds".format(finish_time - start_time))
         # input('Press enter to continue')

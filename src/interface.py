@@ -7,16 +7,18 @@ A basic interface file containing which imports the BioSim class and runs the si
 from src.biosim import BioSim
 
 if __name__ == "__main__":
-    geogr = "WWWW\nWLHW\nWWWW"
+    geogr = """WWW
+    WLW
+    WWW"""
 
     ini_pop = [
         {
             "loc": (2, 2),
-            "pop": [{"species": "Herbivore", "age": 5, "weight": 30} for _ in range(150)]
+            "pop": [{"species": "Herbivore", "age": 5, "weight": 20} for _ in range(50)]
         },
         {
             "loc": (2, 2),
-            "pop": [{"species": "Carnivore", "age": 5, "weight": 20} for _ in range(40)]
+            "pop": [{"species": "Carnivore", "age": 5, "weight": 20} for _ in range(20)]
         }
     ]
 
@@ -36,6 +38,6 @@ if __name__ == "__main__":
 
     sim.set_landscape_parameters('L', {'f_max': 800.0})
 
-    sim.simulate(num_years=200)
+    sim.simulate(num_years=400)
 
     # sim.simulate(num_years=200)
