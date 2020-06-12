@@ -37,6 +37,7 @@ class Animal:
 
         Animal.instance_count += 1
 
+
     @classmethod
     def set_params(cls, new_params):
         """
@@ -136,8 +137,20 @@ class Animal:
         Returns bool indicating whether animal will migrate
         """
         move_prob = self.p["mu"] * self.fitness
-        return True if random.random() < move_prob else False
+        if random.random() < move_prob and self.has_moved() is False:
+            return True
+        else:
+            return False
         # return np.random.choice([True, False], p=[move_prob, 1 - move_prob])
+
+    def has_moved(self):
+        """
+        Checks if animal has migrated during the year cycle
+        """
+        if self.migrate():
+            return True
+        else:
+            return False
 
     def lose_weight(self):
         """
@@ -321,10 +334,14 @@ if __name__ == "__main__":
     print(Herbivore.get_params())
     print(Herbivore.p)
     print(Carnivore.get_params())
-    Carnivore.set_params({"w_birth": -5.0, "beta": 0.95})
-    print(Carnivore.get_params())
+    herb1 = Herbivore()
+    herb2 = Herbivore()
+    herb3 = Herbivore()
+    herb1.migrate()
+    print(herb1.has_moved())
+    print(herb3.has_moved())
+    #print(herb1.migrate())
     # new instance with default parameters
 
     # Output 10. OK
-    # KeyError. Expected 8. Comments?
 
