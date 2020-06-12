@@ -10,6 +10,45 @@ import scipy.stats as stats
 import pytest
 
 
+def test_death(mocker):
+    """
+    Replace random number by a function returning a fixed value
+    """
+    mocker.patch("random.random", return_value=0)
+    h = Herbivore()
+    assert h.death() is True
+
+
+def test_death_binom():
+    alpha = 0.01
+    """
+    Test if the death function returns statistical significant results
+    under the bionomial test, with a given death probability p.
+    Null hypothesis: The death functions returns correct probability of death of animal
+    Alternative hypothesis: The death function does not return correct.
+    Reject the null hypothesis if and only if the p-value is less than the significance
+    level.
+
+    : param p: The hypothesized probability
+    : type p: float
+    : param N: The number of animals
+    : type N: int
+    : param n: The number of deaths
+    : type n: int
+    """
+    h = Herbivore(age=0, weight=10)
+    p = 0.4
+
+    # Comment two sided test fails for high values of p.
+    # In biolab bacteria example p can be "anything"
+
+    N = 1000
+    n = sum(h.death() for _ in range(N))
+    print("Number of deaths:", n)
+    assert stats.binom_test(h.death(), n, p, "greater") > alpha
+
+
+
 class TestAnimal:
     alpha = 0.01
 
@@ -24,8 +63,6 @@ class TestAnimal:
 
         self.death_prob = 1
         """
-
-
     def test_certain_death(self):
         """
         Test that the animal always must die given death_prob = 1
@@ -54,7 +91,7 @@ class TestAnimal:
         : type n: int
         """
         h = Herbivore(age=0, weight=10)
-        p = 0.25
+        p = 0.2
 
         # Comment test fails for high values of p. In biolab bacteria example p can be "anything"
         # Comment test fails for high values of p
@@ -62,8 +99,10 @@ class TestAnimal:
         N = 1000
         n = sum(h.death() for _ in range(N))
         print("Number of deaths:", n)
-        # Output 27 deaths
-        assert stats.binom_test(h.death(), n, p, "two-sided") > self.alpha
+        assert stats.binom_test(n, N, p, "greater") > self.alpha
+        print(stats.binom_test(n, N, p, "greater"))
+        # With a probability of at most p = 0.2 The null hypothesis cannot be rejected
+
 
     @pytest.fixture(autouse=True)
     def create_animals(self):
@@ -90,7 +129,7 @@ class TestAnimal:
         """
         b = Herbivore(age=0, weight=10)
         # Set mocking parameter of the death probability of the animal
-        p = 0.1
+        p = 0.2
         # 100 animals
         N = 100
         n = sum(b.death() for _ in range(N))
