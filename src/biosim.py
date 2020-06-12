@@ -199,9 +199,12 @@ class BioSim:
             self.procreation(cell)
 
             # 3. Migration
-            migrated_animals = self.migrate(loc, cell, all_migrated_animals)
+            for animal in cell.animals:
+                animal.migrate()
 
-            all_migrated_animals.extend(migrated_animals)
+            #migrated_animals = self.migrate(loc, cell, all_migrated_animals)
+
+            #all_migrated_animals.extend(migrated_animals)
 
             #  4. Aging
             for animal in cell.animals:

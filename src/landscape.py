@@ -7,6 +7,7 @@ Lowland class for the simulation.
 import numpy as np
 import operator
 import random
+from src.animal import Animal
 
 
 class Island:
@@ -19,8 +20,8 @@ class Island:
         self.map_str = map_str
         self._land_cells = None
 
-        self.herb_pop_matrix = [[0 for col in self.unique_cols] for row in self.unique_rows]
-        self.carn_pop_matrix = [[0 for col in self.unique_cols] for row in self.unique_rows]
+        self.herb_pop_matrix = [[0 for _ in self.unique_cols] for _ in self.unique_rows]
+        self.carn_pop_matrix = [[0 for _ in self.unique_cols] for _ in self.unique_rows]
 
         self._herb_fitness_list = []
         self._carn_fitness_list = []
