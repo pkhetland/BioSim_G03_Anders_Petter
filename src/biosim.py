@@ -58,6 +58,12 @@ class BioSim:
         else:
             print("Map string needs to be of type str!")
 
+        self._ymax = ymax_animals
+        self._cmax = cmax_animals
+
+        if hist_specs is not None:
+            pass
+
         self.add_population(ini_pop)
 
         self._year = 0
@@ -227,7 +233,9 @@ class BioSim:
         start_time = time.time()
 
         if self._plot_bool and self._plot is None:
-            self._plot = Plotting(self._island)
+            self._plot = Plotting(self._island,
+                                  cmax=self._cmax,
+                                  ymax=self._ymax)
             self._island.update_pop_matrix()
             self._plot.init_plot(num_years)
 

@@ -11,7 +11,7 @@ import numpy as np
 
 
 class Plotting:
-    def __init__(self, island, img_base=None):
+    def __init__(self, island, cmax=200, ymax=None, img_base=None):
         # Arguments for plotting
 
         self._island = island
@@ -40,6 +40,9 @@ class Plotting:
         self._imax_carn = None
         self._axim = None
         self._axlg = None
+
+        self._ymax = ymax
+        self._cmax = cmax
 
     def init_plot(self, num_years):
         """ Initialize the plot at the beginning of the simulation
@@ -75,6 +78,9 @@ class Plotting:
             [0, num_years]
         )  # x-limit is set permanently to amount of years to simulate
 
+        if self._ymax is not None:
+            self._ax_main.set_ylim([0, self._ymax])
+
         plt.ion()  # Activate interactive mode
 
     def update_plot(self, year):
@@ -83,12 +89,13 @@ class Plotting:
         :param year: year attrbiute to be used when plotting in intervals
         :type year: int
         """
-        if max(self.y_herb) >= max(
-            self.y_carn
-        ):  # Find the biggest count value in either y_herb or y_carn
-            self._ax_main.set_ylim([0, max(self.y_herb) + 20])  # Set the y-lim to this max
-        else:
-            self._ax_main.set_ylim([0, max(self.y_carn) + 20])  #
+        if self._ymax is None:
+            if max(self.y_herb) >= max(
+                self.y_carn
+            ):  # Find the biggest count value in either y_herb or y_carn
+                self._ax_main.set_ylim([0, max(self.y_herb) + 20])  # Set the y-lim to this max
+            else:
+                self._ax_main.set_ylim([0, max(self.y_carn) + 20])  #
 
         self._ax_weight.clear()
         self._weight_hist = self._ax_weight.hist(self._island.animal_weights, bins=10)
@@ -163,10 +170,16 @@ class Plotting:
         ]
 
         self._imax_herb = self._axhm_herb.imshow(
-            self._island.herb_pop_matrix, cmap="viridis", interpolation="nearest", vmax=200
+            self._island.herb_pop_matrix,
+            cmap="viridis",
+            interpolation="nearest",
+            vmax=self._cmax
         )
         self._imax_carn = self._axhm_carn.imshow(
-            self._island.carn_pop_matrix, cmap="cividis", interpolation="nearest", vmax=50
+            self._island.carn_pop_matrix,
+            cmap="cividis",
+            interpolation="nearest",
+            vmax=self._cmax
         )
         self._axhm_herb.set_title("Herbivore density")
         self._axhm_carn.set_title("Carnivore density")
