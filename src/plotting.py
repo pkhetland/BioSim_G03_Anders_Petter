@@ -11,12 +11,12 @@ import numpy as np
 
 
 class Plotting:
-    def __init__(self, island, cmax=200, ymax=None, img_base=None):
+    def __init__(self, island, cmax=None, ymax=None, hist_specs=None):
         # Arguments for plotting
 
         self._island = island
         self._img_base = None
-        self._img_counter = None
+        self._img_ctr = 0
 
         self.y_herb = None
         self.y_carn = None
@@ -42,7 +42,18 @@ class Plotting:
         self._axlg = None
 
         self._ymax = ymax
+
         self._cmax = cmax
+        if self._cmax is None:
+            self._cmax = {'Herbivore': 200, 'Carnivore': 50}
+
+        self._cmax_herb = self._cmax['Herbivore']
+        self._cmax_carn = self._cmax['Carnivore']
+
+        if hist_specs is None:
+            self._hist_specs = {'weight': {'max': 80, 'delta': 2},
+                                'fitness': {'max': 1.0, 'delta': 0.05},
+                                'age': {'max': 80, 'delta': 2}}
 
     def init_plot(self, num_years):
         """ Initialize the plot at the beginning of the simulation
@@ -50,8 +61,8 @@ class Plotting:
         :param num_years: Number of years to run sim for x-axis
         :type num_years: int
         """
-        self.y_herb = [np.nan for _ in range(num_years)]
-        self.y_carn = [np.nan for _ in range(num_years)]
+        self.y_herb = [np.nan for _ in range(num_years+1)]
+        self.y_carn = [np.nan for _ in range(num_years+1)]
 
         fig = plt.figure(figsize=(10, 7), constrained_layout=True)  # Initiate pyplot
         gs = fig.add_gridspec(4, 6)
@@ -83,7 +94,7 @@ class Plotting:
 
         plt.ion()  # Activate interactive mode
 
-    def update_plot(self, year):
+    def update_plot(self):
         """Redraw plot with updated values. !! Histograms need an update/set_data function
 
         :param year: year attrbiute to be used when plotting in intervals
@@ -96,25 +107,44 @@ class Plotting:
                 self._ax_main.set_ylim([0, max(self.y_herb) + 20])  # Set the y-lim to this max
             else:
                 self._ax_main.set_ylim([0, max(self.y_carn) + 20])  #
-
-        self._ax_weight.clear()
-        self._weight_hist = self._ax_weight.hist(self._island.animal_weights, bins=10)
-        # self._ax_weight.set_xlim([0, 100])
-
-        self._ax_fitness.clear()
-        self._ax_fitness.hist(self._island.animal_fitness, bins=10)
-        self._ax_fitness.set_xlim([0, 1])
-
-        self._ax_age.clear()
-        self._ax_age.hist(self._island.animal_ages, bins=10)
-        # self._ax_age.set_xlim([0, 30])
-
+        #
+        # weight_data = self._island.animal_weights
+        # weight_max = int(max(max(weight_data)))
+        # weight_min = int(min(min(weight_data)))
+        # weight_delta = self._hist_specs['weight']['delta']
+        # self._ax_weight.clear()
+        # self._weight_hist = self._ax_weight.hist(weight_data,
+        #                                          range(weight_min,
+        #                                                weight_max + int(weight_delta),
+        #                                                weight_delta))
+        # self._ax_weight.set_xlim([0, self._hist_specs['weight']['max']])
+        #
+        # fitness_data = self._island.animal_fitness
+        # fitness_max = int(max(max(fitness_data)))
+        # fitness_min = int(min(min(fitness_data)))
+        # fitness_delta = self._hist_specs['fitness']['delta']
+        #
+        # self._ax_fitness.clear()
+        # self._ax_fitness.hist(fitness_data, bins=np.arange(fitness_min,
+        #                                                    fitness_max+fitness_delta,
+        #                                                    fitness_delta))
+        #
+        # self._ax_weight.set_xlim([0, self._hist_specs['fitness']['max']])
+        #
+        # age_data = self._island.animal_ages
+        # age_max = int(max(max(age_data)))
+        # age_min = int(min(min(age_data)))
+        # age_delta = self._hist_specs['age']['delta']
+        # self._ax_age.clear()
+        # self._ax_age.hist(age_data, bins=range(age_min,
+        #                                        age_max + int(age_delta),
+        #                                        age_delta))
+        # self._ax_age.set_xlim([0, self._hist_specs['age']['max']])
+        #
         self._herb_line.set_ydata(self.y_herb)
         self._herb_line.set_xdata(range(len(self.y_herb)))
         self._carn_line.set_ydata(self.y_carn)
         self._carn_line.set_xdata(range(len(self.y_carn)))
-
-        # self._weight_hist.set_data(self._island.animal_weights)
 
         self._ax_weight.set_title("Weight distribution")
         self._ax_fitness.set_title("Fitness distribution")
@@ -173,13 +203,13 @@ class Plotting:
             self._island.herb_pop_matrix,
             cmap="viridis",
             interpolation="nearest",
-            vmax=self._cmax
+            vmax=self._cmax_herb
         )
         self._imax_carn = self._axhm_carn.imshow(
             self._island.carn_pop_matrix,
             cmap="cividis",
             interpolation="nearest",
-            vmax=self._cmax
+            vmax=self._cmax_carn
         )
         self._axhm_herb.set_title("Herbivore density")
         self._axhm_carn.set_title("Carnivore density")
@@ -188,15 +218,15 @@ class Plotting:
 
         plt.colorbar(self._imax_carn, ax=self._axhm_carn, orientation="vertical")
 
-    def _save_graphics(self):
+    def save_graphics(self, img_base, img_fmt):
         """Saves graphics to file if file name given. From randviz sim."""
 
-        if self._img_base is None:
+        if img_base is None:
             return
 
         plt.savefig(
             "{base}_{num:05d}.{type}".format(
-                base=self._img_base, num=self._img_ctr, type=self._img_fmt
+                base=img_base, num=self._img_ctr, type=img_fmt
             )
         )
         self._img_ctr += 1

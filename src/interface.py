@@ -7,42 +7,42 @@ A basic interface file containing which imports the BioSim class and runs the si
 from src.biosim import BioSim
 
 if __name__ == "__main__":
-    geogr = """WWWWWWW
-               WDDDDDW
-               WDDLDDW
-               WDHLHDW
-               WDDLDDW
-               WDDDDDW
-               WWWWWWW"""
+    geogr = "WWWW\nWLHW\nWWWW"
+    # geogr = """WWW
+    # WLW
+    # WWW"""
 
-    ini_herbs = [{
-            "loc": (4, 4),
-            "pop": [{"species": "Herbivore", "age": 5, "weight": 20} for _ in range(200)]
-    }]
+    ini_pop = [
+        {
+            "loc": (2, 2),
+            "pop": [{"species": "Herbivore", "age": 5, "weight": 30} for _ in range(150)]
+        },
+        {
+            "loc": (2, 2),
+            "pop": [{"species": "Carnivore", "age": 5, "weight": 20} for _ in range(40)]
+        }
+    ]
 
-    ini_carns = [{
-        "loc": (3, 3),
-        "pop": [{"species": "Carnivore", "age": 5, "weight": 20} for _ in range(40)]
-    }]
+    ini_carns = []
 
-    cmax = {'Herbivore': 500, 'Carnivore': 200}
+    # cmax = {'Herbivore': 500, 'Carnivore': 200}
 
     sim = BioSim(
         seed=123,
-        ini_pop=ini_herbs,
+        ini_pop=ini_pop,
         island_map=geogr,
-        cmax_animals=cmax,
+        cmax_animals=None,
         ymax_animals=None,
-        plot_graph=False
+        hist_specs={'weight': {'max': 80, 'delta': 2}, 'fitness': {'max': 1.0, 'delta': 0.05}},
+        plot_graph=True,
+        img_base='test'
     )  # Create simple simulation instance
-
-    sim.add_population(ini_carns)
 
     # sim.set_animal_parameters('Carnivore', {'omega': 0})
     # sim.set_animal_parameters('Herbivore', {'omega': 0})
 
-    # sim.set_landscape_parameters('L', {'f_max': 800.0})
+    sim.set_landscape_parameters('L', {'f_max': 800.0})
 
-    sim.simulate(num_years=1000)
+    sim.simulate(num_years=2, vis_years=1, img_years=1)
 
-    # sim.simulate(num_years=20)
+    # sim.simulate(num_years=200)

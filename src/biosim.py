@@ -69,6 +69,8 @@ class BioSim:
         self._year = 0
         self._plot_bool = plot_graph
         self._plot = None
+        self._img_base = img_base
+        self._img_fmt = img_fmt
 
         random.seed(seed)
 
@@ -238,24 +240,34 @@ class BioSim:
                                   ymax=self._ymax)
             self._island.update_pop_matrix()
             self._plot.init_plot(num_years)
+            self._plot.y_herb[self._year] = Herbivore.instance_count
+            self._plot.y_carn[self._year] = Carnivore.instance_count
 
-        for year in range(num_years):
+        for _ in range(num_years):
             self.run_year_cycle()
-            print(f"Year: {self.year}")
+            print(f"Year: {self._year}")
             print(f"Animals: {Animal.instance_count}")
             print(f"Herbivores: {Herbivore.instance_count}")
             print(f"Carnivore: {Carnivore.instance_count}")
-
             if self._plot_bool:
-                self._island.update_pop_matrix()
-                self._plot.y_herb[year] = Herbivore.instance_count
-                self._plot.y_carn[year] = Carnivore.instance_count
-                self._plot.update_plot(self._year)
+                self._plot.y_herb[self._year] = Herbivore.instance_count
+                self._plot.y_carn[self._year] = Carnivore.instance_count
+                if self._year % vis_years == 0:
+                    self._island.update_pop_matrix()
+                    self._plot.update_plot()
+
+            if img_years is None:
+                if self._year % vis_years == 0:
+                    self._plot.save_graphics(self._img_base, self._img_fmt)
+
+            else:
+                if self._year % img_years == 0:
+                    self._plot.save_graphics(self._img_base, self._img_fmt)
 
         finish_time = time.time()
         print("Simulation complete.")
         print("Elapsed time: {:.3} seconds".format(finish_time - start_time))
-        input('Press enter to continue')
+        # input('Press enter to continue')
 
     @property
     def year(self):
