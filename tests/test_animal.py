@@ -41,6 +41,10 @@ class TestAnimal:
         """
         Test if the death function returns statistical significant results
         under the bionomial test, with a given death probability p.
+        Null hypothesis: The death functions returns correct probability of death of animal
+        Alternative hypothesis: The death function does not return correct.
+        Reject the null hypothesis if and only if the p-value is less than the significance
+        level.
 
         : param p: The hypothesized probability
         : type p: float
@@ -50,12 +54,12 @@ class TestAnimal:
         : type n: int
         """
         h = Herbivore(age=0, weight=10)
-        p = 0.1
+        p = 0.25
 
         # Comment test fails for high values of p. In biolab bacteria example p can be "anything"
         # Comment test fails for high values of p
 
-        N = 100
+        N = 1000
         n = sum(h.death() for _ in range(N))
         print("Number of deaths:", n)
         # Output 27 deaths
