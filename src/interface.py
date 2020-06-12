@@ -8,9 +8,6 @@ from src.biosim import BioSim
 
 if __name__ == "__main__":
     geogr = "WWWW\nWLHW\nWWWW"
-    # geogr = """WWW
-    # WLW
-    # WWW"""
 
     ini_pop = [
         {
@@ -23,19 +20,15 @@ if __name__ == "__main__":
         }
     ]
 
-    ini_carns = []
-
-    # cmax = {'Herbivore': 500, 'Carnivore': 200}
-
     sim = BioSim(
         seed=123,
         ini_pop=ini_pop,
         island_map=geogr,
         cmax_animals=None,
         ymax_animals=None,
-        hist_specs={'weight': {'max': 80, 'delta': 2}, 'fitness': {'max': 1.0, 'delta': 0.05}},
-        plot_graph=True,
-        img_base='test'
+        hist_specs=None,
+        plot_graph=False,
+        img_base=None
     )  # Create simple simulation instance
 
     # sim.set_animal_parameters('Carnivore', {'omega': 0})
@@ -43,6 +36,6 @@ if __name__ == "__main__":
 
     sim.set_landscape_parameters('L', {'f_max': 800.0})
 
-    sim.simulate(num_years=2, vis_years=1, img_years=1)
+    sim.simulate(num_years=200)
 
     # sim.simulate(num_years=200)

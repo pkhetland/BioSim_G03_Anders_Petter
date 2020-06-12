@@ -5,6 +5,7 @@ from src.landscape import Island
 from src.plotting import Plotting
 
 import random as random
+import numpy as np
 import time
 
 
@@ -246,6 +247,10 @@ class BioSim:
             self._plot.y_herb[self._year] = Herbivore.instance_count
             self._plot.y_carn[self._year] = Carnivore.instance_count
 
+        else:
+            self._plot.y_herb += [np.nan for _ in range(num_years)]
+            self._plot.y_carn += [np.nan for _ in range(num_years)]
+
         for _ in range(num_years):
             self.run_year_cycle()
             print(f"Year: {self._year}")
@@ -259,6 +264,7 @@ class BioSim:
                     self._island.update_pop_matrix()
                     self._plot.update_plot()
 
+        if self._img_base is not None:
             if img_years is None:
                 if self._year % vis_years == 0:
                     self._plot.save_graphics(self._img_base, self._img_fmt)
