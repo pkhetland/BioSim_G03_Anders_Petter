@@ -19,6 +19,21 @@ def test_death(mocker):
     assert h.death() is True
 
 
+def test_give_birth(mocker):
+    """
+    Mock the birth function to see it returns correct.
+    Replace random number by fixed value.
+
+    Making sure the weight is greater than the newborn weight
+
+    """
+    mocker.patch("random.random", return_value=0)
+    h1 = Herbivore(weight=100)
+    assert h1.give_birth(n_same=1000)
+
+
+
+
 class TestAnimal:
     alpha = 0.01
 
@@ -131,6 +146,8 @@ class TestAnimal:
         carn.aging()
         assert herb.age > 0, carn.age > 0
 
+
+
     def test_lose_weight(self):
         """
         Test that animals lose weight
@@ -177,11 +194,6 @@ class TestHerbivore:
         herb_weight_after = herb.weight
         assert herb_weight < herb_weight_after
 
-    def test_give_birth(self):
-        """
-        Test that the give birth function works
-        """
-        pass
 
     def test_instance_count(self):
         herb = Herbivore()

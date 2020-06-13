@@ -118,7 +118,7 @@ class Animal:
         :return: True or False
         :rtype: bool
         """
-        birth_prob = self.p["gamma"] * self.fitness * n_same - 1
+        birth_prob = self.p["gamma"] * self.fitness * (n_same - 1)
         if self.weight < self.p["zeta"] * (self.p["w_birth"] + self.p["sigma_birth"]):
             return False, None  # Return false if weight of mother is less than birth
         elif birth_prob >= 1:
