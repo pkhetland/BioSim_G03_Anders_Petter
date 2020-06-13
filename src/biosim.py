@@ -73,7 +73,7 @@ class BioSim:
         self._img_base = img_base
         self._img_fmt = img_fmt
 
-        random.seed(seed)
+        # random.seed(seed)
 
     @staticmethod
     def set_animal_parameters(species, params):
@@ -103,14 +103,14 @@ class BioSim:
         :param population: List of dictionaries specifying population
         """
         for loc_dict in population:  # This loop will be replaced with a more elegant iteration
-            self._island.landscape[loc_dict["loc"]].add_animals(
-                [
+            new_animals = [
                     Herbivore.from_dict(animal_dict)
                     if animal_dict["species"] == "Herbivore"
                     else Carnivore.from_dict(animal_dict)
                     for animal_dict in loc_dict["pop"]
                 ]
-            )
+            self._island.landscape[loc_dict["loc"]].add_animals(new_animals)
+            self._island.count_animals(animal_list=new_animals)
 
     def feeding(self, cell):
         """Iterates through each animal in the cell and feeds it according to species
@@ -157,7 +157,7 @@ class BioSim:
 
         self._island.count_animals(num_herbs=len(new_herbs), num_carns=len(new_carns))
 
-    def migrate(self, loc, cell):
+    def migrate(self, cell):
         """Iterates through each animal in the cell and migrates
 
         :param loc: Coordinate of current cell
@@ -194,7 +194,7 @@ class BioSim:
             self.procreation(cell)
 
             # 3. Migration
-            self.migrate(loc, cell)
+            self.migrate(cell)
 
             #  4. Aging
             for animal in cell.animals:
@@ -241,6 +241,10 @@ class BioSim:
 
         for _ in range(num_years):
             self.run_year_cycle()
+            print(f"Year: {self._year}")
+            print(f"Animals: {self._island.num_animals}")
+            print(f"Herbivores: {self._island.num_herbs}")
+            print(f"Carnivore: {self._island.num_carns}")
             if self._plot_bool:
                 self._plot.y_herb[self._year] = self._island.num_herbs
                 self._plot.y_carn[self._year] = self._island.num_carns
@@ -248,21 +252,17 @@ class BioSim:
                     self._island.update_pop_matrix()
                     self._plot.update_plot()
 
-        if self._img_base is not None:
-            if img_years is None:
-                if self._year % vis_years == 0:
-                    self._plot.save_graphics(self._img_base, self._img_fmt)
+            if self._img_base is not None:
+                if img_years is None:
+                    if self._year % vis_years == 0:
+                        self._plot.save_graphics(self._img_base, self._img_fmt)
 
-            else:
-                if self._year % img_years == 0:
-                    self._plot.save_graphics(self._img_base, self._img_fmt)
+                else:
+                    if self._year % img_years == 0:
+                        self._plot.save_graphics(self._img_base, self._img_fmt)
 
         finish_time = time.time()
 
-        print(f"Year: {self._year}")
-        print(f"Animals: {self._island.num_animals}")
-        print(f"Herbivores: {self._island.num_herbs}")
-        print(f"Carnivore: {self._island.num_carns}")
         print("Simulation complete.")
         print("Elapsed time: {:.3} seconds".format(finish_time - start_time))
         # input('Press enter to continue')

@@ -35,7 +35,7 @@ class Animal:
         self._death_prob = None
         self.has_moved = False
 
-        random.seed(123)  # Set seed - Will be moved to interface
+        # random.seed(1)  # Set seed - Will be moved to interface
 
         Animal.instance_count += 1
 
@@ -125,7 +125,6 @@ class Animal:
             give_birth = True
         elif 0 < birth_prob < 1:
             give_birth = True if random.random() < birth_prob else False
-            # give_birth = random.choice([True, False], weights=[birth_prob, 1 - birth_prob])
         else:
             give_birth = False
 

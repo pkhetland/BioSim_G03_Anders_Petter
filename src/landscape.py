@@ -203,7 +203,7 @@ class LandscapeCell:
         self.herbivores = []
         self.carnivores = []
 
-        random.seed(123)
+        # random.seed(123)
 
         self.land_cell_neighbors = []
 
