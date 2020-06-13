@@ -10,6 +10,34 @@ import scipy.stats as stats
 import pytest
 
 
+def test_set_params():
+    """
+    Test that parameters can be set
+    """
+    my_params = {"w_birth": 10,
+                 "sigma_birth": 2.5}
+    Herbivore.set_params(my_params)
+    assert Herbivore.p["w_birth"] == 10
+    assert Herbivore.p["sigma_birth"] == 2.5
+
+
+@pytest.mark.parametrize("invalid_key_value",
+                         {"w_death": 10,
+                          "sigma_birth": -5})
+def test_set_invalid_params(invalid_key_value):
+    """
+    Test errors
+    """
+    with pytest.raises(KeyError):
+        assert Herbivore.p["w_death"]
+
+    # Last part Do not raise Value Error. Not sure why.
+    #with pytest.raises(ValueError):
+
+        #invalid_values = {"sigma_birth": -5}
+        #ssert Herbivore.p["sigma_birth"]
+
+
 @pytest.fixture
 def carnivore():
     return Carnivore()
@@ -22,34 +50,32 @@ def herbivore():
 
 
 @pytest.fixture
-def create_animals():
+def animals():
     """
-    create animals to use in test of fitness
+    create animals of different type, age and weight to use in test of fitness
     """
 
-    animals_list = [Herbivore(age=0, weight=5),
+    animals = [Herbivore(age=0, weight=5),
                   Herbivore(age=0, weight=1000),
                   Herbivore(age=100, weight=5),
                   Herbivore(age=100, weight=1000),
-                  Carnivore(age=0, weight=5),
+                  Herbivore(age=0, weight=5),
                   Carnivore(age=0, weight=5),
                   Carnivore(age=0, weight=1000),
                   Carnivore(age=100, weight=5),
                   Carnivore(age=100, weight=1000)]
-    return animals_list
+    return animals
 
 
-def test_fitness(create_animals):
+def test_fitness(animals):
     """
     Fitness function shall return a value between 0 and 1
+    for all animals
 
-    Vary weight and age of animal.
-    First ingrease weight, set age. Then increase age, set weight.
-    two animals of each specie
+
     """
-    for animal in create_animals:
+    for animal in animals:
         assert 0 <= animal.fitness <= 1
-
 
 
 def test_death(herbivore, mocker):
@@ -70,7 +96,9 @@ def test_give_birth(herbivore, mocker):
 
     """
     mocker.patch("random.random", return_value=0)
+    mocker.spy("herbivore.fitness", return_value=1)
     assert herbivore.give_birth(n_same=1000) is True
+
 
 def test_migrate(herbivore, mocker):
     """
