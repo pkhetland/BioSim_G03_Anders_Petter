@@ -15,7 +15,8 @@ class Animal:
     """
     Super class for Herbivores and Carnivores.
     """
-    instance_count = 0
+    instance_count = 0 # Instance counten deres er en klasse
+    # variabel.
 
     def __init__(self, weight, age):
         """
@@ -111,6 +112,11 @@ class Animal:
     def give_birth(self, n_same):
         """
         Animals give birth based on fitness and same-type animals in cell
+
+        :param n_same: number of same-type animals
+        :type n_same: int
+        :return: True or False
+        :rtype: bool
         """
         birth_prob = self.p["gamma"] * self.fitness * n_same - 1
         if self.weight < self.p["zeta"] * (self.p["w_birth"] + self.p["sigma_birth"]):
