@@ -14,9 +14,9 @@ class BioSim:
 
     def __init__(
         self,
-        island_map,
-        ini_pop,
-        seed,
+        island_map=None,
+        ini_pop=[],
+        seed=123,
         ymax_animals=None,
         cmax_animals=None,
         hist_specs=None,
@@ -50,14 +50,12 @@ class BioSim:
         """
 
         if island_map is None:
-            map_str = """WWW
-                         WLW
-                         WWW"""
+            map_str = """WWW\nWLW\nWWW"""
             self._island = Island(map_str)
         elif type(island_map) == str:
             self._island = Island(island_map)
         else:
-            print("Map string needs to be of type str!")
+            raise ValueError("Map string needs to be of type str!")
 
         self._ymax = ymax_animals
         self._cmax = cmax_animals
@@ -83,11 +81,13 @@ class BioSim:
         :param params: Dict with valid parameter specification for species
         """
         if species == 'Herbivore':
+            print(species)
             Herbivore.set_params(params)
         elif species == 'Carnivore':
+            print(species)
             Carnivore.set_params(params)
         else:
-            print('species needs to be either Herbivore or Carnivore!')
+            raise ValueError('species needs to be either Herbivore or Carnivore!')
 
     def set_landscape_parameters(self, landscape, params):
         """
@@ -102,15 +102,18 @@ class BioSim:
         Add a population to the island
         :param population: List of dictionaries specifying population
         """
-        for loc_dict in population:  # This loop will be replaced with a more elegant iteration
-            new_animals = [
-                    Herbivore.from_dict(animal_dict)
-                    if animal_dict["species"] == "Herbivore"
-                    else Carnivore.from_dict(animal_dict)
-                    for animal_dict in loc_dict["pop"]
-                ]
-            self._island.landscape[loc_dict["loc"]].add_animals(new_animals)
-            self._island.count_animals(animal_list=new_animals)
+        if type(population) == list:
+            for loc_dict in population:  # This loop will be replaced with a more elegant iteration
+                new_animals = [
+                        Herbivore.from_dict(animal_dict)
+                        if animal_dict["species"] == "Herbivore"
+                        else Carnivore.from_dict(animal_dict)
+                        for animal_dict in loc_dict["pop"]
+                    ]
+                self._island.landscape[loc_dict["loc"]].add_animals(new_animals)
+                self._island.count_animals(animal_list=new_animals)
+        else:
+            raise ValueError(f'Pop list needs to be a list of dicts! Was of type {type(population)}.')
 
     def feeding(self, cell):
         """Iterates through each animal in the cell and feeds it according to species

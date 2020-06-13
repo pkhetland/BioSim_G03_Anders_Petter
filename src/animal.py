@@ -53,14 +53,14 @@ class Animal:
                     raise ValueError("Parameter must be positive")
                 cls.p.update(new_params)
 
-    @classmethod
-    def get_params(cls):
-        """
-
-        :return dictionary with parameters
-        :r_type: dict
-        """
-        return cls.p
+    # @classmethod
+    # def get_params(cls):
+    #     """
+    #
+    #     :return dictionary with parameters
+    #     :r_type: dict
+    #     """
+    #     return cls.p
 
     def __repr__(self):
         return '{}({} years, {:.3} kg)'.format(self._species, self._age, self._weight)
@@ -277,9 +277,6 @@ class Carnivore(Animal):
                 elif 0 < fitness_diff < self.p["DeltaPhiMax"]:
                     kill_prob = fitness_diff / self.p["DeltaPhiMax"]
                     kill_prey = True if random.random() <= kill_prob else False
-                    # kill_prey = random.choice(
-                    #     [True, False], weights=[kill_prob, 1 - kill_prob]
-                    # )
 
                 else:
                     kill_prey = True
@@ -298,21 +295,3 @@ class Carnivore(Animal):
         self.weight += consumption_weight * self.p["beta"]  # Add weight to carnivore
 
         return herbs_killed
-
-
-if __name__ == "__main__":
-    Herbivore.set_params({"w_birth": 9.0})
-    print(Herbivore.get_params())
-    print(Herbivore.p)
-    print(Carnivore.get_params())
-    herb1 = Herbivore()
-    herb2 = Herbivore()
-    herb3 = Herbivore()
-    herb1.migrate()
-    print(herb1.has_moved())
-    print(herb3.has_moved())
-    #print(herb1.migrate())
-    # new instance with default parameters
-
-    # Output 10. OK
-

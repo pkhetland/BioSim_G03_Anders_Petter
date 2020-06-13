@@ -78,7 +78,7 @@ class Island:
         elif landscape == 'H':
             Highland.set_params(params)
         else:
-            raise AttributeError('Only params in Lowland and Highland can be changed! '
+            raise ValueError('Only params in Lowland and Highland can be changed! '
                                  'No params set.')
 
     @property
