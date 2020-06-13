@@ -7,7 +7,7 @@ Lowland class for the simulation.
 import numpy as np
 import operator
 import random
-from src.animal import Animal
+from src.animal import Herbivore, Carnivore
 
 
 class Island:
@@ -219,7 +219,7 @@ class LandscapeCell:
             if param in cls.params:
                 cls.params[param] = param_dict[param]
             else:
-                print('Invalid param dict!')
+                raise AttributeError('Invalid parameter dictionary! Format: {\'<param>\': <value>}')
 
     @classmethod
     def f_max(cls):
@@ -248,10 +248,12 @@ class LandscapeCell:
         :type animal_list: list
         """
         for animal in animal_list:  # Iterate through animals in list
-            if animal.species == "Herbivore":
+            if isinstance(animal, Herbivore):
                 self.herbivores.append(animal)
-            elif animal.species == "Carnivore":
+            elif isinstance(animal, Carnivore):
                 self.carnivores.append(animal)
+            else:
+                raise AttributeError('List may only contain Herbivore and Carnivore instances!')
 
     def remove_animals(self, animal_list):
         """Removes a list of animal objects from the cell class
@@ -260,10 +262,12 @@ class LandscapeCell:
         :type animal_list: list
         """
         for animal in animal_list:  # Iterate through animals in list
-            if animal.species == "Herbivore":
+            if isinstance(animal, Herbivore):
                 self.herbivores.remove(animal)
-            elif animal.species == "Carnivore":
+            elif isinstance(animal, Carnivore):
                 self.carnivores.remove(animal)
+            else:
+                raise AttributeError('List may only contain Herbivore and Carnivore instances!')
 
     def randomize_herbs(self):
         """Shuffles the self.herbivores list
@@ -353,11 +357,6 @@ class Lowland(LandscapeCell):
     def __init__(self):
         super().__init__()  # Initialise landscape class
 
-    @classmethod
-    def set_f_max(cls, f_max):
-        if f_max >= 0:
-            cls._f_max = f_max
-
 
 class Highland(LandscapeCell):
     """
@@ -367,11 +366,6 @@ class Highland(LandscapeCell):
 
     def __init__(self, location=None):
         super().__init__()  # Initialise landscape class
-
-    @classmethod
-    def set_f_max(cls, f_max):
-        if f_max >= 0:
-            cls._f_max = f_max
 
 
 class Desert(LandscapeCell):

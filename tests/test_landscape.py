@@ -10,31 +10,9 @@ from src.biosim import BioSim
 import pytest
 
 
-@pytest.fixture
-def lowland_cell():
-    return Lowland()
-
-
-def test_lowland_fmax(lowland_cell):
-    """Basic Lowland instance can be created with or without argument"""
-    assert lowland_cell.params['f_max'] == 800.0
-
-
-def test_lowland_mainland(lowland_cell):
-    """Basic Lowland instance can be created with or without argument"""
-    assert lowland_cell.is_mainland
-
-
-def test_lowland_fodder(lowland_cell):
-    """Fodder attribute of instance can be accessed and has the right value"""
-    assert lowland_cell.fodder == lowland_cell.params['f_max']
-
-
-def test_add_remove_animals(lowland_cell):
-    animals = [Herbivore(), Carnivore()]
-    lowland_cell.add_animals(animals)
-    lowland_cell.remove_animals([animals[0]])
-    assert len(lowland_cell.animals) == 1
+"""
+================== TEST HIGHLAND AND LANDSCAPECELL ==================
+"""
 
 
 @pytest.fixture
@@ -71,11 +49,78 @@ def test_reset_animals(highland_cell):
 
 
 def test_shuffle_herbs(highland_cell):
-    highland_cell.add_animals([Herbivore(age=0), Herbivore(age=1), Herbivore(age=2)])
+    highland_cell.add_animals([Herbivore() for _ in range(1000)])
     original_herbs = [animal for animal in highland_cell.herbivores]
     highland_cell.randomize_herbs()
     assert highland_cell.herbivores != original_herbs
 
+
+def test_repr_and_str(highland_cell):
+    assert repr(highland_cell) == str(highland_cell) == 'Highland(f_max: 300.0)'
+
+
+def test_set_params(highland_cell):
+    with pytest.raises(AttributeError):
+        highland_cell.set_params({'ff_maxx': 200.0})
+
+
+def test_add_remove_animals(highland_cell):
+    animals = [Herbivore(), Carnivore(), Herbivore()]
+    highland_cell.add_animals(animals)
+    highland_cell.remove_animals([animals[0], animals[1]])
+    assert highland_cell.animal_count == 1
+
+
+@pytest.mark.parametrize('add_remove_func',
+                         ['add', 'remove'])
+def test_invalid_add_remove_animals(highland_cell, add_remove_func):
+    with pytest.raises(AttributeError):
+        if add_remove_func == 'add':
+            highland_cell.add_animals(['Herbivore'])
+        else:
+            highland_cell.remove_animals((['Carnivore']))
+
+
+def test_sorted_herbivores_and_carnivores(highland_cell):
+    highland_cell.add_animals([Herbivore(weight=50), Herbivore(weight=20)])
+    highland_cell.add_animals([Carnivore(weight=25), Carnivore(weight=40)])
+    assert highland_cell.sorted_herbivores == highland_cell.herbivores[::-1]
+    assert highland_cell.sorted_carnivores == highland_cell.carnivores[::-1]
+
+
+def test_is_empty(highland_cell):
+    highland_cell.fodder = 0
+    assert highland_cell.is_empty is True
+
+
+"""
+================== TEST LOWLAND ==================
+"""
+
+
+@pytest.fixture
+def lowland_cell():
+    return Lowland()
+
+
+def test_lowland_fmax(lowland_cell):
+    """Basic Lowland instance can be created with or without argument"""
+    assert lowland_cell.params['f_max'] == 800.0
+
+
+def test_lowland_mainland(lowland_cell):
+    """Basic Lowland instance can be created with or without argument"""
+    assert lowland_cell.is_mainland
+
+
+def test_lowland_fodder(lowland_cell):
+    """Fodder attribute of instance can be accessed and has the right value"""
+    assert lowland_cell.fodder == lowland_cell.params['f_max']
+
+
+"""
+================== TEST DESERT ==================
+"""
 
 @pytest.fixture
 def desert_cell():
@@ -97,13 +142,26 @@ def test_desert_fodder(desert_cell):
     assert desert_cell._fodder == desert_cell.params['f_max']
 
 
+"""
+================== TEST OCEAN ==================
+"""
+
 def test_ocean_instance():
-    ocean = Water()
-    assert not ocean.is_mainland
+    water = Water()
+    assert not water.is_mainland
+
+def test_repr_and_str_water():
+    water = Water()
+    assert repr(water) == str(water) == 'Water cell'
+
+
+"""
+================== TEST ISLAND ==================
+"""
 
 
 @pytest.mark.parametrize('bad_boundary',
-                         ['H, D, L'])
+                         ['H', 'D', 'L'])
 def test_border(bad_boundary):
     with pytest.raises(ValueError):
         geogr = f"""{bad_boundary}WW
@@ -122,13 +180,30 @@ def test_inconsistent_map(bad_map):
         Island(geogr)
 
 
+def test_invalid_map():
+    with pytest.raises(ValueError):
+        geogr = f"""WWW
+                    WSW
+                    WWW"""
+        Island(geogr)
+
+
 @pytest.fixture
 def island():
     geogr = """WWWW
     WLHW
-    WLWW
+    WDWW
     WWWW"""
     return Island(map_str=geogr)
+
+
+def test_count_del_animals(island):
+    island.count_animals(num_herbs=10, num_carns=10)
+    island.del_animals(animal_list=[Herbivore()])
+    island.del_animals(num_herbs=5, num_carns=5)
+    assert island.num_animals == 9
+    assert island.num_herbs == 4
+    assert island.num_carns == 5
 
 
 def test_island_instance(island):
@@ -142,7 +217,7 @@ def test_landscape(island):
 def test_map_str(island):
     assert island.map_str == """WWWW
     WLHW
-    WLWW
+    WDWW
     WWWW"""
 
 
@@ -166,6 +241,11 @@ def test_set_landscape_params(island, params):
         assert Lowland.f_max() == 1000.0
     elif params[0] == 'H':
         assert Highland.f_max() == 200.0
+
+
+def test_set_invalid_landscape_params(island):
+    with pytest.raises(AttributeError):
+        island.set_landscape_params('S', {'f_max': 200.0})
 
 
 def test_set_neighbors(island):

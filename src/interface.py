@@ -20,11 +20,7 @@ if __name__ == "__main__":
     ini_pop = [
         {
             "loc": (2, 2),
-            "pop": [{"species": "Herbivore", "age": 5, "weight": 20} for _ in range(150)]
-        },
-        {
-            "loc": (2, 2),
-            "pop": [{"species": "Carnivore", "age": 5, "weight": 20} for _ in range(40)]
+            "pop": [{"species": "Herbivore", "age": 5, "weight": 20} for _ in range(50)]
         }
     ]
 
@@ -35,7 +31,7 @@ if __name__ == "__main__":
         cmax_animals=None,
         ymax_animals=None,
         hist_specs=None,
-        plot_graph=True,
+        plot_graph=False,
         img_base=None
     )  # Create simple simulation instance
 
@@ -44,6 +40,13 @@ if __name__ == "__main__":
 
     # sim.set_landscape_parameters('L', {'f_max': 800.0})
 
-    sim.simulate(num_years=400)
+    sim.simulate(num_years=50)
 
-    # sim.simulate(num_years=200)
+    input('Press enter')
+
+    sim.add_population([{
+            "loc": (2, 2),
+            "pop": [{"species": "Carnivore", "age": 5, "weight": 20} for _ in range(20)]
+        }])
+
+    sim.simulate(num_years=200)
