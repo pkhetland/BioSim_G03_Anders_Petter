@@ -21,6 +21,7 @@ def test_death(mocker):
 
 def test_give_birth(mocker):
     """
+    TEST FAILS 13.06
     Mock the birth function to see it returns correct.
     Replace random number by fixed value.
 
@@ -40,8 +41,6 @@ def test_migrate(mocker):
     mocker.patch("random.random", return_value=0)
     h1 = Herbivore()
     assert h1.migrate() is True
-
-
 
 
 class TestAnimal:
@@ -220,6 +219,9 @@ class TestCarnivore:
     """
     Test for carnivore class
     """
+    @pytest.fixture
+    def carnivore():
+
 
     def test_constructor(self):
 
@@ -232,7 +234,8 @@ class TestCarnivore:
 
     def test_kill_prey(self):
         carn = Carnivore(age=5, weight=900)
-        killed_herbivores = carn.kill_prey([Herbivore(age=10, weight=1), Herbivore(age=5, weight=80)])
+        killed_herbivores = carn.kill_prey([Herbivore(age=10, weight=1),
+                                            Herbivore(age=5, weight=80)])
         assert len(killed_herbivores) > 0
 
     def test_instance_count(self):
