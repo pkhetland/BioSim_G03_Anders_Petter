@@ -10,17 +10,59 @@ import scipy.stats as stats
 import pytest
 
 
-def test_death(mocker):
+@pytest.fixture
+def carnivore():
+    return Carnivore()
+
+
+@pytest.fixture()
+def herbivore():
+    return Herbivore()
+
+
+
+@pytest.fixture
+def create_animals():
+    """
+    create animals to use in test of fitness
+    """
+
+    animals_list = [Herbivore(age=0, weight=5),
+                  Herbivore(age=0, weight=1000),
+                  Herbivore(age=100, weight=5),
+                  Herbivore(age=100, weight=1000),
+                  Carnivore(age=0, weight=5),
+                  Carnivore(age=0, weight=5),
+                  Carnivore(age=0, weight=1000),
+                  Carnivore(age=100, weight=5),
+                  Carnivore(age=100, weight=1000)]
+    return animals_list
+
+
+def test_fitness(create_animals):
+    """
+    Fitness function shall return a value between 0 and 1
+
+    Vary weight and age of animal.
+    First ingrease weight, set age. Then increase age, set weight.
+    two animals of each specie
+    """
+    for animal in create_animals:
+        assert 0 <= animal.fitness <= 1
+
+
+
+def test_death(herbivore, mocker):
     """
     Replace random number by a function returning a fixed value
     """
     mocker.patch("random.random", return_value=0)
-    h = Herbivore()
-    assert h.death() is True
+    assert herbivore.death() is True
 
 
-def test_give_birth(mocker):
+def test_give_birth(herbivore, mocker):
     """
+    TEST FAILS 13.06
     Mock the birth function to see it returns correct.
     Replace random number by fixed value.
 
@@ -28,10 +70,16 @@ def test_give_birth(mocker):
 
     """
     mocker.patch("random.random", return_value=0)
-    h1 = Herbivore(weight=100)
-    assert h1.give_birth(n_same=1000)
+    assert herbivore.give_birth(n_same=1000) is True
 
+def test_migrate(herbivore, mocker):
+    """
+    Mock migrate function to see if it returns correct
 
+    """
+
+    mocker.patch("random.random", return_value=0)
+    assert herbivore.migrate() is True
 
 
 class TestAnimal:
@@ -48,16 +96,15 @@ class TestAnimal:
 
         self.death_prob = 1
         """
-    def test_certain_death(self):
+    def test_certain_death(self, herbivore):
         """
         Test that the animal always must die given death_prob = 1
         100 Herbivore instances all must die
         See examples/biolab/test_bacteria.py
 
         """
-        h = Herbivore()
-        h.weight = 0
-        assert h.death()
+        herbivore.weight = 0
+        assert herbivore.death()
 
     def test_death_binom(self):
         """
@@ -130,7 +177,7 @@ class TestAnimal:
 
     def test_constructor(self):
             """
-            Herbivore can be created
+            Animals can be created
             """
             herb = Herbivore(weight=10, age=0)
             carn = Carnivore()
@@ -169,19 +216,22 @@ class TestAnimal:
         herb, carn = Herbivore(), Carnivore()
         assert herb.p != carn.p
 
-    def test_has_moved(self):
-        """
-        Test if the animal only once per year cycle
-        """
-        herb = Herbivore()
-        herb.migrate()
-        assert herb.has_moved() is True
+
 
 
 class TestHerbivore:
     """
     Tests for herbivore class
     """
+
+    def test_constructor(self):
+     """
+    Test herbivores can be constructed
+    """
+    herb = Herbivore()
+    assert isinstance(herb, Herbivore)
+
+
     def test_eat_fodder(self):
         """
         Weight of animal shall increase after eating fodder
@@ -205,13 +255,27 @@ class TestHerbivore:
         assert Herbivore.herbivore_instance_count == 0
 
 
+
+
 class TestCarnivore:
     """
     Test for carnivore class
     """
+
+
+    def test_constructor(self):
+
+        """
+        Test carnivores can be constructed
+        """
+        carn = Carnivore()
+        assert isinstance(carn, Carnivore)
+
+
     def test_kill_prey(self):
         carn = Carnivore(age=5, weight=900)
-        killed_herbivores = carn.kill_prey([Herbivore(age=10, weight=1), Herbivore(age=5, weight=80)])
+        killed_herbivores = carn.kill_prey([Herbivore(age=10, weight=1),
+                                            Herbivore(age=5, weight=80)])
         assert len(killed_herbivores) > 0
 
     def test_instance_count(self):
