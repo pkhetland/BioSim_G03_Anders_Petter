@@ -73,7 +73,7 @@ class BioSim:
         self._img_base = img_base
         self._img_fmt = img_fmt
 
-        # random.seed(seed)
+        random.seed(seed)
 
     @staticmethod
     def set_animal_parameters(species, params):

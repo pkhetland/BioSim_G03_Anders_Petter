@@ -57,6 +57,26 @@ def test_highland_fodder(highland_cell):
     assert highland_cell._fodder == highland_cell.params['f_max']
 
 
+def test_fodder_setter(highland_cell):
+    """Fodder attribute of instance can be accessed and has the right value"""
+    highland_cell.fodder = 200.0
+    assert highland_cell._fodder == 200.0
+
+
+def test_reset_animals(highland_cell):
+    highland_cell.add_animals([Carnivore(), Herbivore()])
+    highland_cell.carnivores[0].has_moved = True
+    highland_cell.reset_animals()
+    assert highland_cell.carnivores[0].has_moved is False
+
+
+def test_shuffle_herbs(highland_cell):
+    highland_cell.add_animals([Herbivore(age=0), Herbivore(age=1), Herbivore(age=2)])
+    original_herbs = [animal for animal in highland_cell.herbivores]
+    highland_cell.randomize_herbs()
+    assert highland_cell.herbivores != original_herbs
+
+
 @pytest.fixture
 def desert_cell():
     return Desert()
@@ -82,35 +102,6 @@ def test_ocean_instance():
     assert not ocean.is_mainland
 
 
-@pytest.fixture
-def island():
-    geogr = """WWW
-    WLW
-    WWW"""
-    return Island(map_str=geogr)
-
-
-def test_landscape(island):
-    assert type(island.landscape) == dict
-
-
-def test_map_str(island):
-    assert island.map_str == """WWW
-    WLW
-    WWW"""
-
-
-def test_land_cells(island):
-    assert type(island.land_cells) == dict
-    assert len(island.land_cells) == 1
-
-
-def test_rows_and_cols(island):
-    unique_rows = island.unique_rows
-    unique_cols = island.unique_cols
-    assert unique_cols == unique_rows == [1, 2, 3]
-
-
 @pytest.mark.parametrize('bad_boundary',
                          ['H, D, L'])
 def test_border(bad_boundary):
@@ -123,12 +114,62 @@ def test_border(bad_boundary):
 
 @pytest.mark.parametrize('bad_map',
                          ['H, D, L'])
-def test_inconcistent_map(bad_map):
+def test_inconsistent_map(bad_map):
     with pytest.raises(ValueError):
         geogr = f"""{bad_map}WWW
                     WLW
                     WWW"""
         Island(geogr)
+
+
+@pytest.fixture
+def island():
+    geogr = """WWWW
+    WLHW
+    WLWW
+    WWWW"""
+    return Island(map_str=geogr)
+
+
+def test_island_instance(island):
+    assert isinstance(island, Island)
+
+
+def test_landscape(island):
+    assert type(island.landscape) == dict
+
+
+def test_map_str(island):
+    assert island.map_str == """WWWW
+    WLHW
+    WLWW
+    WWWW"""
+
+
+def test_land_cells(island):
+    assert type(island.land_cells) == dict
+    assert len(island.land_cells) == 3
+
+
+def test_rows_and_cols(island):
+    unique_rows = island.unique_rows
+    unique_cols = island.unique_cols
+    assert unique_cols == unique_rows == [1, 2, 3, 4]
+
+
+@pytest.mark.parametrize('params',
+                         [('L', {'f_max': 1000.0}),
+                          ('H', {'f_max': 200.0})])
+def test_set_landscape_params(island, params):
+    island.set_landscape_params(params[0], params[1])
+    if params[0] == 'L':
+        assert Lowland.f_max() == 1000.0
+    elif params[0] == 'H':
+        assert Highland.f_max() == 200.0
+
+
+def test_set_neighbors(island):
+    assert len(island._land_cells[(2, 2)].land_cell_neighbors) == 2
 
 
 @pytest.fixture

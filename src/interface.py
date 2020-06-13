@@ -22,10 +22,10 @@ if __name__ == "__main__":
             "loc": (2, 2),
             "pop": [{"species": "Herbivore", "age": 5, "weight": 20} for _ in range(150)]
         },
-        # {
-        #     "loc": (3, 3),
-        #     "pop": [{"species": "Carnivore", "age": 5, "weight": 20} for _ in range(20)]
-        # }
+        {
+            "loc": (2, 2),
+            "pop": [{"species": "Carnivore", "age": 5, "weight": 20} for _ in range(40)]
+        }
     ]
 
     sim = BioSim(
@@ -36,7 +36,7 @@ if __name__ == "__main__":
         ymax_animals=None,
         hist_specs=None,
         plot_graph=True,
-        img_base='test'
+        img_base=None
     )  # Create simple simulation instance
 
     # sim.set_animal_parameters('Carnivore', {'omega': 0})

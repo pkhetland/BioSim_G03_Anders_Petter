@@ -15,8 +15,6 @@ class Animal:
     """
     Super class for Herbivores and Carnivores.
     """
-    instance_count = 0 # Instance counten deres er en klasse
-    # variabel.
 
     def __init__(self, weight, age):
         """
@@ -36,8 +34,6 @@ class Animal:
         self.has_moved = False
 
         # random.seed(1)  # Set seed - Will be moved to interface
-
-        Animal.instance_count += 1
 
 
     @classmethod
@@ -163,21 +159,9 @@ class Animal:
         if self.weight <= 0:
             death = True
         else:
-            if self._death_prob is None:
-                self._death_prob = self.p["omega"] * (1 - self.fitness)
+            self._death_prob = self.p["omega"] * (1 - self.fitness)
 
             death = True if random.random() < self._death_prob else False
-            # death = np.random.choice(
-            #     [True, False], weights=[self._death_prob, 1 - self._death_prob]
-            # )
-            self._death_prob = None
-
-        if death:
-            Animal.instance_count -= 1
-            if self.species == 'Herbivore':
-                Herbivore.instance_count -= 1
-            elif self.species == 'Carnivore':
-                Carnivore.instance_count -= 1
 
         return death
 
@@ -210,44 +194,39 @@ class Animal:
 
 
 class Herbivore(Animal):
-
-    instance_count = 0
     p = {
-                "w_birth": 8.0,
-                "sigma_birth": 1.5,
-                "beta": 0.9,
-                "eta": 0.05,
-                "a_half": 40.0,
-                "phi_age": 0.6,
-                "w_half": 10.0,
-                "phi_weight": 0.1,
-                "mu": 0.25,
-                "gamma": 0.2,
-                "zeta": 3.5,
-                "xi": 1.2,
-                "omega": 0.4,
-                "F": 10.0}
+            "w_birth": 8.0,
+            "sigma_birth": 1.5,
+            "beta": 0.9,
+            "eta": 0.05,
+            "a_half": 40.0,
+            "phi_age": 0.6,
+            "w_half": 10.0,
+            "phi_weight": 0.1,
+            "mu": 0.25,
+            "gamma": 0.2,
+            "zeta": 3.5,
+            "xi": 1.2,
+            "omega": 0.4,
+            "F": 10.0
+    }
 
-    def __init__(self, weight=10, age=0):
+    def __init__(self, weight=None, age=0):
         super().__init__(weight, age)
-
-        Herbivore.instance_count += 1
 
     def eat_fodder(self, cell):
         """
         When an animal eats, its weight increases
         """
-        consumption_amount = (
-            self.p["beta"] * self.p["F"]
-        )  # Calculate amount of fodder consumed
+        consumption_amount = self.p['F']  # Calculate amount of fodder consumed
         if consumption_amount <= cell.fodder:
-            self.weight += consumption_amount  # Eat fodder
+            self.weight += self.p['beta'] * consumption_amount  # Eat fodder
             cell.fodder -= (
                 consumption_amount  # Removes consumed fodder from cell object
             )
 
         elif consumption_amount > cell.fodder > 0:
-            self.weight += cell.fodder  # Eat fodder
+            self.weight += self.p['beta'] * cell.fodder  # Eat fodder
             cell.fodder = 0  # Sets fodder to zero.
 
 
@@ -255,9 +234,8 @@ class Carnivore(Animal):
     """
     Carnivore class
     """
-
-    instance_count = 0
-    p = {"w_birth": 6.0,
+    p = {
+         "w_birth": 6.0,
          "sigma_birth": 1.0,
          "beta": 0.75,
          "eta": 0.125,
@@ -271,12 +249,11 @@ class Carnivore(Animal):
          "xi": 1.1,
          "omega": 0.8,
          "F": 50.0,
-         "DeltaPhiMax": 10.0}
+         "DeltaPhiMax": 10.0
+    }
 
     def __init__(self, weight=None, age=0):
         super().__init__(weight, age)
-
-        Carnivore.instance_count += 1
 
     def kill_prey(self, sorted_herbivores):
         """Iterates through sorted herbivores and eats until F is met
@@ -312,9 +289,6 @@ class Carnivore(Animal):
                         herb.weight
                     )  # Add herb weight to consumption_weight variable
                     herbs_killed.append(herb)
-
-                    Animal.instance_count -= 1
-                    Herbivore.instance_count -= 1
 
         if (
             consumption_weight > self.p["F"]
