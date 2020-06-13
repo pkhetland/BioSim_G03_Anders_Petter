@@ -20,12 +20,56 @@ class Island:
         self.map_str = map_str
         self._land_cells = None
         self.check_border_cells()
+        self.set_neighbors()
+
+        self._num_herbs = 0
+        self._num_carns = 0
 
         self.herb_pop_matrix = [[0 for _ in self.unique_cols] for _ in self.unique_rows]
         self.carn_pop_matrix = [[0 for _ in self.unique_cols] for _ in self.unique_rows]
 
         self._herb_fitness_list = []
         self._carn_fitness_list = []
+
+    def count_animals(self, num_herbs=0, num_carns=0, animal_list=None):
+        if animal_list is None:
+            self._num_herbs += num_herbs
+            self._num_carns += num_carns
+        else:
+            self._num_herbs += len([animal for animal in animal_list if animal.species == 'Herbivore'])
+            self._num_carns += len([animal for animal in animal_list if animal.species == 'Carnivore'])
+
+    def del_animals(self, num_herbs=0, num_carns=0, animal_list=None):
+        if animal_list is None:
+            self._num_herbs -= num_herbs
+            self._num_carns -= num_carns
+        else:
+            self._num_herbs -= len([animal for animal in animal_list if animal.species == 'Herbivore'])
+            self._num_carns -= len([animal for animal in animal_list if animal.species == 'Carnivore'])
+
+    def set_neighbors(self):
+        for loc, cell in self._land_cells.items():
+            neighbor_cells = [
+                self.landscape[(loc[0] - 1, loc[1])],
+                self.landscape[(loc[0], loc[1] + 1)],
+                self.landscape[(loc[0] + 1, loc[1])],
+                self.landscape[(loc[0], loc[1] - 1)],
+            ]
+            cell.land_cell_neighbors = (
+                [neighbor for neighbor in neighbor_cells if neighbor.type != 'Water']
+            )
+
+    @property
+    def num_animals(self):
+        return self._num_herbs + self._num_carns
+
+    @property
+    def num_herbs(self):
+        return self._num_herbs
+
+    @property
+    def num_carns(self):
+        return self._num_carns
 
     @staticmethod
     def set_landscape_params(landscape, params):
@@ -54,33 +98,6 @@ class Island:
     @property
     def unique_cols(self):
         return list(set([coord[1] for coord in self.landscape]))
-
-    def add_animals(self, animal_list):
-        pass
-
-    @property
-    def all_animals(self):
-        """
-        :return: A list containing all animals in the mainland cells
-        :rtype: list
-        """
-        return [cell.animals for cell in self.land_cells.values()]
-
-    @property
-    def all_herbivores(self):
-        """
-        :return: A list containing all animals in the mainland cells
-        :rtype: list
-        """
-        return [cell.herbivores for cell in self.land_cells.values()]
-
-    @property
-    def all_carnivores(self):
-        """
-        :return: A list containing all animals in the mainland cells
-        :rtype: list
-        """
-        return [cell.carnivores for cell in self.land_cells.values()]
 
     @staticmethod
     def map_from_str(map_str):
@@ -126,7 +143,6 @@ class Island:
                     or col == 1
                     or col == self.unique_cols[-1]
             ):
-                print(row, self.unique_rows[-1], col, self.unique_cols[-1])
                 raise ValueError('Only water cells may be border cells!')
 
     def update_pop_matrix(self):
@@ -182,17 +198,20 @@ class LandscapeCell:
     def __init__(self):
         self._fodder = self.f_max()
         self._is_mainland = True
+        self.type = self.__class__.__name__
 
         self.herbivores = []
         self.carnivores = []
 
         random.seed(123)
 
+        self.land_cell_neighbors = []
+
     def __repr__(self):
-        return "{}(f_max: {})".format(self.__class__.__name__, self._f_max)
+        return "{}(f_max: {})".format(self.__class__.__name__, self.f_max())
 
     def __str__(self):
-        return "{}(f_max: {})".format(self.__class__.__name__, self._f_max)
+        return "{}(f_max: {})".format(self.__class__.__name__, self.f_max())
 
     @classmethod
     def set_params(cls, param_dict):
@@ -217,6 +236,10 @@ class LandscapeCell:
     @property
     def is_mainland(self):
         return self._is_mainland
+
+    def reset_animals(self):
+        for animal in self.animals:
+            animal.has_moved = False
 
     def add_animals(self, animal_list):
         """Adds a list of animals to the cell class
@@ -369,6 +392,7 @@ class Water:
 
     def __init__(self):
         self.is_mainland = False
+        self.type = 'Water'
 
     def __repr__(self):
         return "Water cell"

@@ -112,8 +112,7 @@ class BioSim:
                 ]
             )
 
-    @staticmethod
-    def feeding(cell):
+    def feeding(self, cell):
         """Iterates through each animal in the cell and feeds it according to species
 
         :param cell: Current cell object
@@ -130,30 +129,33 @@ class BioSim:
         for carn in cell.carnivores:  # Carnivores eat last
             herbs_killed = carn.kill_prey(cell.sorted_herbivores)  # Carnivore hunts for herbivores
             cell.remove_animals(herbs_killed)  # Remove killed animals from cell
+            self._island.del_animals(num_herbs=len(herbs_killed))
 
-    @staticmethod
-    def procreation(cell):
+    def procreation(self, cell):
         """Iterates through each animal in the cell and procreates
 
         :param cell: Current cell object
         :type cell: object
         """
-        new_animals = []
+        new_herbs = []
+        new_carns = []
         n_herbs, n_carns = cell.herb_count, cell.carn_count
 
         for herb in cell.herbivores:  # Herbivores give birth)
             give_birth, birth_weight = herb.give_birth(n_herbs)
 
             if give_birth:
-                new_animals.append(Herbivore(weight=birth_weight, age=0))
+                new_herbs.append(Herbivore(weight=birth_weight, age=0))
 
         for carn in cell.carnivores:  # Carnivores give birth
             give_birth, birth_weight = carn.give_birth(n_carns)
 
             if give_birth:
-                new_animals.append(Carnivore(weight=birth_weight, age=0))
+                new_carns.append(Carnivore(weight=birth_weight, age=0))
 
-        cell.add_animals(new_animals)  # Add new animals to cell
+        cell.add_animals(new_herbs + new_carns)  # Add new animals to cell
+
+        self._island.count_animals(num_herbs=len(new_herbs), num_carns=len(new_carns))
 
     def migrate(self, loc, cell):
         """Iterates through each animal in the cell and migrates
@@ -166,31 +168,19 @@ class BioSim:
         :type all_migrated_animals: list
         """
         # Define neighbor cells once:
-        neighbor_cells = [
-            self._island.landscape[(loc[0] - 1, loc[1])],
-            self._island.landscape[(loc[0], loc[1] + 1)],
-            self._island.landscape[(loc[0] + 1, loc[1])],
-            self._island.landscape[(loc[0], loc[1] - 1)],
-        ]
 
         migrated_animals = []
         for animal in cell.animals:
-            if not animal.has_moved:
-                if animal.migrate():
-                    available_neighbors = [
-                        neighbor for neighbor in neighbor_cells if neighbor.is_mainland
-                    ]
+            if not animal.has_moved and animal.migrate():
+                if len(cell.land_cell_neighbors) > 0:
+                    chosen_cell = random.choice(cell.land_cell_neighbors)
+                    chosen_cell.add_animals([animal])
+                    migrated_animals.append(animal)
 
-                    if len(available_neighbors) > 0:
-                        chosen_cell = random.choice(available_neighbors)
-                        chosen_cell.add_animals([animal])
-                        migrated_animals.append(animal)
-
-                    animal.has_moved = True
+                animal.has_moved = True
 
         cell.remove_animals(migrated_animals)
-        for animal in cell.animals:
-            animal.has_moved = False
+        cell.reset_animals()
 
     def run_year_cycle(self):
         """
@@ -205,10 +195,6 @@ class BioSim:
 
             # 3. Migration
             self.migrate(loc, cell)
-
-            #migrated_animals =
-
-            #all_migrated_animals.extend(migrated_animals)
 
             #  4. Aging
             for animal in cell.animals:
@@ -226,6 +212,7 @@ class BioSim:
                     dead_animals.append(animal)
 
             cell.remove_animals(dead_animals)
+            self._island.del_animals(animal_list=dead_animals)
 
         self._year += 1  # Add year to simulation
 
@@ -245,8 +232,8 @@ class BioSim:
                                   ymax=self._ymax)
             self._island.update_pop_matrix()
             self._plot.init_plot(num_years)
-            self._plot.y_herb[self._year] = Herbivore.instance_count
-            self._plot.y_carn[self._year] = Carnivore.instance_count
+            self._plot.y_herb[self._year] = self._island.num_herbs
+            self._plot.y_carn[self._year] = self._island.num_carns
 
         elif self._plot_bool:
             self._plot.y_herb += [np.nan for _ in range(num_years)]
@@ -255,8 +242,8 @@ class BioSim:
         for _ in range(num_years):
             self.run_year_cycle()
             if self._plot_bool:
-                self._plot.y_herb[self._year] = Herbivore.instance_count
-                self._plot.y_carn[self._year] = Carnivore.instance_count
+                self._plot.y_herb[self._year] = self._island.num_herbs
+                self._plot.y_carn[self._year] = self._island.num_carns
                 if self._year % vis_years == 0:
                     self._island.update_pop_matrix()
                     self._plot.update_plot()
@@ -273,9 +260,9 @@ class BioSim:
         finish_time = time.time()
 
         print(f"Year: {self._year}")
-        print(f"Animals: {Animal.instance_count}")
-        print(f"Herbivores: {Herbivore.instance_count}")
-        print(f"Carnivore: {Carnivore.instance_count}")
+        print(f"Animals: {self._island.num_animals}")
+        print(f"Herbivores: {self._island.num_herbs}")
+        print(f"Carnivore: {self._island.num_carns}")
         print("Simulation complete.")
         print("Elapsed time: {:.3} seconds".format(finish_time - start_time))
         # input('Press enter to continue')
@@ -288,12 +275,12 @@ class BioSim:
     @property
     def num_animals(self):
         """Total number of animals on island."""
-        return Animal.instance_count # Dette returnerer en klasse variabel. Klasse variabler er statiske og ikke dynamiske. De slettes ikke etter en instans er "drept".
+        return self._island.num_animals
 
     @property
     def num_animals_per_species(self):
         """Number of animals per species in island, as dictionary."""
-        return {"Herbivore": Herbivore.instance_count, "Carnivore": Carnivore.instance_count}
+        return {"Herbivore": self._island.num_herbs, "Carnivore": self._island.num_carns}
 
     def make_movie(self):
         """Create MPEG4 movie from visualization images saved."""

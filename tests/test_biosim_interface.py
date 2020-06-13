@@ -120,12 +120,13 @@ def plain_sim():
 def test_add_population(plain_sim):
     """Test that population can be added to simulation"""
 
-    plain_sim.add_population([{'loc': (2, 2),
-                               'pop': [{'species': 'Herbivore', 'age': 1, 'weight': 10.},
-                                       {'species': 'Carnivore', 'age': 1, 'weight': 10.}]},
-                              {'loc': (2, 3),
-                               'pop': [{'species': 'Herbivore', 'age': 1, 'weight': 10.},
-                                       {'species': 'Carnivore', 'age': 1, 'weight': 10.}]}])
+    plain_sim.add_population([
+        {'loc': (2, 2),
+         'pop': [{'species': 'Herbivore', 'age': 1, 'weight': 10.},
+                 {'species': 'Carnivore', 'age': 1, 'weight': 10.}]},
+        {'loc': (2, 3),
+         'pop': [{'species': 'Herbivore', 'age': 1, 'weight': 10.},
+                 {'species': 'Carnivore', 'age': 1, 'weight': 10.}]}])
 
 
 def test_simulate(plain_sim):
