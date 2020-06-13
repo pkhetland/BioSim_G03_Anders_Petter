@@ -28,8 +28,18 @@ def test_give_birth(mocker):
 
     """
     mocker.patch("random.random", return_value=0)
-    h1 = Herbivore(weight=100)
-    assert h1.give_birth(n_same=1000)
+    h1 = Herbivore(weight=100, age=5)
+    assert h1.give_birth(n_same=1000) is True
+
+def test_migrate(mocker):
+    """
+    Mock migrate function to see if it returns correct
+
+    """
+
+    mocker.patch("random.random", return_value=0)
+    h1 = Herbivore()
+    assert h1.migrate() is True
 
 
 
@@ -130,7 +140,7 @@ class TestAnimal:
 
     def test_constructor(self):
             """
-            Herbivore can be created
+            Animals can be created
             """
             herb = Herbivore(weight=10, age=0)
             carn = Carnivore()
@@ -169,19 +179,20 @@ class TestAnimal:
         herb, carn = Herbivore(), Carnivore()
         assert herb.p != carn.p
 
-    def test_has_moved(self):
-        """
-        Test if the animal only once per year cycle
-        """
-        herb = Herbivore()
-        herb.migrate()
-        assert herb.has_moved() is True
-
 
 class TestHerbivore:
     """
     Tests for herbivore class
     """
+
+    def test_constructor(self):
+     """
+    Test herbivores can be constructed
+    """
+    herb = Herbivore()
+    assert isinstance(herb, Herbivore)
+
+
     def test_eat_fodder(self):
         """
         Weight of animal shall increase after eating fodder
@@ -209,6 +220,16 @@ class TestCarnivore:
     """
     Test for carnivore class
     """
+
+    def test_constructor(self):
+
+        """
+        Test carnivores can be constructed
+        """
+        carn = Carnivore()
+        assert isinstance(carn, Carnivore)
+
+
     def test_kill_prey(self):
         carn = Carnivore(age=5, weight=900)
         killed_herbivores = carn.kill_prey([Herbivore(age=10, weight=1), Herbivore(age=5, weight=80)])

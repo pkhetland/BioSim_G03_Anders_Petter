@@ -332,13 +332,8 @@ if __name__ == "__main__":
     print(Herbivore.get_params())
     print(Herbivore.p)
     print(Carnivore.get_params())
-    herb1 = Herbivore()
-    herb2 = Herbivore()
-    herb3 = Herbivore()
-    herb1.migrate()
-    print(herb1.has_moved())
-    print(herb3.has_moved())
-    #print(herb1.migrate())
+    herb_list = []
+    h = Herbivore()
     # new instance with default parameters
 
     # Output 10. OK
