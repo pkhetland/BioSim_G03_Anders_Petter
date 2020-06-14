@@ -78,6 +78,32 @@ def test_fitness(animals):
         assert 0 <= animal.fitness <= 1
 
 
+@pytest.mark.parametrize("params_herb", {"phi_age": 1,
+                                         "phi_weight": 0.1},
+                         "params_carn", {"DeltaPhiMax": 0.1})
+@pytest.fixture
+def animals(params_herb, params_carn):
+    """
+    create some new animals for statistical test of carnivores eating herbivores
+    Make Herbivores heavy, old and bad fitness. Bad fitness achived throgh high phi_age
+    and low phi_weight
+    Low DeltaPhiMax such that carnivore only need marginal better fitness than herbivore.
+
+    Then test the weight gain of carnivores.
+
+    """
+    herbivores = [Herbivore(age=100, weight=1000),
+                  Herbivore(age=100, weight=1000),
+                  Herbivore(age=100, weight=1000),
+                  Herbivore(age=100, weight=1000)]
+    carn = Carnivore(age=5, weight=50)
+    carn.set_params(params_carn)
+    for herb in herbivores:
+        herb.set_params(params_herb)
+
+    # Continue from here. see note.
+
+
 def test_death(herbivore, mocker):
     """
     Replace random number by a function returning a fixed value
