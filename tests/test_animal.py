@@ -5,9 +5,11 @@ Tests for animal class.
 """
 from src.animal import Herbivore, Carnivore
 from src.landscape import Lowland
+from src.biosim import BioSim
 import math
 import scipy.stats as stats
 import pytest
+import random
 
 
 def test_set_params():
@@ -188,15 +190,21 @@ class TestAnimal:
         normally distributed for large number of animals. And the death probability is
         significant with a p-value of 0.01.
         """
+        # Task: Import seed from BioSim
+        # Compared to Biolab/test_bacteria. mean and n is "static". Do not depend
+        # on each other in our case.
+        random.seed(123)
         b = Herbivore(age=0, weight=10)
         # Set mocking parameter of the death probability of the animal
-        p = 0.2
+        p = 0.20
         # 100 animals
         N = 100
         n = sum(b.death() for _ in range(N))
+        print("n is", n)
         # print([b.death() for _ in range(10)])
 
         mean = N * p
+        print("mean is", mean)
         var = N * p * (1-p)
         Z = (n-mean) / math.sqrt(var)
         phi = 2 * stats.norm.cdf(-abs(Z))
