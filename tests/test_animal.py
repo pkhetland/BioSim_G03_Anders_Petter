@@ -132,6 +132,15 @@ def test_migrate(herbivore, mocker):
 class TestWeightGain:
 
     """
+    Based on suggestions lecture Plesser
+
+    create some new animals for statistical test of carnivores eating herbivores
+    Make Herbivores heavy, old and bad fitness. Bad fitness achived throgh high phi_age
+    and low phi_weight
+    Low DeltaPhiMax such that carnivore only need marginal better fitness than herbivore.
+
+    Then test the weight gain of carnivores.
+
 
 
     """
@@ -149,47 +158,12 @@ class TestWeightGain:
             herb.set_params(params_herb)
         self.carnivore.set_params(params_carn)
 
-
-
-    def test_fitness2(self, params_herb):
+    def test_weight_gain(self, params_herb, params_carn):
         """
-        Fitness function shall return a value between 0 and 1
-        for all animals
-
+        Statistical test
 
         """
-        for herb in self.herbivores:
-            herb.get_params()
-        for herb in self.herbivores:
-            assert 0 <= herb.fitness <= 1
-
-
-    @pytest.fixture
-    def animals(self, params_herb, params_carn, reset_carnivore_params, reset_herbivore_params):
-        """
-        create some new animals for statistical test of carnivores eating herbivores
-        Make Herbivores heavy, old and bad fitness. Bad fitness achived throgh high phi_age
-        and low phi_weight
-        Low DeltaPhiMax such that carnivore only need marginal better fitness than herbivore.
-
-        Then test the weight gain of carnivores.
-
-        """
-
-
-        self.herbivores = [Herbivore(age=100, weight=1000),
-                      Herbivore(age=100, weight=1000),
-                      Herbivore(age=100, weight=1000),
-                      Herbivore(age=100, weight=1000)]
-
-        self.carnivore = Carnivore(age=5, weight=50)
-        self.carnivore.set_params(params_carn)
-        for herb in self.herbivores:
-            herb.set_params(params_herb)
-        # Continue from here. see note.
-
-
-
+        pass
 
 
 class TestAnimal:
