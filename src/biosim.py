@@ -286,6 +286,6 @@ class BioSim:
         """Number of animals per species in island, as dictionary."""
         return {"Herbivore": self._island.num_herbs, "Carnivore": self._island.num_carns}
 
-    def make_movie(self):
-        """Create MPEG4 movie from visualization images saved."""
-        pass
+    # def make_movie(self):
+    #     """Create MPEG4 movie from visualization images saved."""
+    #     pass

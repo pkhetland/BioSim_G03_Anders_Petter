@@ -105,13 +105,18 @@ def biosim_with_animals():
         {
             "loc": (2, 2),
             "pop": [{"species": "Herbivore", "age": 5, "weight": None} for _ in range(50)]
-        }])
+        },
+        {
+            "loc": (2, 3),
+            "pop": [{"species": "Herbivore", "age": 5, "weight": 0} for _ in range(20)]
+        }
+    ])
     return biosim
 
 
 def test_add_population(biosim_with_animals):
-    assert biosim_with_animals.num_animals == 70
-    assert biosim_with_animals.num_animals_per_species == {'Herbivore': 50, 'Carnivore': 20}
+    assert biosim_with_animals.num_animals == 90
+    assert biosim_with_animals.num_animals_per_species == {'Herbivore': 70, 'Carnivore': 20}
 
 
 def test_year_cycle(biosim_with_animals):
@@ -121,6 +126,11 @@ def test_year_cycle(biosim_with_animals):
 def test_simulate(biosim_with_animals):
     biosim_with_animals.simulate(num_years=500, vis_years=1, img_years=None)
     assert biosim_with_animals.year == 500
+
+
+def test_simulate_extreme(biosim_with_animals):
+    biosim_with_animals.set_animal_parameters('Carnivore', {'DeltaPhiMax': 0.7})
+    biosim_with_animals.simulate(num_years=100, vis_years=1, img_years=None)
 
 
 @pytest.fixture
