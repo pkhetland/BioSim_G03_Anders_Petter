@@ -20,6 +20,25 @@ def test_set_params():
     assert Herbivore.p["w_birth"] == 10
     assert Herbivore.p["sigma_birth"] == 2.5
 
+@pytest.fixture
+def reset_herbivore_params():
+    """
+    Based on test_dish.py
+    set parameters of herbivores back to defaults
+    """
+    yield
+
+    Herbivore.set_params(Herbivore.p)
+
+@pytest.fixture
+def reset_carnivore_params():
+    """
+    set paramteres of carnivores back to defaults
+    """
+    yield
+
+    Carnivore.set_params(Carnivore.p)
+
 
 @pytest.mark.parametrize("invalid_key_value",
                          {"w_death": 10,
@@ -78,31 +97,6 @@ def test_fitness(animals):
         assert 0 <= animal.fitness <= 1
 
 
-@pytest.mark.parametrize("params_herb", {"phi_age": 1,
-                                         "phi_weight": 0.1},
-                         "params_carn", {"DeltaPhiMax": 0.1})
-@pytest.fixture
-def animals(params_herb, params_carn):
-    """
-    create some new animals for statistical test of carnivores eating herbivores
-    Make Herbivores heavy, old and bad fitness. Bad fitness achived throgh high phi_age
-    and low phi_weight
-    Low DeltaPhiMax such that carnivore only need marginal better fitness than herbivore.
-
-    Then test the weight gain of carnivores.
-
-    """
-    herbivores = [Herbivore(age=100, weight=1000),
-                  Herbivore(age=100, weight=1000),
-                  Herbivore(age=100, weight=1000),
-                  Herbivore(age=100, weight=1000)]
-    carn = Carnivore(age=5, weight=50)
-    carn.set_params(params_carn)
-    for herb in herbivores:
-        herb.set_params(params_herb)
-
-    # Continue from here. see note.
-
 
 def test_death(herbivore, mocker):
     """
@@ -134,6 +128,68 @@ def test_migrate(herbivore, mocker):
 
     mocker.patch("random.random", return_value=0)
     assert herbivore.migrate() is True
+
+class TestWeightGain:
+
+    """
+
+
+    """
+
+    @pytest.mark.parametrize("params_herb", {"phi_age": 1,
+                                             "phi_weight": 0.1},
+                             "params_carn", {"DeltaPhiMax": 0.1,
+                                             "F": 50},
+                             indirect=True)
+    def create_animals(self, params_herb, params_carn):
+        self.herbivores = [Herbivore(age=100, weight=1000) for _ in range(100)]
+        # 100 herbivores
+        self.carnivore = Carnivore(age=5, weight=50)
+        for herb in self.herbivores:
+            herb.set_params(params_herb)
+        self.carnivore.set_params(params_carn)
+
+
+
+    def test_fitness2(self, params_herb):
+        """
+        Fitness function shall return a value between 0 and 1
+        for all animals
+
+
+        """
+        for herb in self.herbivores:
+            herb.get_params()
+        for herb in self.herbivores:
+            assert 0 <= herb.fitness <= 1
+
+
+    @pytest.fixture
+    def animals(self, params_herb, params_carn, reset_carnivore_params, reset_herbivore_params):
+        """
+        create some new animals for statistical test of carnivores eating herbivores
+        Make Herbivores heavy, old and bad fitness. Bad fitness achived throgh high phi_age
+        and low phi_weight
+        Low DeltaPhiMax such that carnivore only need marginal better fitness than herbivore.
+
+        Then test the weight gain of carnivores.
+
+        """
+
+
+        self.herbivores = [Herbivore(age=100, weight=1000),
+                      Herbivore(age=100, weight=1000),
+                      Herbivore(age=100, weight=1000),
+                      Herbivore(age=100, weight=1000)]
+
+        self.carnivore = Carnivore(age=5, weight=50)
+        self.carnivore.set_params(params_carn)
+        for herb in self.herbivores:
+            herb.set_params(params_herb)
+        # Continue from here. see note.
+
+
+
 
 
 class TestAnimal:
@@ -269,8 +325,6 @@ class TestAnimal:
         """
         herb, carn = Herbivore(), Carnivore()
         assert herb.p != carn.p
-
-
 
 
 class TestHerbivore:

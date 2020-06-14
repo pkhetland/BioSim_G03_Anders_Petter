@@ -53,14 +53,14 @@ class Animal:
                     raise ValueError("Parameter must be positive")
                 cls.p.update(new_params)
 
-    # @classmethod
-    # def get_params(cls):
-    #     """
-    #
-    #     :return dictionary with parameters
-    #     :r_type: dict
-    #     """
-    #     return cls.p
+    @classmethod
+    def get_params(cls):
+        """
+
+        :return dictionary with parameters
+        :r_type: dict
+        """
+        return cls.p
 
     def __repr__(self):
         return '{}({} years, {:.3} kg)'.format(self._species, self._age, self._weight)
