@@ -186,20 +186,30 @@ class TestAnimal:
         """
         Souce: biolab/test_bacteria.py
 
-        Probabilistic test of death function. Test the number of deaths is
-        normally distributed for large number of animals. And the death probability is
-        significant with a p-value of 0.01.
+        Probabilistic test of death function. Testing on herbivores.
+        Assuming low fitness of animal.
+
+        Null hypothesis: the dead animals returned by the death function cannot be rejected under
+        the z-test. We keep our death function
+        Alternative hypothesis: the death function does not return the dead animals correctly and
+        we reject our null hypothesis.
         """
         # Task: Import seed from BioSim
-        # Compared to Biolab/test_bacteria. mean and n is "static". Do not depend
-        # on each other in our case.
         random.seed(123)
-        b = Herbivore(age=0, weight=10)
+        # High age gives low fitness
+        herb = Herbivore(age=100, weight=1)
+        # with low fitness we assume that the death probability is the same as omega
+        # set parameters
+        my_parameters = {"phi_age": 0.6, "phi_weight": 0.1, "omega": 0.4}
+        herb.set_params(my_parameters)
+        fitness_herbs = [herb.fitness for _ in range(100)]
+        print("fitness of herbs", fitness_herbs)
         # Set mocking parameter of the death probability of the animal
-        p = 0.20
+        # death probability set equal to omega
+        p = my_parameters["omega"]
         # 100 animals
         N = 100
-        n = sum(b.death() for _ in range(N))
+        n = sum(herb.death() for _ in range(N))
         print("n is", n)
         # print([b.death() for _ in range(10)])
 
@@ -209,6 +219,7 @@ class TestAnimal:
         Z = (n-mean) / math.sqrt(var)
         phi = 2 * stats.norm.cdf(-abs(Z))
         assert phi > 0.01
+        print("phi", phi)
 
 
     def test_constructor(self):
