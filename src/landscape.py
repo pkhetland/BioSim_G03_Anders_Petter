@@ -38,18 +38,22 @@ class Island:
     def count_animals(self, num_herbs=0, num_carns=0, animal_list=None):
         if animal_list is None:
             self._num_herbs += num_herbs
-            self._num_carns += num_carns
+            self._num_carns += num_herbs
         else:
-            self._num_herbs += len([animal for animal in animal_list if animal.species == 'Herbivore'])
-            self._num_carns += len([animal for animal in animal_list if animal.species == 'Carnivore'])
+            self._num_herbs += len([animal for animal in animal_list if
+                                    animal.species == 'Herbivore'])
+            self._num_carns += len([animal for animal in animal_list if
+                                    animal.species == 'Carnivore'])
 
     def del_animals(self, num_herbs=0, num_carns=0, animal_list=None):
         if animal_list is None:
             self._num_herbs -= num_herbs
             self._num_carns -= num_carns
         else:
-            self._num_herbs -= len([animal for animal in animal_list if animal.species == 'Herbivore'])
-            self._num_carns -= len([animal for animal in animal_list if animal.species == 'Carnivore'])
+            self._num_herbs -= len([animal for animal in animal_list if
+                                    animal.species == 'Herbivore'])
+            self._num_carns -= len([animal for animal in animal_list if
+                                    animal.species == 'Carnivore'])
 
     def set_neighbors(self):
         for loc, cell in self._land_cells.items():
@@ -135,7 +139,8 @@ class Island:
                 elif cell == "D":
                     map_dict[coord] = Desert()
                 else:
-                    raise ValueError("Map strings need to be either W, L, H or D! Try setting map again.")
+                    raise ValueError("Map strings need to be either W, L, H or D! "
+                                     "Try setting map again.")
 
         return map_dict
 

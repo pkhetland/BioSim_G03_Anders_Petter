@@ -115,7 +115,8 @@ class BioSim:
                 self._island.landscape[loc_dict["loc"]].add_animals(new_animals)
                 self._island.count_animals(animal_list=new_animals)
         else:
-            raise ValueError(f'Pop list needs to be a list of dicts! Was of type {type(population)}.')
+            raise ValueError(f'Pop list needs to be a list of dicts! Was of type '
+                             f'{type(population)}.')
 
     def feeding(self, cell):
         """Iterates through each animal in the cell and feeds it according to species
