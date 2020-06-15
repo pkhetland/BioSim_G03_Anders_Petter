@@ -209,6 +209,21 @@ class TestAnimal:
         herb, carn = Herbivore(), Carnivore()
         assert herb.p != carn.p
 
+    def test_single_procreation(self):
+        """
+        test that the initial herbivore population will not reproduce a newborn population of
+        greater numbers. Each mother can at most give birth to one animal. A high fitness
+        and gamma parameter ensures highly fertile animals.
+        """
+        newborn_herbs = 0
+        adult_herbs = [Herbivore(age=5, weight=40) for _ in range(100)]
+        num_adult_herbs = len(adult_herbs)
+        for herb in adult_herbs:
+            herb.set_params(({"gamma": 0.99}))
+            if herb.give_birth(num_adult_herbs):
+                newborn_herbs += 1
+        assert newborn_herbs <= num_adult_herbs
+
 
 class TestHerbivore:
     """
