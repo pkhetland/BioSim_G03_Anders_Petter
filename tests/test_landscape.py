@@ -17,31 +17,52 @@ import pytest
 
 @pytest.fixture
 def highland_cell():
+    """Create basic Highland instance for testing"""
     return Highland()
 
 
 def test_highland_fmax(highland_cell):
-    """Basic Lowland instance can be created with or without argument"""
+    """
+    :property: Highland.params
+    Test that highland parameters are correct
+    """
     assert highland_cell.params['f_max'] == 300.0
 
 
 def test_highland_mainland(highland_cell):
-    """Basic Lowland instance can be created with or without argument"""
+    """
+    :property: Highland.params
+    Test that is_mainland property is True
+    """
     assert highland_cell.is_mainland
 
 
 def test_highland_fodder(highland_cell):
-    """Fodder attribute of instance can be accessed and has the right value"""
+    """
+    :cls property: Highland._fodder
+    Fodder attribute of instance can be accessed and has the right value
+    """
     assert highland_cell._fodder == highland_cell.params['f_max']
 
 
 def test_fodder_setter(highland_cell):
-    """Fodder attribute of instance can be accessed and has the right value"""
+    """
+    :setter: LandscapeCell.fodder
+    :property: Highland._fodder
+    Fodder attribute of instance can be accessed and has the right value
+    """
     highland_cell.fodder = 200.0
     assert highland_cell._fodder == 200.0
 
 
 def test_reset_animals(highland_cell):
+    """
+    :method: LandscapeCell.add_animal
+    :method: LandscapeCell.reset_animals
+    :property: LandscapeCell.carnivores
+    :property: LandscapeCell.has_moved
+    Test that has_moved property is correctly set and reset
+    """
     highland_cell.add_animals([Carnivore(), Herbivore()])
     highland_cell.carnivores[0].has_moved = True
     highland_cell.reset_animals()
@@ -49,6 +70,11 @@ def test_reset_animals(highland_cell):
 
 
 def test_shuffle_herbs(highland_cell):
+    """
+    :method: LandscapeCell.add_animals
+    :method: LandscapeCell.randomize_herbs
+    Test that shuffle method shuffles herbivores list
+    """
     highland_cell.add_animals([Herbivore() for _ in range(1000)])
     original_herbs = [animal for animal in highland_cell.herbivores]
     highland_cell.randomize_herbs()
@@ -56,15 +82,28 @@ def test_shuffle_herbs(highland_cell):
 
 
 def test_repr_and_str(highland_cell):
+    """
+    Test __repr__ and __str__ dunder methods for Highland cell
+    """
     assert repr(highland_cell) == str(highland_cell) == 'Highland(f_max: 300.0)'
 
 
 def test_set_params(highland_cell):
+    """
+    :cls method: Highland.set_params
+    Test that error is raised when invalid key is passed
+    """
     with pytest.raises(AttributeError):
         highland_cell.set_params({'ff_maxx': 200.0})
 
 
 def test_add_remove_animals(highland_cell):
+    """
+    :method: LandscapeCell.add_animals
+    :method: LandscapeCell.remove_animals
+    :property: LandscapeCell.animal_count
+    Test that animals can be added and removed correctly
+    """
     animals = [Herbivore(), Carnivore(), Herbivore()]
     highland_cell.add_animals(animals)
     highland_cell.remove_animals([animals[0], animals[1]])
@@ -74,14 +113,25 @@ def test_add_remove_animals(highland_cell):
 @pytest.mark.parametrize('add_remove_func',
                          ['add', 'remove'])
 def test_invalid_add_remove_animals(highland_cell, add_remove_func):
-    with pytest.raises(AttributeError):
+    """
+    :method: LandscapeCell.add_animals
+    :method: LandscapeCell.remove_animals
+    Test that error is raised when non-instance objects are passed to methods
+    """
+    with pytest.raises(ValueError):
         if add_remove_func == 'add':
             highland_cell.add_animals(['Herbivore'])
         else:
-            highland_cell.remove_animals((['Carnivore']))
+            highland_cell.remove_animals(['Carnivore'])
 
 
 def test_sorted_herbivores_and_carnivores(highland_cell):
+    """
+    :method: LandscapeCell.add_animals
+    :method: LandscapeCell.sorted_herbivores
+    :method: LandscapeCell.sorted_carnivores
+    Check that sorting algorithms sort the lists by fitness
+    """
     highland_cell.add_animals([Herbivore(weight=50), Herbivore(weight=20)])
     highland_cell.add_animals([Carnivore(weight=25), Carnivore(weight=40)])
     assert highland_cell.sorted_herbivores == highland_cell.herbivores[::-1]
@@ -89,6 +139,10 @@ def test_sorted_herbivores_and_carnivores(highland_cell):
 
 
 def test_is_empty(highland_cell):
+    """
+    :setter: LandscapeCell.fodder
+    :property: LandscapeCell.is_empty
+    """
     highland_cell.fodder = 0
     assert highland_cell.is_empty is True
 
@@ -100,21 +154,31 @@ def test_is_empty(highland_cell):
 
 @pytest.fixture
 def lowland_cell():
+    """Create basic Lowland instance"""
     return Lowland()
 
 
 def test_lowland_fmax(lowland_cell):
-    """Basic Lowland instance can be created with or without argument"""
+    """
+    :cls property: Lowland.params
+    Check that f_max is correct
+    """
     assert lowland_cell.params['f_max'] == 800.0
 
 
 def test_lowland_mainland(lowland_cell):
-    """Basic Lowland instance can be created with or without argument"""
+    """
+    :property: LandscapeCell.is_mainland
+    Check that is_mainland returns True
+    """
     assert lowland_cell.is_mainland
 
 
 def test_lowland_fodder(lowland_cell):
-    """Fodder attribute of instance can be accessed and has the right value"""
+    """
+    :property: LandscapeCell.fodder
+    Fodder attribute of instance can be accessed and has the right value
+    """
     assert lowland_cell.fodder == lowland_cell.params['f_max']
 
 
@@ -124,33 +188,54 @@ def test_lowland_fodder(lowland_cell):
 
 @pytest.fixture
 def desert_cell():
+    """Create basic desert instance"""
     return Desert()
 
 
 def test_desert_fmax(desert_cell):
-    """Basic Lowland instance can be created with or without argument"""
+    """
+    :cls property: Desert.params
+    Test that class parameters are correct
+    """
     assert desert_cell.params['f_max'] == 0.0
 
 
 def test_desert_mainland(desert_cell):
-    """Basic Lowland instance can be created with or without argument"""
+    """
+    :property: LandscapeCell.is_mainland
+    Test that is_mainland returns True
+    """
     assert desert_cell.is_mainland
 
 
 def test_desert_fodder(desert_cell):
-    """Fodder attribute of instance can be accessed and has the right value"""
+    """
+    :property: LandscapeCell._fodder
+    Fodder attribute of instance can be accessed and has the right value
+    """
     assert desert_cell._fodder == desert_cell.params['f_max']
 
 
 """
-================== TEST OCEAN ==================
+================== TEST Water ==================
 """
 
-def test_ocean_instance():
+
+def test_water_instance():
+    """
+    :cls property: Water.is_mainland
+    Test that is_mainland returns False
+    """
     water = Water()
     assert not water.is_mainland
 
+
 def test_repr_and_str_water():
+    """
+    :method: Water.__repr__
+    :method: Water.__str__
+    Test that dunder methods return correct value
+    """
     water = Water()
     assert repr(water) == str(water) == 'Water cell'
 
@@ -163,6 +248,8 @@ def test_repr_and_str_water():
 @pytest.mark.parametrize('bad_boundary',
                          ['H', 'D', 'L'])
 def test_border(bad_boundary):
+    """Test that invalid border raises error
+    Modified from author Hans E. Plasser"""
     with pytest.raises(ValueError):
         geogr = f"""{bad_boundary}WW
                     WLW
@@ -173,6 +260,8 @@ def test_border(bad_boundary):
 @pytest.mark.parametrize('bad_map',
                          ['H, D, L'])
 def test_inconsistent_map(bad_map):
+    """Test that invalid row lengths raise error
+    Modified from author Hans E. Plasser"""
     with pytest.raises(ValueError):
         geogr = f"""{bad_map}WWW
                     WLW
@@ -181,6 +270,7 @@ def test_inconsistent_map(bad_map):
 
 
 def test_invalid_map():
+    """Test that invalid map symbols raise error"""
     with pytest.raises(ValueError):
         geogr = f"""WWW
                     WSW
@@ -190,6 +280,7 @@ def test_invalid_map():
 
 @pytest.fixture
 def island():
+    """Create basic Island instance for testing"""
     geogr = """WWWW
     WLHW
     WDWW
@@ -198,6 +289,11 @@ def island():
 
 
 def test_count_del_animals(island):
+    """
+    :method: Island.count_animals
+    :method: Island.del_animals
+    Test counting and removing animals with lists passed and arguments only
+    """
     island.count_animals(num_herbs=10, num_carns=10)
     island.del_animals(animal_list=[Herbivore()])
     island.del_animals(num_herbs=5, num_carns=5)
@@ -207,14 +303,23 @@ def test_count_del_animals(island):
 
 
 def test_island_instance(island):
+    """Test that island is an instance of Island"""
     assert isinstance(island, Island)
 
 
 def test_landscape(island):
+    """
+    :property: Island.landscape
+    Test that landscape property is of type `dict`
+    """
     assert type(island.landscape) == dict
 
 
 def test_map_str(island):
+    """
+    :property: Island.map_str
+    Test that map_str property matches initial input
+    """
     assert island.map_str == """WWWW
     WLHW
     WDWW
@@ -222,11 +327,20 @@ def test_map_str(island):
 
 
 def test_land_cells(island):
+    """
+    :property: Island.land_cells
+    Test that land_cells property is of correct type and length
+    """
     assert type(island.land_cells) == dict
     assert len(island.land_cells) == 3
 
 
 def test_rows_and_cols(island):
+    """
+    :property: Island.unique_rows
+    :property: Island.unique_cols
+    Test that row and col counters return correct values
+    """
     unique_rows = island.unique_rows
     unique_cols = island.unique_cols
     assert unique_cols == unique_rows == [1, 2, 3, 4]
@@ -236,6 +350,10 @@ def test_rows_and_cols(island):
                          [('L', {'f_max': 1000.0}),
                           ('H', {'f_max': 200.0})])
 def test_set_landscape_params(island, params):
+    """
+    :method: Island.set_landscape_params
+    Test that method alters properties of cells correctly
+    """
     island.set_landscape_params(params[0], params[1])
     if params[0] == 'L':
         assert Lowland.f_max() == 1000.0
@@ -244,16 +362,28 @@ def test_set_landscape_params(island, params):
 
 
 def test_set_invalid_landscape_params(island):
+    """
+    :method: Island.set_landscape_params
+    Test that invalid key raises error
+    """
     with pytest.raises(AttributeError):
         island.set_landscape_params('S', {'f_max': 200.0})
 
 
 def test_set_neighbors(island):
+    """
+    :property: Island._land_cells
+    :property: LandscapeCell.land_cell_neighbors
+    Check that neighbors are counted for a sample cell
+    """
     assert len(island._land_cells[(2, 2)].land_cell_neighbors) == 2
 
 
 @pytest.fixture
 def biosim():
+    """
+    Create a basic Biosim instance for further testing
+    """
     ini_pop = [
         {
             "loc": (2, 2),
@@ -271,24 +401,44 @@ def biosim():
 
 
 def test_carn_pop_matrix(biosim):
+    """
+    :method: Island.update_pop_matrix
+    Test that carnivore population matrix is of correct shape and value
+    """
     biosim._island.update_pop_matrix()
     assert biosim._island.carn_pop_matrix == [[0, 0, 0], [0, 2, 0], [0, 0, 0]]
 
 
 def test_herb_pop_matrix(biosim):
+    """
+    :method: Island.update_pop_matrix
+    Test that herbivore population matrix is of correct shape and value
+    """
     biosim._island.update_pop_matrix()
     assert biosim._island.herb_pop_matrix == [[0, 0, 0], [0, 3, 0], [0, 0, 0]]
 
 
 def test_animal_weights(biosim):
+    """
+    :property: Island.animal_weights
+    Test that animal weights property is of correct shape and value
+    """
     assert biosim._island.animal_weights == [[20.0, 20.0, 20.0], [25.0, 25.0]]
 
 
 def test_animal_age(biosim):
+    """
+    :property: Island.animal_ages
+    Test that animal ages property is of correct shape and value
+    """
     assert biosim._island.animal_ages == [[5.0, 5.0, 5.0], [4.0, 4.0]]
 
 
 def test_animal_fitness(biosim):
+    """
+    :property: Island.animal_fitness
+    Test that animal fitness property is of correct shape and value
+    """
     fixed_herb_fitness = Herbivore(weight=20, age=5).fitness
     fixed_carn_fitness = Carnivore(weight=25, age=4).fitness
     assert biosim._island.animal_fitness == [

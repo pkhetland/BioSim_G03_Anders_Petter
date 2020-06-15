@@ -262,7 +262,7 @@ class LandscapeCell:
             elif isinstance(animal, Carnivore):
                 self.carnivores.append(animal)
             else:
-                raise AttributeError('List may only contain Herbivore and Carnivore instances!')
+                raise ValueError('List may only contain Herbivore and Carnivore instances!')
 
     def remove_animals(self, animal_list):
         """Removes a list of animal objects from the cell class
@@ -392,10 +392,8 @@ class Water:
     """
     Water class for cells
     """
-
-    def __init__(self):
-        self.is_mainland = False
-        self.type = 'Water'
+    is_mainland = False
+    type = 'Water'
 
     def __repr__(self):
         return "Water cell"
