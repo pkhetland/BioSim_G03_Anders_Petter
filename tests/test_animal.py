@@ -178,37 +178,38 @@ class TestAnimal:
         h1.birth_prob = 0.5
         h2.birth_prob = 0.5
 
-
-
-
     def test_death_z_test(self):
 
         """
         Souce: biolab/test_bacteria.py
 
         Probabilistic test of death function. Testing on herbivores.
-        Assuming low fitness of animal.
+        Assuming low fitness of animal so that omega decides the magnitude of the death probability.
+        We compute the number of dead animals returned by our death function from class Animal.
+        Then we compare this value to the mean of dead animals derived from a fixed probability.
+        This probability is obtained by setting the omega parameter.
 
-        Null hypothesis: the dead animals returned by the death function cannot be rejected under
-        the z-test. We keep our death function
-        Alternative hypothesis: the death function does not return the dead animals correctly and
-        we reject our null hypothesis.
+
+        Null hypothesis: The number of dead animals returned by the death function has a
+        statistically significant p-value.
+        Alternative hypothesis: The number of dead animals returned is not statistically
+        significant and we reject the null hypothesis.
         """
         # Task: Import seed from BioSim
         random.seed(123)
         # High age gives low fitness
-        herb = Herbivore(age=100, weight=1)
+        herb = Herbivore(age=100, weight=10)
         # with low fitness we assume that the death probability is the same as omega
         # set parameters
         my_parameters = {"phi_age": 0.6, "phi_weight": 0.1, "omega": 0.4}
         herb.set_params(my_parameters)
         fitness_herbs = [herb.fitness for _ in range(100)]
         print("fitness of herbs", fitness_herbs)
-        # Set mocking parameter of the death probability of the animal
         # death probability set equal to omega
         p = my_parameters["omega"]
-        # 100 animals
-        N = 100
+        # Number of animals
+        N = 1000
+        # Number of dead animals
         n = sum(herb.death() for _ in range(N))
         print("n is", n)
         # print([b.death() for _ in range(10)])
@@ -218,7 +219,7 @@ class TestAnimal:
         var = N * p * (1-p)
         Z = (n-mean) / math.sqrt(var)
         phi = 2 * stats.norm.cdf(-abs(Z))
-        assert phi > 0.01
+        assert phi > TestAnimal.alpha
         print("phi", phi)
 
 
