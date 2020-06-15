@@ -127,7 +127,7 @@ class TestAnimal:
         assert herbivore.death()
 
     @pytest.fixture
-    def set_params(request):
+    def set_params(self, request):
         """
         fixture setting class parameters on Herbivore
         """
@@ -136,7 +136,7 @@ class TestAnimal:
         Herbivore.set_params(Herbivore.p)
 
     @pytest.mark.parametrize("set_params", [{"omega", 0.4}], indirect=True)
-    def test_death_z_test(self, my_parameters, reset_herbivore_params):
+    def test_death_z_test(self, set_params, reset_herbivore_params):
 
         """
         Souce: biolab/test_bacteria.py
@@ -160,6 +160,7 @@ class TestAnimal:
         herb = Herbivore(age=100, weight=10)
         # with low fitness we assume that the death probability is the same as omega
         # set parameters
+        herb.set_params(["omega"])
         fitness_herbs = [herb.fitness for _ in range(100)]
         print("fitness of herbs", fitness_herbs)
         # death probability set equal to omega
