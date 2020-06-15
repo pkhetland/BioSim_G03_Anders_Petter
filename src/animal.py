@@ -32,6 +32,7 @@ class Animal:
         self._species = self.__class__.__name__
         self._death_prob = None
         self.has_moved = False
+        # Comment: Add self.has_reproduced = False in the same manner as has_moved?
 
         # random.seed(1)  # Set seed - Will be moved to interface
 
