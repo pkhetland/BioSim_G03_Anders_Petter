@@ -31,7 +31,7 @@ if __name__ == "__main__":
         cmax_animals=None,
         ymax_animals=None,
         hist_specs=None,
-        plot_graph=False,
+        plot_graph=True,
         img_base=None
     )  # Create simple simulation instance
 

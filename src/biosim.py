@@ -51,9 +51,9 @@ class BioSim:
 
         if island_map is None:
             map_str = """WWW\nWLW\nWWW"""
-            self._island = Island(map_str)
+            self._island = Island(map_str, seed)
         elif type(island_map) == str:
-            self._island = Island(island_map)
+            self._island = Island(island_map, seed)
         else:
             raise ValueError("Map string needs to be of type str!")
 
@@ -65,12 +65,14 @@ class BioSim:
 
         self.add_population(ini_pop)
 
-        self._year = 0
+        self._year = 0  # Year counter
         self._plot_bool = plot_graph
         self._plot = None
         self._img_base = img_base
         self._img_fmt = img_fmt
 
+        # Set seeds
+        np.random.seed(seed)
         random.seed(seed)
 
     @staticmethod

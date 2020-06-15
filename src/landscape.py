@@ -15,7 +15,7 @@ class Island:
     Island collects all landscape cells in the map
     """
 
-    def __init__(self, map_str):
+    def __init__(self, map_str, seed):
         self.landscape = self.map_from_str(map_str)
         self.map_str = map_str
         self._land_cells = None
@@ -30,6 +30,10 @@ class Island:
 
         self._herb_fitness_list = []
         self._carn_fitness_list = []
+
+    def set_seed(self, seed):
+        np.random.seed(seed)
+        random.seed(seed)
 
     def count_animals(self, num_herbs=0, num_carns=0, animal_list=None):
         if animal_list is None:

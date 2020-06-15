@@ -35,7 +35,6 @@ class Animal:
 
         # random.seed(1)  # Set seed - Will be moved to interface
 
-
     @classmethod
     def set_params(cls, new_params):
         """
