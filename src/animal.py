@@ -63,10 +63,10 @@ class Animal:
         return cls.p
 
     def __repr__(self):
-        return '{}({} years, {:.3} kg)'.format(self._species, self._age, self._weight)
+        return "{}({} years, {:.3} kg)".format(self._species, self._age, self._weight)
 
     def __str__(self):
-        return '{}({} years, {:.3} kg)'.format(self._species, self._age, self._weight)
+        return "{}({} years, {:.3} kg)".format(self._species, self._age, self._weight)
 
     @classmethod
     def from_dict(cls, animal_dict):
@@ -75,8 +75,8 @@ class Animal:
         :param animal_dict: Dict with format {'species': 'Herbivore', 'age': 5, 'weight': 20}
         :type animal_dict: dict
         """
-        class_weight = animal_dict['weight']
-        class_age = animal_dict['age']
+        class_weight = animal_dict["weight"]
+        class_age = animal_dict["age"]
         return cls(age=class_age, weight=class_weight)
 
     @property
@@ -167,7 +167,7 @@ class Animal:
 
     @staticmethod
     def q(sgn, x, x_half, phi):
-        return 1.0 / (1.0 + e**(sgn * phi * (x - x_half)))
+        return 1.0 / (1.0 + e ** (sgn * phi * (x - x_half)))
 
     @property
     def fitness(self):
@@ -195,20 +195,20 @@ class Animal:
 
 class Herbivore(Animal):
     p = {
-            "w_birth": 8.0,
-            "sigma_birth": 1.5,
-            "beta": 0.9,
-            "eta": 0.05,
-            "a_half": 40.0,
-            "phi_age": 0.6,
-            "w_half": 10.0,
-            "phi_weight": 0.1,
-            "mu": 0.25,
-            "gamma": 0.2,
-            "zeta": 3.5,
-            "xi": 1.2,
-            "omega": 0.4,
-            "F": 10.0
+        "w_birth": 8.0,
+        "sigma_birth": 1.5,
+        "beta": 0.9,
+        "eta": 0.05,
+        "a_half": 40.0,
+        "phi_age": 0.6,
+        "w_half": 10.0,
+        "phi_weight": 0.1,
+        "mu": 0.25,
+        "gamma": 0.2,
+        "zeta": 3.5,
+        "xi": 1.2,
+        "omega": 0.4,
+        "F": 10.0,
     }
 
     def __init__(self, weight=None, age=0):
@@ -218,15 +218,13 @@ class Herbivore(Animal):
         """
         When an animal eats, its weight increases
         """
-        consumption_amount = self.p['F']  # Calculate amount of fodder consumed
+        consumption_amount = self.p["F"]  # Calculate amount of fodder consumed
         if consumption_amount <= cell.fodder:
-            self.weight += self.p['beta'] * consumption_amount  # Eat fodder
-            cell.fodder -= (
-                consumption_amount  # Removes consumed fodder from cell object
-            )
+            self.weight += self.p["beta"] * consumption_amount  # Eat fodder
+            cell.fodder -= consumption_amount  # Removes consumed fodder from cell object
 
         elif consumption_amount > cell.fodder > 0:
-            self.weight += self.p['beta'] * cell.fodder  # Eat fodder
+            self.weight += self.p["beta"] * cell.fodder  # Eat fodder
             cell.fodder = 0  # Sets fodder to zero.
 
 
@@ -234,22 +232,23 @@ class Carnivore(Animal):
     """
     Carnivore class
     """
+
     p = {
-         "w_birth": 6.0,
-         "sigma_birth": 1.0,
-         "beta": 0.75,
-         "eta": 0.125,
-         "a_half": 40.0,
-         "phi_age": 0.3,
-         "w_half": 4.0,
-         "phi_weight": 0.4,
-         "mu": 0.4,
-         "gamma": 0.8,
-         "zeta": 3.5,
-         "xi": 1.1,
-         "omega": 0.8,
-         "F": 50.0,
-         "DeltaPhiMax": 10.0
+        "w_birth": 6.0,
+        "sigma_birth": 1.0,
+        "beta": 0.75,
+        "eta": 0.125,
+        "a_half": 40.0,
+        "phi_age": 0.3,
+        "w_half": 4.0,
+        "phi_weight": 0.4,
+        "mu": 0.4,
+        "gamma": 0.8,
+        "zeta": 3.5,
+        "xi": 1.1,
+        "omega": 0.8,
+        "F": 50.0,
+        "DeltaPhiMax": 10.0,
     }
 
     def __init__(self, weight=None, age=0):
@@ -287,9 +286,7 @@ class Carnivore(Animal):
                     )  # Add herb weight to consumption_weight variable
                     herbs_killed.append(herb)
 
-        if (
-            consumption_weight > self.p["F"]
-        ):  # Auto-adjust consumption_weight to be <= F-parameter
+        if consumption_weight > self.p["F"]:  # Auto-adjust consumption_weight to be <= F-parameter
             consumption_weight = self.p["F"]
 
         self.weight += consumption_weight * self.p["beta"]  # Add weight to carnivore

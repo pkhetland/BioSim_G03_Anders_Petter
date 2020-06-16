@@ -7,12 +7,6 @@ A basic interface file containing which imports the BioSim class and runs the si
 from src.biosim import BioSim
 
 if __name__ == "__main__":
-    # migrate_geogr = """WWWWWW
-    # WDDDDW
-    # WDDDDW
-    # WDDDDW
-    # WWWWWW"""
-
     geogr = """WWW
     WLW
     WWW"""
@@ -40,7 +34,7 @@ if __name__ == "__main__":
 
     # sim.set_landscape_parameters('L', {'f_max': 800.0})
 
-    sim.simulate(num_years=50)
+    sim.simulate(num_years=20)
 
     input('Press enter')
 

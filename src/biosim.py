@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from src.animal import Herbivore, Carnivore, Animal
+from src.animal import Herbivore, Carnivore
 from src.landscape import Island
 from src.plotting import Plotting
 
@@ -49,25 +49,28 @@ class BioSim:
         img_base should contain a path and beginning of a file name.
         """
 
-        if island_map is None:
-            map_str = """WWW\nWLW\nWWW"""
-            self._island = Island(map_str, seed)
-        elif type(island_map) == str:
-            self._island = Island(island_map, seed)
+        if island_map is None:  # Set default map if none is provided
+            map_str = """WWW\nWLW\nWWW"""  # Set default map str
+            self._island = Island(map_str)  # Initiate Island
+        elif type(island_map) == str:  # Check map str type
+            self._island = Island(island_map)  # Initiate Island
         else:
             raise ValueError("Map string needs to be of type str!")
 
         self._ymax = ymax_animals
         self._cmax = cmax_animals
 
-        if hist_specs is not None:
-            pass
+        if hist_specs is None:
+            self._hist_specs = None
+        else:
+            self._hist_specs = hist_specs
 
         self.add_population(ini_pop)
 
         self._year = 0  # Year counter
-        self._plot_bool = plot_graph
-        self._plot = None
+        self._year_target = 0
+        self._plot_bool = plot_graph  # Visualization on/off
+        self._plot = None  # Plot figure for simulation initialized
         self._img_base = img_base
         self._img_fmt = img_fmt
 
@@ -82,14 +85,12 @@ class BioSim:
         :param species: String, name of animal species
         :param params: Dict with valid parameter specification for species
         """
-        if species == 'Herbivore':
-            print(species)
+        if species == "Herbivore":
             Herbivore.set_params(params)
-        elif species == 'Carnivore':
-            print(species)
+        elif species == "Carnivore":
             Carnivore.set_params(params)
         else:
-            raise ValueError('species needs to be either Herbivore or Carnivore!')
+            raise ValueError("species needs to be either Herbivore or Carnivore!")
 
     def set_landscape_parameters(self, landscape, params):
         """
@@ -107,16 +108,17 @@ class BioSim:
         if type(population) == list:
             for loc_dict in population:  # This loop will be replaced with a more elegant iteration
                 new_animals = [
-                        Herbivore.from_dict(animal_dict)
-                        if animal_dict["species"] == "Herbivore"
-                        else Carnivore.from_dict(animal_dict)
-                        for animal_dict in loc_dict["pop"]
-                    ]
+                    Herbivore.from_dict(animal_dict)
+                    if animal_dict["species"] == "Herbivore"
+                    else Carnivore.from_dict(animal_dict)
+                    for animal_dict in loc_dict["pop"]
+                ]
                 self._island.landscape[loc_dict["loc"]].add_animals(new_animals)
                 self._island.count_animals(animal_list=new_animals)
         else:
-            raise ValueError(f'Pop list needs to be a list of dicts! Was of type '
-                             f'{type(population)}.')
+            raise ValueError(
+                f"Pop list needs to be a list of dicts! Was of type " f"{type(population)}."
+            )
 
     def feeding(self, cell):
         """Iterates through each animal in the cell and feeds it according to species
@@ -231,17 +233,19 @@ class BioSim:
         Image files will be numbered consecutively.
         """
         start_time = time.time()
+        self._year_target += num_years
 
         if self._plot_bool and self._plot is None:
-            self._plot = Plotting(self._island,
-                                  cmax=self._cmax,
-                                  ymax=self._ymax)
+            self._plot = Plotting(
+                self._island, cmax=self._cmax, ymax=self._ymax, hist_specs=self._hist_specs
+            )
             self._island.update_pop_matrix()
             self._plot.init_plot(num_years)
             self._plot.y_herb[self._year] = self._island.num_herbs
             self._plot.y_carn[self._year] = self._island.num_carns
 
         elif self._plot_bool:
+            self._plot.set_x_axis(self._year_target)
             self._plot.y_herb += [np.nan for _ in range(num_years)]
             self._plot.y_carn += [np.nan for _ in range(num_years)]
 
@@ -270,7 +274,7 @@ class BioSim:
         finish_time = time.time()
 
         print("Simulation complete.")
-        print("Elapsed time: {:.3} seconds".format(finish_time - start_time))
+        print("Elapsed time: {:.6} seconds".format(finish_time - start_time))
         # input('Press enter to continue')
 
     @property

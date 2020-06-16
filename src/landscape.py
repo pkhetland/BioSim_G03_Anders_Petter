@@ -15,7 +15,7 @@ class Island:
     Island collects all landscape cells in the map
     """
 
-    def __init__(self, map_str, seed):
+    def __init__(self, map_str):
         self.landscape = self.map_from_str(map_str)
         self.map_str = map_str
         self._land_cells = None
@@ -31,29 +31,34 @@ class Island:
         self._herb_fitness_list = []
         self._carn_fitness_list = []
 
-    def set_seed(self, seed):
-        np.random.seed(seed)
-        random.seed(seed)
+    # @staticmethod
+    # def set_seed(seed):
+    #     np.random.seed(seed)
+    #     random.seed(seed)
 
     def count_animals(self, num_herbs=0, num_carns=0, animal_list=None):
         if animal_list is None:
             self._num_herbs += num_herbs
-            self._num_carns += num_herbs
+            self._num_carns += num_carns
         else:
-            self._num_herbs += len([animal for animal in animal_list if
-                                    animal.species == 'Herbivore'])
-            self._num_carns += len([animal for animal in animal_list if
-                                    animal.species == 'Carnivore'])
+            self._num_herbs += len(
+                [animal for animal in animal_list if animal.species == "Herbivore"]
+            )
+            self._num_carns += len(
+                [animal for animal in animal_list if animal.species == "Carnivore"]
+            )
 
     def del_animals(self, num_herbs=0, num_carns=0, animal_list=None):
         if animal_list is None:
             self._num_herbs -= num_herbs
             self._num_carns -= num_carns
         else:
-            self._num_herbs -= len([animal for animal in animal_list if
-                                    animal.species == 'Herbivore'])
-            self._num_carns -= len([animal for animal in animal_list if
-                                    animal.species == 'Carnivore'])
+            self._num_herbs -= len(
+                [animal for animal in animal_list if animal.species == "Herbivore"]
+            )
+            self._num_carns -= len(
+                [animal for animal in animal_list if animal.species == "Carnivore"]
+            )
 
     def set_neighbors(self):
         for loc, cell in self._land_cells.items():
@@ -63,9 +68,9 @@ class Island:
                 self.landscape[(loc[0] + 1, loc[1])],
                 self.landscape[(loc[0], loc[1] - 1)],
             ]
-            cell.land_cell_neighbors = (
-                [neighbor for neighbor in neighbor_cells if neighbor.type != 'Water']
-            )
+            cell.land_cell_neighbors = [
+                neighbor for neighbor in neighbor_cells if neighbor.type != "Water"
+            ]
 
     @property
     def num_animals(self):
@@ -81,13 +86,14 @@ class Island:
 
     @staticmethod
     def set_landscape_params(landscape, params):
-        if landscape == 'L':
+        if landscape == "L":
             Lowland.set_params(params)
-        elif landscape == 'H':
+        elif landscape == "H":
             Highland.set_params(params)
         else:
-            raise ValueError('Only params in Lowland and Highland can be changed! '
-                                 'No params set.')
+            raise ValueError(
+                "Only params in Lowland and Highland can be changed! " "No params set."
+            )
 
     @property
     def land_cells(self):
@@ -121,10 +127,10 @@ class Island:
         map_dict = {}
 
         # Test row lengths
-        row_lengths = [len(row.strip()) for row in map_str.strip(' ').splitlines()]
+        row_lengths = [len(row.strip()) for row in map_str.strip(" ").splitlines()]
         for i, row in enumerate(row_lengths[:-1]):
-            if row_lengths[i] != row_lengths[i+1]:
-                raise ValueError('Map needs to have uniform row lengths!')
+            if row_lengths[i] != row_lengths[i + 1]:
+                raise ValueError("Map needs to have uniform row lengths!")
 
         for row_coord, cell_row in enumerate(map_str.splitlines()):
             for col_coord, cell in enumerate(cell_row.strip()):
@@ -139,20 +145,16 @@ class Island:
                 elif cell == "D":
                     map_dict[coord] = Desert()
                 else:
-                    raise ValueError("Map strings need to be either W, L, H or D! "
-                                     "Try setting map again.")
+                    raise ValueError(
+                        "Map strings need to be either W, L, H or D! " "Try setting map again."
+                    )
 
         return map_dict
 
     def check_border_cells(self):
         for row, col in self.land_cells:
-            if (
-                    row == 1
-                    or row == self.unique_rows[-1]
-                    or col == 1
-                    or col == self.unique_cols[-1]
-            ):
-                raise ValueError('Only water cells may be border cells!')
+            if row == 1 or row == self.unique_rows[-1] or col == 1 or col == self.unique_cols[-1]:
+                raise ValueError("Only water cells may be border cells!")
 
     def update_pop_matrix(self):
         for row in self.unique_rows[1:-1]:  # First and last cell is water
@@ -173,7 +175,12 @@ class Island:
             for carn in cell.carnivores:
                 carn_weights.append(carn.weight)
 
-        return [herb_weights, carn_weights]
+        if not herb_weights:
+            return [carn_weights]
+        elif not carn_weights:
+            return [herb_weights]
+        else:
+            return [herb_weights, carn_weights]
 
     @property
     def animal_ages(self):
@@ -184,7 +191,12 @@ class Island:
                 herb_ages.append(herb.age)
             for carn in cell.carnivores:
                 carn_ages.append(carn.age)
-        return [herb_ages, carn_ages]
+        if not herb_ages:
+            return [carn_ages]
+        elif not carn_ages:
+            return [herb_ages]
+        else:
+            return [herb_ages, carn_ages]
 
     @property
     def animal_fitness(self):
@@ -195,8 +207,12 @@ class Island:
                 herb_fits.append(herb.fitness)
             for carn in cell.carnivores:
                 carn_fits.append(carn.fitness)
-
-        return [herb_fits, carn_fits]
+        if not herb_fits:
+            return [carn_fits]
+        elif not carn_fits:
+            return [herb_fits]
+        else:
+            return [herb_fits, carn_fits]
 
 
 class LandscapeCell:
@@ -228,11 +244,11 @@ class LandscapeCell:
             if param in cls.params:
                 cls.params[param] = param_dict[param]
             else:
-                raise AttributeError('Invalid parameter dictionary! Format: {\'<param>\': <value>}')
+                raise AttributeError("Invalid parameter dictionary! Format: {'<param>': <value>}")
 
     @classmethod
     def f_max(cls):
-        return cls.params['f_max']
+        return cls.params["f_max"]
 
     @property
     def fodder(self):
@@ -262,7 +278,7 @@ class LandscapeCell:
             elif isinstance(animal, Carnivore):
                 self.carnivores.append(animal)
             else:
-                raise ValueError('List may only contain Herbivore and Carnivore instances!')
+                raise ValueError("List may only contain Herbivore and Carnivore instances!")
 
     def remove_animals(self, animal_list):
         """Removes a list of animal objects from the cell class
@@ -276,7 +292,7 @@ class LandscapeCell:
             elif isinstance(animal, Carnivore):
                 self.carnivores.remove(animal)
             else:
-                raise AttributeError('List may only contain Herbivore and Carnivore instances!')
+                raise AttributeError("List may only contain Herbivore and Carnivore instances!")
 
     def randomize_herbs(self):
         """Shuffles the self.herbivores list
@@ -361,7 +377,8 @@ class Lowland(LandscapeCell):
     """
     Lowland class for cells
     """
-    params = {'f_max': 800.0}
+
+    params = {"f_max": 800.0}
 
     def __init__(self):
         super().__init__()  # Initialise landscape class
@@ -371,7 +388,8 @@ class Highland(LandscapeCell):
     """
     Highland class for cells
     """
-    params = {'f_max': 300.0}
+
+    params = {"f_max": 300.0}
 
     def __init__(self, location=None):
         super().__init__()  # Initialise landscape class
@@ -382,7 +400,8 @@ class Desert(LandscapeCell):
     Desert class for cells.
     No fodder available for herbivores, but carnivores may kill herbivores
     """
-    params = {'f_max': 0.0}
+
+    params = {"f_max": 0.0}
 
     def __init__(self):
         super().__init__()  # Initialise landscape class
@@ -392,8 +411,9 @@ class Water:
     """
     Water class for cells
     """
+
     is_mainland = False
-    type = 'Water'
+    type = "Water"
 
     def __repr__(self):
         return "Water cell"
