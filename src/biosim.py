@@ -63,23 +63,20 @@ class BioSim:
         self._ymax = ymax_animals
         self._cmax = cmax_animals
 
-        if hist_specs is None:
-            self._hist_specs = None
-        else:
-            self._hist_specs = hist_specs
+        self._hist_specs = hist_specs
 
-        self.add_population(ini_pop)
+        self.add_population(ini_pop)  # Add initial population to Island instance
 
         self._year = 0  # Year counter
-        self._year_target = 0
+        self._year_target = 0  # Number of simulated years total
         self._plot_bool = plot_graph  # Visualization on/off
         self._plot = None  # Plot figure for simulation initialized
-        self._img_base = img_base
-        self._img_fmt = img_fmt
+        self._img_base = img_base  # Str for naming saved figures
+        self._img_fmt = img_fmt  # Format saved figures
 
         # Set seeds
-        np.random.seed(seed)
-        random.seed(seed)
+        np.random.seed(seed)  # Set numpy seed
+        random.seed(seed)  # Seed python random seed
 
         if self._img_base:  # Create images folder
             if not path.exists("images"):
