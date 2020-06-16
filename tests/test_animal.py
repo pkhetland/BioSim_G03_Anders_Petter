@@ -132,10 +132,10 @@ class TestAnimal:
         Souce: biolab/test_bacteria.py
 
         Probabilistic test of death function. Testing on herbivores.
-        Assuming low fitness of animal so that omega decides the magnitude of the death probability.
+        Assuming low fitness of animal such that the death probability is approximately the same
+        as Omega.
         We compute the number of dead animals returned by our death function from class Animal.
         Then we compare this value to the mean of dead animals derived from a fixed probability.
-        This probability is obtained by setting the omega parameter.
 
 
         Null hypothesis: The number of dead animals returned by the death function has a
@@ -212,8 +212,8 @@ class TestAnimal:
     def test_single_procreation(self):
         """
         test that the initial herbivore population will not reproduce a newborn population of
-        greater numbers. Each mother can at most give birth to one animal. A high fitness
-        and gamma parameter ensures highly fertile animals.
+        greater numbers during a year cycle. Each mother can at most give birth to one animal.
+        A high fitness and gamma parameter ensures highly fertile animals.
         """
         num_newborns = 0
         adult_herbs = [Herbivore(age=5, weight=40) for _ in range(100)]
