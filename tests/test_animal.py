@@ -126,14 +126,16 @@ class TestAnimal:
         herbivore.weight = 0
         assert herbivore.death()
 
-    def test_death_z_test(self, reset_herbivore_params):
+
+    @pytest.mark.parametrize("omega_dict", [{"omega": 0.6}, {"omega": 0.4}])
+    def test_death_z_test(self, reset_herbivore_params, omega_dict):
 
         """
         Souce: biolab/test_bacteria.py
 
         Probabilistic test of death function. Testing on herbivores.
-        Assuming low fitness of animal such that the death probability is approximately the same
-        as Omega.
+        Assuming low fitness of animal so that omega can be interpreted as an approximation of the
+        death probability.
         We compute the number of dead animals returned by our death function from class Animal.
         Then we compare this value to the mean of dead animals derived from a fixed probability.
 
@@ -149,12 +151,12 @@ class TestAnimal:
         herb = Herbivore(age=100, weight=10)
         # with low fitness we assume that the death probability is the same as omega
         # set parameters
-        my_parameters = {"phi_age": 0.6, "phi_weight": 0.1, "omega": 0.4}
-        herb.set_params(my_parameters)
+        print(omega_dict)
+        herb.set_params(omega_dict)
         fitness_herbs = [herb.fitness for _ in range(100)]
         print("fitness of herbs", fitness_herbs)
         # death probability set equal to omega
-        p = my_parameters["omega"]
+        p = Herbivore.p["omega"]
         # Number of animals
         N = 1000
         # Number of dead animals
