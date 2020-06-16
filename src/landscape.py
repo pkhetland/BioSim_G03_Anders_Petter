@@ -28,26 +28,48 @@ class Island:
         self.herb_pop_matrix = [[0 for _ in self.unique_cols] for _ in self.unique_rows]  # Herbivore population matrix
         self.carn_pop_matrix = [[0 for _ in self.unique_cols] for _ in self.unique_rows]  # Carnivore population matrix
 
-        # self._herb_fitness_list = []  #
-        # self._carn_fitness_list = []
-
     def count_animals(self, num_herbs=0, num_carns=0, animal_list=None):
-        if animal_list is None:
-            self._num_herbs += num_herbs
-            self._num_carns += num_carns
+        """Count animals for fast retrieval when needed
+
+        :param num_herbs: Number of herbs to be counted
+        :type num_herbs: int
+        :param num_carns: Number of carns to be counted
+        :type num_carns: int
+        :param animal_list: List of animal instances with automatic counting
+        :type animal_list: list
+        """
+
+        if num_herbs >= 0 and num_carns >= 0:
+            self._num_herbs += num_herbs  # Count herbs
+            self._num_carns += num_carns  # Count carns
         else:
+            raise ValueError('num_herbs and num_carns need to be 0 or a positive integer.')
+
+        if animal_list is not None:
             self._num_herbs += len(
                 [animal for animal in animal_list if animal.species == "Herbivore"]
-            )
+            )  # Count herbivores
             self._num_carns += len(
                 [animal for animal in animal_list if animal.species == "Carnivore"]
-            )
+            )  # Count carnivores
 
     def del_animals(self, num_herbs=0, num_carns=0, animal_list=None):
-        if animal_list is None:
-            self._num_herbs -= num_herbs
-            self._num_carns -= num_carns
+        """Remove animals from counters
+
+        :param num_herbs: Number of herbs to be removed
+        :type num_herbs: int
+        :param num_carns: Number of carns to be removed
+        :type num_carns: int
+        :param animal_list: List of animal instances with automatic removal
+        :type animal_list: list
+        """
+        if num_herbs >= 0 and num_carns >= 0:
+            self._num_herbs -= num_herbs  # Remove herbs
+            self._num_carns -= num_carns  # Remove carns
         else:
+            raise ValueError('num_herbs and num_carns need to be 0 or a positive integer.')
+
+        if animal_list is not None:
             self._num_herbs -= len(
                 [animal for animal in animal_list if animal.species == "Herbivore"]
             )
@@ -56,6 +78,7 @@ class Island:
             )
 
     def set_neighbors(self):
+        """Find and save mainland neighbor cells for all cells in Island instance"""
         for loc, cell in self._land_cells.items():
             neighbor_cells = [
                 self.landscape[(loc[0] - 1, loc[1])],
@@ -69,43 +92,85 @@ class Island:
 
     @property
     def num_animals(self):
+        """Total animal count of Island instance
+
+        :return: Total animal count
+        :rtype: int
+        """
         return self._num_herbs + self._num_carns
 
     @property
     def num_herbs(self):
+        """Herb count of Island instance
+
+        :return: Herb count
+        :rtype: int
+        """
         return self._num_herbs
 
     @property
     def num_carns(self):
+        """Carn count of Island instance
+
+        :return: Carn count
+        :rtype: int
+        """
         return self._num_carns
 
     @staticmethod
     def set_landscape_params(landscape, params):
+        """Update class parameters of Lowland or Highland class
+
+        :param landscape: Indicator of either Lowland og Highland
+        :type landscape: str
+        :param params: New keys and values for class variables
+        :type params: dict
+        """
         if landscape == "L":
             Lowland.set_params(params)
         elif landscape == "H":
             Highland.set_params(params)
         else:
             raise ValueError(
-                "Only params in Lowland and Highland can be changed! " "No params set."
+                "Only params in Lowland and Highland can be changed! No params set."
             )
 
     @property
     def land_cells(self):
+        """Getter function for _land_cells property
+
+        :return: Coord and instance of mainland cells
+        :rtype: dict
+        """
         if self._land_cells is None:
             self._land_cells = self.get_land_cells
         return self._land_cells
 
     @property
     def get_land_cells(self):
+        """ Check is_mainland property and discard Water cells. Only runs once.
+
+        :return: Coord and instance of mainland cells
+        :rtype: dict
+        """
         return {loc: cell for loc, cell in self.landscape.items() if cell.is_mainland}
 
     @property
     def unique_rows(self):
+        """Return unique row values
+
+        :return: Row coordinate values
+        :rtype: list
+        """
         return list(set([coord[0] for coord in self.landscape]))
 
     @property
     def unique_cols(self):
+        """Return unique col values
+
+        :return: Col coordinate values
+        :rtype: list
+        """
         return list(set([coord[1] for coord in self.landscape]))
 
     @staticmethod
@@ -147,11 +212,13 @@ class Island:
         return map_dict
 
     def check_border_cells(self):
+        """Iterate through land_cells and check that none have border coordinates"""
         for row, col in self.land_cells:
             if row == 1 or row == self.unique_rows[-1] or col == 1 or col == self.unique_cols[-1]:
                 raise ValueError("Only water cells may be border cells!")
 
     def update_pop_matrix(self):
+        """Update the population matrices for heatmap"""
         for row in self.unique_rows[1:-1]:  # First and last cell is water
             for col in self.unique_cols[1:-1]:  # First and last cell is water
                 cell = self.landscape[(row, col)]
@@ -162,6 +229,11 @@ class Island:
 
     @property
     def animal_weights(self):
+        """Find weights of current animals in Island instance for histograms
+
+        :return: Herbivore weights and carnivore weights
+        :rtype: List of lists
+        """
         herb_weights = []
         carn_weights = []
         for cell in self.land_cells.values():
@@ -179,6 +251,11 @@ class Island:
 
     @property
     def animal_ages(self):
+        """Find ages of current animals in Island instance for histograms
+
+        :return: Herbivore ages and carnivore ages
+        :rtype: List of lists
+        """
         herb_ages = []
         carn_ages = []
         for cell in self.land_cells.values():
@@ -195,6 +272,11 @@ class Island:
 
     @property
     def animal_fitness(self):
+        """Find fitness of current animals in Island instance for histograms
+
+        :return: Herbivore fitness and carnivore fitness
+        :rtype: List of lists
+        """
         herb_fits = []
         carn_fits = []
         for cell in self.land_cells.values():
@@ -214,7 +296,6 @@ class LandscapeCell:
     """
     Parent class for landscape cells
     """
-
     def __init__(self):
         self._fodder = self.f_max()
         self._is_mainland = True
@@ -222,9 +303,6 @@ class LandscapeCell:
 
         self.herbivores = []
         self.carnivores = []
-
-        # random.seed(123)
-
         self.land_cell_neighbors = []
 
     def __repr__(self):
@@ -235,6 +313,11 @@ class LandscapeCell:
 
     @classmethod
     def set_params(cls, param_dict):
+        """Set new values of class parameters for Herbivore or Carnivore
+
+        :param param_dict: Keys and values for new param values
+        :type param_dict: dict
+        """
         for param in param_dict:
             if param in cls.params:
                 cls.params[param] = param_dict[param]
@@ -243,21 +326,26 @@ class LandscapeCell:
 
     @classmethod
     def f_max(cls):
+        """Getter method for _f_max property"""
         return cls.params["f_max"]
 
     @property
     def fodder(self):
+        """Getter method for cell._fodder property"""
         return self._fodder
 
     @fodder.setter
     def fodder(self, new_fodder):
+        """Setter method for fodder property"""
         self._fodder = new_fodder
 
     @property
     def is_mainland(self):
+        """Getter method for is_mainland property"""
         return self._is_mainland
 
     def reset_animals(self):
+        """Reset has_moved property of all animals after all animals in a cell has moved"""
         for animal in self.animals:
             animal.has_moved = False
 
@@ -290,8 +378,7 @@ class LandscapeCell:
                 raise AttributeError("List may only contain Herbivore and Carnivore instances!")
 
     def randomize_herbs(self):
-        """Shuffles the self.herbivores list
-        """
+        """Shuffles the self.herbivores list"""
         random.shuffle(self.herbivores)
 
     @property
@@ -372,7 +459,6 @@ class Lowland(LandscapeCell):
     """
     Lowland class for cells
     """
-
     params = {"f_max": 800.0}
 
     def __init__(self):
@@ -383,7 +469,6 @@ class Highland(LandscapeCell):
     """
     Highland class for cells
     """
-
     params = {"f_max": 300.0}
 
     def __init__(self, location=None):
@@ -395,7 +480,6 @@ class Desert(LandscapeCell):
     Desert class for cells.
     No fodder available for herbivores, but carnivores may kill herbivores
     """
-
     params = {"f_max": 0.0}
 
     def __init__(self):
@@ -406,7 +490,6 @@ class Water:
     """
     Water class for cells
     """
-
     is_mainland = False
     type = "Water"
 
