@@ -189,3 +189,17 @@
 # conda version: 4.8.3
 +defaults/noarch::seaborn-0.10.1-py_0
 # update specs: ['seaborn']
+==> 2020-06-16 12:36:04 <==
+# cmd: /Users/petter/opt/anaconda3/bin/conda install -p /Users/petter/Projects/school/INF200/inf200_exam/env ffmpeg -y
+# conda version: 4.8.3
++defaults/osx-64::bzip2-1.0.8-h1de35cc_0
++defaults/osx-64::ffmpeg-4.2.2-h97e5cf8_0
++defaults/osx-64::gmp-6.1.2-hb37e062_1
++defaults/osx-64::gnutls-3.6.5-h91ad68e_1002
++defaults/osx-64::lame-3.100-h1de35cc_0
++defaults/osx-64::libopus-1.3.1-h1de35cc_0
++defaults/osx-64::libvpx-1.7.0-h378b8a2_0
++defaults/osx-64::nettle-3.4.1-h3018a27_0
++defaults/osx-64::openh264-2.1.0-hd9629dc_0
++defaults/osx-64::x264-1!157.20191217-h1de35cc_0
+# update specs: ['ffmpeg']

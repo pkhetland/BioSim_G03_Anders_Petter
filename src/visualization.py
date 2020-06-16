@@ -225,6 +225,6 @@ class Plotting:
             return
 
         plt.savefig(
-            "{base}_{num:05d}.{type}".format(base=img_base, num=self._img_ctr, type=img_fmt)
+            "images/{base}_{num:05d}.{type}".format(base=img_base, num=self._img_ctr, type=img_fmt)
         )
         self._img_ctr += 1

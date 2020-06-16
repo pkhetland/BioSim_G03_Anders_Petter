@@ -12,29 +12,24 @@ from src.animal import Herbivore, Carnivore
 
 class Island:
     """
-    Island collects all landscape cells in the map
+    Island collects all landscape cells in the map and keeps track of animals
     """
 
     def __init__(self, map_str):
-        self.landscape = self.map_from_str(map_str)
-        self.map_str = map_str
-        self._land_cells = None
-        self.check_border_cells()
-        self.set_neighbors()
+        self.landscape = self.map_from_str(map_str)  # Create landscape from map_str
+        self.map_str = map_str  # Save map_str as property
+        self._land_cells = None  # Create placeholder for mainland cells
+        self.check_border_cells()  # Initiate test of map borders e.g. that all are Water cells
+        self.set_neighbors()  # Define neighbor cells for each cell and save for later
 
-        self._num_herbs = 0
-        self._num_carns = 0
+        self._num_herbs = 0  # Herbivore counter
+        self._num_carns = 0  # Carnivore counter
 
-        self.herb_pop_matrix = [[0 for _ in self.unique_cols] for _ in self.unique_rows]
-        self.carn_pop_matrix = [[0 for _ in self.unique_cols] for _ in self.unique_rows]
+        self.herb_pop_matrix = [[0 for _ in self.unique_cols] for _ in self.unique_rows]  # Herbivore population matrix
+        self.carn_pop_matrix = [[0 for _ in self.unique_cols] for _ in self.unique_rows]  # Carnivore population matrix
 
-        self._herb_fitness_list = []
-        self._carn_fitness_list = []
-
-    # @staticmethod
-    # def set_seed(seed):
-    #     np.random.seed(seed)
-    #     random.seed(seed)
+        # self._herb_fitness_list = []  #
+        # self._carn_fitness_list = []
 
     def count_animals(self, num_herbs=0, num_carns=0, animal_list=None):
         if animal_list is None:

@@ -2,11 +2,14 @@
 
 from src.animal import Herbivore, Carnivore
 from src.landscape import Island
-from src.plotting import Plotting
+from src.visualization import Plotting
 
 import random as random
 import numpy as np
 import time
+import os
+# import ffmpeg
+from os import path
 
 
 class BioSim:
@@ -78,6 +81,10 @@ class BioSim:
         np.random.seed(seed)
         random.seed(seed)
 
+        if self._img_base:  # Create images folder
+            if not path.exists("images"):
+                os.mkdir('images')
+
     @staticmethod
     def set_animal_parameters(species, params):
         """
@@ -93,16 +100,16 @@ class BioSim:
             raise ValueError("species needs to be either Herbivore or Carnivore!")
 
     def set_landscape_parameters(self, landscape, params):
-        """
-        Set parameters for landscape type.
+        """Set parameters for landscape type.
+
         :param landscape: String, code letter for landscape
         :param params: Dict with valid parameter specification for landscape
         """
         self._island.set_landscape_params(landscape, params)
 
     def add_population(self, population):
-        """
-        Add a population to the island
+        """Add a population to the island
+
         :param population: List of dictionaries specifying population
         """
         if type(population) == list:
@@ -292,6 +299,13 @@ class BioSim:
         """Number of animals per species in island, as dictionary."""
         return {"Herbivore": self._island.num_herbs, "Carnivore": self._island.num_carns}
 
-    # def make_movie(self):
-    #     """Create MPEG4 movie from visualization images saved."""
-    #     pass
+    def make_movie(self):
+        """Create MPEG4 movie from visualization images saved."""
+        pass
+        os.system(f"ffmpeg -r 1 -i {self._img_base}_{self._year:05d}.png -vcodec mpeg4 -y movie.mp4")
+        (
+            ffmpeg
+                .input('/path/to/jpegs/*.jpg', pattern_type='glob', framerate=25)
+                .output('movie.mp4')
+                .run()
+        )

@@ -26,21 +26,18 @@ if __name__ == "__main__":
         ymax_animals=None,
         hist_specs=None,
         plot_graph=True,
-        img_base=None
+        img_base='Test'
     )  # Create simple simulation instance
 
-    # sim.set_animal_parameters('Carnivore', {'omega': 0})
-    # sim.set_animal_parameters('Herbivore', {'omega': 0})
-
-    # sim.set_landscape_parameters('L', {'f_max': 800.0})
-
-    sim.simulate(num_years=20)
+    sim.simulate(num_years=3, img_years=1)
 
     input('Press enter')
 
-    sim.add_population([{
-            "loc": (2, 2),
-            "pop": [{"species": "Carnivore", "age": 5, "weight": 20} for _ in range(20)]
-        }])
+    sim.make_movie()
 
-    sim.simulate(num_years=200)
+    # sim.add_population([{
+    #         "loc": (2, 2),
+    #         "pop": [{"species": "Carnivore", "age": 5, "weight": 20} for _ in range(20)]
+    #     }])
+
+    # sim.simulate(num_years=200)
