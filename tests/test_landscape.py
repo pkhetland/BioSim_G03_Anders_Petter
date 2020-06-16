@@ -9,6 +9,9 @@ from src.animal import Herbivore, Carnivore
 from src.biosim import BioSim
 import pytest
 
+"""
+Tests of classes in landscape.py. Check if classes behaves as expected
+"""
 
 class TestHighlandLandscapeCell:
 
