@@ -171,7 +171,7 @@ class TestAnimal:
         less than the significance level. We reject are null hypothesis if the difference between
         our computed mean and the sample mean is large.
         """
-        np.random.seed(123)
+        random.seed(123)
         N = 1000
         #herb1 = Herbivore(age=5, weight=50)
         n = sum(Herbivore(age=5, weight=50).birth_weight for _ in range(N))
