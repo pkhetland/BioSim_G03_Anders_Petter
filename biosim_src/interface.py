@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+
 """
 A basic interface file containing which imports the BioSim class and runs the simulation.
 """
@@ -8,8 +9,8 @@ from biosim.biosim import BioSim
 
 if __name__ == "__main__":
     geogr = """WWW
-    WLW
-    WWW"""
+               WLW
+               WWW"""
 
     ini_pop = [
         {

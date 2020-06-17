@@ -10,7 +10,6 @@ import time
 import os
 # import ffmpeg
 from os import path
-from threading import Thread
 
 
 class BioSim:

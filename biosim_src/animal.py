@@ -8,11 +8,9 @@ from math import e
 
 
 class Animal:
+    """Super class for Herbivores and Carnivores.
 
-    """Super class for Herbivores and Carnivores
     """
-    # Empty dictionaries to set parameters
-    p = {}
 
     def __init__(self, weight, age):
         """Initialize the animal class
@@ -34,7 +32,7 @@ class Animal:
 
     @classmethod
     def set_params(cls, new_params):
-        """Set parameter for animal classes
+        """Set parameter for animal classes.
 
         :param new_params: dict
         """
