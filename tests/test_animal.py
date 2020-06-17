@@ -3,16 +3,15 @@
 """
 Tests for animal class.
 """
-from biosim.landscape import Lowland
 from biosim.animal import Herbivore, Carnivore
+from biosim.landscape import Lowland
 import math
 import scipy.stats as stats
 import pytest
 import random
-import numpy as np
 
 
-@pytest.fixture
+@pytest.fixture()
 def reset_herbivore_params():
     """
     Based on test_dish.py
@@ -29,6 +28,17 @@ def reset_carnivore_params():
     yield Carnivore.set_params(Carnivore.p)
 
 
+def formula_z_test(N, p, n):
+    """
+    Formula for the z-test used in tests
+    """
+    mean = N * p
+    var = N * p * (1 - p)
+    Z = (n - mean) / math.sqrt(var)
+    phi = 2 * stats.norm.cdf(-abs(Z))
+    return phi
+
+
 class TestAnimal:
     alpha = 0.01    # Significance level
 
@@ -36,6 +46,7 @@ class TestAnimal:
     Tests for animal class
     
     """
+
     def test_set_params(self):
         """
         Test that parameters can be set
@@ -46,7 +57,7 @@ class TestAnimal:
         assert Herbivore.p["w_birth"] == 10
         assert Herbivore.p["sigma_birth"] == 2.5
 
-    def test_set_invalid_params(self):
+    def test_set_invalid_params(self, reset_herbivore_params):
         """
         Test errors with illegal keys and values
         """
@@ -119,17 +130,22 @@ class TestAnimal:
     def test_death_z_test(self, reset_herbivore_params, omega_dict):
 
         """
-        Souce: biolab/test_bacteria.py
+        Based on H.E. Plesser: biolab/test_bacteria.py
 
         Probabilistic test of death function. Testing on herbivores.
-        Assuming low fitness of animal so that omega can be interpreted as an approximation of the
-        death probability.
+
+        Given that the sample size is large. Under the Z-test the distribution under the null
+        hypothesis can be estimated approximately by the normal distribution.
+        See https://en.wikipedia.org/wiki/Z-test.
+
+        Assuming low fitness of animals such that omega can be interpreted as an approximation of
+        the death probability.
         We compute the number of dead animals returned by our death function from class Animal.
         Then we compare this value to the mean of dead animals derived from a fixed probability.
 
 
-        Null hypothesis: The number of dead animals returned by the death function has a
-        statistically significant p-value.
+        Null hypothesis: The number of dead animals returned by the death function is
+        statistically significant with a p-value greater than the alpha parameter.
         Alternative hypothesis: The number of dead animals returned is not statistically
         significant and we reject the null hypothesis.
         """
@@ -150,7 +166,7 @@ class TestAnimal:
         n = sum(herb.death() for _ in range(N))
         print("n is", n)
         # print([b.death() for _ in range(10)])
-
+        print("formula phi is", formula_z_test(N, p, n))
         mean = N * p
         print("mean is", mean)
         var = N * p * (1-p)
@@ -160,8 +176,12 @@ class TestAnimal:
         assert phi > TestAnimal.alpha
         print("phi", phi)
 
-    def test_mean_birth_weight(self, reset_herbivore_params):
+    @pytest.mark.parametrize("birth_dict", [{"w_birth": 8.0, "sigma_birth": 1.5},
+                                            {"w_birth": 5.0, "sigma_birth": 7.5}])
+    def test_mean_birth_weight(self, birth_dict, reset_herbivore_params):
         """
+        Same type as above. But with exact value of variance
+
         Test that the birth weight of animals have a mean
         as specified in the animals parameter dictionary.
 
@@ -173,14 +193,14 @@ class TestAnimal:
         """
         random.seed(123)
         N = 1000
-        #herb1 = Herbivore(age=5, weight=50)
+        Herbivore.set_params(birth_dict)
         n = sum(Herbivore(age=5, weight=50).birth_weight for _ in range(N))
         print("n is", n)
         # Theoretical mean
         p = Herbivore.p["w_birth"]
         mean = N * p
         print("mean is", mean)
-        # Theoretical variance
+        # Since the standard deviation is known, we can write the variance as
         var = (Herbivore.p["sigma_birth"]**2) * N
         print(var)
         Z = (n - mean) / math.sqrt(var)
@@ -188,7 +208,7 @@ class TestAnimal:
         assert phi > TestAnimal.alpha
         print("phi", phi)
 
-    def test_give_birth(self, mocker, reset_herbivore_params):
+    def test_certain_birth(self, mocker, reset_herbivore_params):
         """
         test give birth function
         Mock the random number generator to always return one.
@@ -200,6 +220,32 @@ class TestAnimal:
         mocker.patch("random.random", return_value=0)
         give_birth, _ = herb.give_birth(num_herbs)
         assert give_birth is True
+
+    @pytest.mark.parametrize("gamma_dict", [{"gamma": 0.2},
+                                            {"gamma": 0.4},
+                                            {"gamma": 0.6},
+                                            {"gamma": 0.8}])
+    def test_give_birth(self, gamma_dict, reset_herbivore_params):
+        """Test that for animals with fitness close to one, and two same animals of one specie in
+          a cell. The birth function should be well approximated by the parameter gamma."""
+
+        random.seed(123)
+        N = 1000
+        Herbivore.set_params(gamma_dict)
+        num_herbs = 2
+        p = gamma_dict["gamma"]
+        list_birth = [Herbivore(weight=200, age=5).give_birth(num_herbs) for _ in range(N)]
+        # number when births return True
+        n = sum([item[0] for item in list_birth])
+        print("n is", n)
+        mean = N * p
+        print(mean)
+        var = N * p * (1 - p)
+        Z = (n - mean) / math.sqrt(var)
+        phi = 2 * stats.norm.cdf(-abs(Z))
+        print(phi)
+        assert phi > TestAnimal.alpha
+
 
 
     def test_constructor(self):
