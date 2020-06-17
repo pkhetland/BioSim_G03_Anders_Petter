@@ -10,22 +10,23 @@ import time
 import os
 # import ffmpeg
 from os import path
+from threading import Thread
 
 
 class BioSim:
     """Main BioSim class for running simulations"""
 
     def __init__(
-        self,
-        island_map=None,
-        ini_pop=[],
-        seed=123,
-        ymax_animals=None,
-        cmax_animals=None,
-        hist_specs=None,
-        img_base=None,
-        img_fmt="png",
-        plot_graph=False,
+            self,
+            island_map=None,
+            ini_pop=[],
+            seed=123,
+            ymax_animals=None,
+            cmax_animals=None,
+            hist_specs=None,
+            img_base=None,
+            img_fmt="png",
+            plot_graph=False,
     ):
         """
         :param island_map: Multi-line string specifying island geography
@@ -296,13 +297,13 @@ class BioSim:
         """Number of animals per species in island, as dictionary."""
         return {"Herbivore": self._island.num_herbs, "Carnivore": self._island.num_carns}
 
-    def make_movie(self):
-        """Create MPEG4 movie from visualization images saved."""
-        pass
-        os.system(f"ffmpeg -r 1 -i {self._img_base}_{self._year:05d}.png -vcodec mpeg4 -y movie.mp4")
-        (
-            ffmpeg
-                .input('/path/to/jpegs/*.jpg', pattern_type='glob', framerate=25)
-                .output('movie.mp4')
-                .run()
-        )
+    # def make_movie(self):
+    #     """Create MPEG4 movie from visualization images saved."""
+    #     pass
+    #     os.system(f"ffmpeg -r 1 -i {self._img_base}_{self._year:05d}.png -vcodec mpeg4 -y movie.mp4")
+    #     (
+    #         ffmpeg
+    #             .input('/path/to/jpegs/*.jpg', pattern_type='glob', framerate=25)
+    #             .output('movie.mp4')
+    #             .run()
+    #     )

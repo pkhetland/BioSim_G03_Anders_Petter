@@ -287,24 +287,18 @@ class TestCarnivore:
         the herbivore.
         """
         carn = Carnivore(age=5, weight=40)
-        herb = Herbivore(age=100, weight=200)
         # number of herbivores
         N = 1000
-        herb_list = [herb for _ in range(N)]
-        kill_count = 0
+        herb_list = [Herbivore(age=100, weight=200) for _ in range(N)]
         initial_weight = carn.weight
-        print(initial_weight)
-        for _ in herb_list:
-            if carn.kill_prey(herb_list):
-                kill_count += 1
+        # print(initial_weight)
+        _ = carn.kill_prey(herb_list)
+        # kill_count = len(herbs_killed)
 
         new_weight = carn.weight
-        n = kill_count
+        # n = kill_count
         print(new_weight)
         print(carn.p["beta"]*carn.p["F"])
-        assert new_weight == initial_weight +carn.p["beta"]*carn.p["F"]
-        # Assertion fails, weight is added for all herbivores.
-
-
-
+        assert new_weight == initial_weight + carn.p["beta"] * carn.p["F"]
+        # Assertion fails, weight is aded for all herbivores.
 

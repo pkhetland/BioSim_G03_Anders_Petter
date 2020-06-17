@@ -285,6 +285,8 @@ class Carnivore(Animal):
                         herb.weight
                     )  # Add herb weight to consumption_weight variable
                     herbs_killed.append(herb)
+            else:
+                continue
 
         if consumption_weight > self.p["F"]:  # Auto-adjust consumption_weight to be <= F-parameter
             consumption_weight = self.p["F"]
