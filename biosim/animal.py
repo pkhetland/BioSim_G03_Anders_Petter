@@ -291,7 +291,7 @@ class Carnivore(Animal):
 
         :param sorted_herbivores: Herbivores sorted by fitness levels from low to high
         :type sorted_herbivores: list
-        ...
+            ...
         :return: Animals killed by herbivore to be removed from simulation
         :rtype: list
         """

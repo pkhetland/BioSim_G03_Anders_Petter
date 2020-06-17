@@ -4,9 +4,9 @@
 Test set for the initial Lowland class.
 """
 
-from src.landscape import Island, Desert, Highland, Lowland, Water
-from src.animal import Herbivore, Carnivore
-from src.biosim import BioSim
+from biosim.landscape import Island, Desert, Highland, Lowland, Water
+from biosim.animal import Herbivore, Carnivore
+from biosim.biosim import BioSim
 import pytest
 
 """

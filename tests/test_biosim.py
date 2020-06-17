@@ -10,9 +10,9 @@ import glob
 import os
 import os.path
 
-from src.animal import Herbivore, Carnivore
-from src.biosim import BioSim
-from src.landscape import Lowland, Highland
+from biosim.animal import Herbivore, Carnivore
+from biosim.biosim import BioSim
+from biosim.landscape import Lowland, Highland
 
 
 class TestBioSim:

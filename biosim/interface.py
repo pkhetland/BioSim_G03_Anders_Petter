@@ -4,7 +4,7 @@
 A basic interface file containing which imports the BioSim class and runs the simulation.
 """
 
-from src.biosim import BioSim
+from biosim.biosim import BioSim
 
 if __name__ == "__main__":
     geogr = """WWW
