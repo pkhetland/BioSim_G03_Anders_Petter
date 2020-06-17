@@ -3,12 +3,13 @@
 """
 Tests for animal class.
 """
-from src.animal import Herbivore, Carnivore
+from src.animal import Herbivore, Carnivore, Animal
 from src.landscape import Lowland
 import math
 import scipy.stats as stats
 import pytest
 import random
+import numpy as np
 
 
 @pytest.fixture
@@ -26,16 +27,6 @@ def reset_carnivore_params():
     Set parameters of carnivores back to defaults
     """
     yield Carnivore.set_params(Carnivore.p)
-
-def test_give_birth():
-    """
-    Mock the birth function to see it returns correct.
-    Replace random number by fixed value.
-
-    Making sure the weight is greater than the newborn weight
-
-    """
-    pass
 
 
 class TestAnimal:
@@ -94,14 +85,13 @@ class TestAnimal:
         Fitness function shall return a value between 0 and 1
         for all animals
 
-
         """
         for animal in animals:
             assert 0 <= animal.fitness <= 1
 
     def test_death_mocker(self, herbivore, mocker):
         """
-        Replace random number by a function returning a fixed value.
+        Replace random number by a fixed value 0.
         Animal will then always die.
         """
         mocker.patch("random.random", return_value=0)
@@ -118,8 +108,7 @@ class TestAnimal:
 
     def test_certain_death_weight(self, herbivore):
         """
-        Test that the animal always must die given death_prob = 1
-        100 Herbivore instances all must die
+        Test that the animal always must die given a weight of 0.
         See examples/biolab/test_bacteria.py
 
         """
@@ -171,7 +160,7 @@ class TestAnimal:
         assert phi > TestAnimal.alpha
         print("phi", phi)
 
-    def test_mean_birth_weight(self):
+    def test_mean_birth_weight(self, reset_herbivore_params):
         """
         Test that the birth weight of animals have a mean
         as specified in the animals parameter dictionary.
@@ -182,9 +171,10 @@ class TestAnimal:
         less than the significance level. We reject are null hypothesis if the difference between
         our computed mean and the sample mean is large.
         """
+        np.random.seed(123)
         N = 1000
-        herb1 = Herbivore(age=5, weight=50)
-        n = sum(herb1.birth_weight for _ in range(N))
+        #herb1 = Herbivore(age=5, weight=50)
+        n = sum(Herbivore(age=5, weight=50).birth_weight for _ in range(N))
         print("n is", n)
         # Theoretical mean
         p = Herbivore.p["w_birth"]
@@ -197,6 +187,20 @@ class TestAnimal:
         phi = 2 * stats.norm.cdf(-abs(Z))
         assert phi > TestAnimal.alpha
         print("phi", phi)
+
+    def test_give_birth(self, mocker, reset_herbivore_params):
+        """
+        test give birth function
+        Mock the random number generator to always return one.
+        Then as long as weight is not zero. give_birth function shall return True.
+
+        """
+        herb = Herbivore(weight=80, age=5)
+        num_herbs = 10
+        mocker.patch("random.random", return_value=0)
+        give_birth, _ = herb.give_birth(num_herbs)
+        assert give_birth is True
+
 
     def test_constructor(self):
         """
