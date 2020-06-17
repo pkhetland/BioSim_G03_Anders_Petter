@@ -6,6 +6,7 @@ Tests for animal class.
 from biosim.animal import Herbivore, Carnivore
 from biosim.landscape import Lowland
 import math
+import numpy as np
 import scipy.stats as stats
 import pytest
 import random
@@ -28,7 +29,7 @@ def reset_carnivore_params():
     yield Carnivore.set_params(Carnivore.p)
 
 
-def formula_z_test(N, p, n):
+def phi_z_test(N, p, n):
     """
     Formula for the z-test used in tests
     """
@@ -139,7 +140,7 @@ class TestAnimal:
         See https://en.wikipedia.org/wiki/Z-test.
 
         Assuming low fitness of animals such that omega can be interpreted as an approximation of
-        the death probability.
+        the death probability. Testing with different values of omega
         We compute the number of dead animals returned by our death function from class Animal.
         Then we compare this value to the mean of dead animals derived from a fixed probability.
 
@@ -150,63 +151,37 @@ class TestAnimal:
         significant and we reject the null hypothesis.
         """
         random.seed(123)
-        # High age gives low fitness
+        # High age ensures low fitness
         herb = Herbivore(age=100, weight=10)
         # with low fitness we assume that the death probability is the same as omega
-        # set parameters
-        print(omega_dict)
         herb.set_params(omega_dict)
-        fitness_herbs = [herb.fitness for _ in range(100)]
-        print("fitness of herbs", fitness_herbs)
         # death probability set equal to omega
         p = Herbivore.p["omega"]
         # Number of animals
         N = 1000
         # Number of dead animals
         n = sum(herb.death() for _ in range(N))
-        print("n is", n)
-        # print([b.death() for _ in range(10)])
-        print("formula phi is", formula_z_test(N, p, n))
-        mean = N * p
-        print("mean is", mean)
-        var = N * p * (1-p)
-        print("var is", var)
-        Z = (n-mean) / math.sqrt(var)
-        phi = 2 * stats.norm.cdf(-abs(Z))
-        assert phi > TestAnimal.alpha
-        print("phi", phi)
+        # Performing the z-test
+        assert phi_z_test(N, p, n) > TestAnimal.alpha
 
     @pytest.mark.parametrize("birth_dict", [{"w_birth": 8.0, "sigma_birth": 1.5},
-                                            {"w_birth": 5.0, "sigma_birth": 7.5}])
+                                            {"w_birth": 6.0, "sigma_birth": 1.0},
+                                            {"w_birth": 7.0, "sigma_birth": 1.5}])
     def test_mean_birth_weight(self, birth_dict, reset_herbivore_params):
-        """
-        Same type as above. But with exact value of variance
+        """ Test that the birth weight of animals are normal distributed using the kstest
+        https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.normaltest.html
 
-        Test that the birth weight of animals have a mean
-        as specified in the animals parameter dictionary.
+        Null hypothesis: The birth weight of the animal is normally distributed
+        Alternative hypothesis: The birth weight are not normally distributed.
 
-        Null hypothesis: The birth weight of the animal is returned correctly.
-        Alternative hypothesis: The mean of the birth weight is not significant. The birth weight
-        of the animal is not returned correctly. The observed mean birth weight has a p-value
-        less than the significance level. We reject are null hypothesis if the difference between
-        our computed mean and the sample mean is large.
+        We keep the null hypothesis if the p-value is larger than the significance level alpha
         """
         random.seed(123)
         N = 1000
         Herbivore.set_params(birth_dict)
-        n = sum(Herbivore(age=5, weight=50).birth_weight for _ in range(N))
-        print("n is", n)
-        # Theoretical mean
-        p = Herbivore.p["w_birth"]
-        mean = N * p
-        print("mean is", mean)
-        # Since the standard deviation is known, we can write the variance as
-        var = (Herbivore.p["sigma_birth"]**2) * N
-        print(var)
-        Z = (n - mean) / math.sqrt(var)
-        phi = 2 * stats.norm.cdf(-abs(Z))
+        herb_birth_weights = [Herbivore(age=5, weight=20).birth_weight for _ in range(N)]
+        k2, phi = stats.normaltest(herb_birth_weights)
         assert phi > TestAnimal.alpha
-        print("phi", phi)
 
     def test_certain_birth(self, mocker, reset_herbivore_params):
         """
@@ -215,7 +190,7 @@ class TestAnimal:
         Then as long as weight is not zero. give_birth function shall return True.
 
         """
-        herb = Herbivore(weight=80, age=5)
+        herb = Herbivore(weight=800, age=5)
         num_herbs = 10
         mocker.patch("random.random", return_value=0)
         give_birth, _ = herb.give_birth(num_herbs)
@@ -226,8 +201,13 @@ class TestAnimal:
                                             {"gamma": 0.6},
                                             {"gamma": 0.8}])
     def test_give_birth(self, gamma_dict, reset_herbivore_params):
-        """Test that for animals with fitness close to one, and two same animals of one specie in
-          a cell. The birth function should be well approximated by the parameter gamma."""
+        """Test that for animals with fitness close to one, and two animals of same type one specie
+        in a cell. The give_birth function should be well approximated by the parameter gamma.
+        An we test this against our function.
+
+        Null hypothesis: The give_birth function is well approximated by the gamma parameter
+        Alternative hypothesis: We reject the null hypothesis if the value is to far away from
+        """
 
         random.seed(123)
         N = 1000
