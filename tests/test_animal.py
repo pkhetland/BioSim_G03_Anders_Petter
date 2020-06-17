@@ -144,7 +144,6 @@ class TestAnimal:
         Alternative hypothesis: The number of dead animals returned is not statistically
         significant and we reject the null hypothesis.
         """
-        # Task: Import seed from BioSim
         random.seed(123)
         # High age gives low fitness
         herb = Herbivore(age=100, weight=10)
@@ -166,7 +165,35 @@ class TestAnimal:
         mean = N * p
         print("mean is", mean)
         var = N * p * (1-p)
+        print("var is", var)
         Z = (n-mean) / math.sqrt(var)
+        phi = 2 * stats.norm.cdf(-abs(Z))
+        assert phi > TestAnimal.alpha
+        print("phi", phi)
+
+    def test_mean_birth_weight(self):
+        """
+        Test that the birth weight of animals have a mean
+        as specified in the animals parameter dictionary.
+
+        Null hypothesis: The birth weight of the animal is returned correctly.
+        Alternative hypothesis: The mean of the birth weight is not significant. The birth weight
+        of the animal is not returned correctly. The observed mean birth weight has a p-value
+        less than the significance level. We reject are null hypothesis if the difference between
+        our computed mean and the sample mean is large.
+        """
+        N = 1000
+        herb1 = Herbivore(age=5, weight=50)
+        n = sum(herb1.birth_weight for _ in range(N))
+        print("n is", n)
+        # Theoretical mean
+        p = Herbivore.p["w_birth"]
+        mean = N * p
+        print("mean is", mean)
+        # Theoretical variance
+        var = (Herbivore.p["sigma_birth"]**2) * N
+        print(var)
+        Z = (n - mean) / math.sqrt(var)
         phi = 2 * stats.norm.cdf(-abs(Z))
         assert phi > TestAnimal.alpha
         print("phi", phi)
@@ -269,8 +296,7 @@ class TestCarnivore:
         Test kill prey. With a high fitness diff the carnivore will always kill the herbivore.
         """
         carn = Carnivore(age=5, weight=30)
-        herb = Herbivore(age=100, weight=50)
-        herb_list = [herb for _ in range(100)]
+        herb_list = [Herbivore(age=100, weight=50) for _ in range(100)]
         kill_count = 0
         for _ in herb_list:
             if carn.kill_prey(herb_list):
