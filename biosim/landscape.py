@@ -6,13 +6,8 @@ Lowland class for the simulation.
 
 import numpy as np
 import operator
-<<<<<<< HEAD:src/landscape.py
-    import random
-from src.animal import Herbivore, Carnivore
-=======
 import random
 from biosim.animal import Herbivore, Carnivore
->>>>>>> test_coverage_phase:biosim/landscape.py
 
 
 class Island:
