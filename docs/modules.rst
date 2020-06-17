@@ -1,5 +1,5 @@
-src
-===
+biosim
+======
 
 .. toctree::
    :maxdepth: 4

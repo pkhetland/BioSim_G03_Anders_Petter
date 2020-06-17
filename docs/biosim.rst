@@ -17,7 +17,7 @@ biosim.animal module
    :undoc-members:
    :show-inheritance:
 
-biosim.interface module
+interface module
 -----------------------
 
 .. automodule:: biosim.interface
@@ -25,7 +25,7 @@ biosim.interface module
    :undoc-members:
    :show-inheritance:
 
-biosim.landscape module
+landscape module
 -----------------------
 
 .. automodule:: biosim.landscape
@@ -33,7 +33,7 @@ biosim.landscape module
    :undoc-members:
    :show-inheritance:
 
-biosim.visualization module
+visualization module
 ---------------------------
 
 .. automodule:: biosim.visualization
