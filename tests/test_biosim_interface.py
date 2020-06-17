@@ -23,7 +23,7 @@ import glob
 import os
 import os.path
 
-from src.biosim import BioSim
+from biosim.biosim import BioSim
 
 
 def test_empty_island():

@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-from src.animal import Herbivore, Carnivore
-from src.landscape import Island
-from src.visualization import Plotting
+from biosim.animal import Herbivore, Carnivore
+from biosim.landscape import Island
+from biosim.visualization import Plotting
 
 import random as random
 import numpy as np
@@ -14,7 +14,34 @@ from threading import Thread
 
 
 class BioSim:
-    """Main BioSim class for running simulations"""
+    """Main interface class for completing simulations and setting parameters.
+
+            :param island_map: Multi-line string specifying island geography
+            :param ini_pop: List of dictionaries specifying initial population
+            :param seed: Integer used as random number seed
+            :param ymax_animals: Number specifying y-axis limit for graph showing animal numbers
+            :param cmax_animals: Dict specifying color-code limits for animal densities
+            :param hist_specs: Specifications for histograms, see below
+            :param img_base: String with beginning of file name for figures, including path
+            :param img_fmt: String with file type for figures, e.g. 'png'
+
+            If ymax_animals is None, the y-axis limit should be adjusted automatically.
+            If cmax_animals is None, sensible, fixed default values should be used.
+            cmax_animals is a dict mapping species names to numbers, e.g.,
+            {'Herbivore': 50, 'Carnivore': 20}.
+
+            hist_specs is a dictionary with one entry per property for which a histogram shall be shown.
+            For each property, a dictionary providing the maximum value and the bin width must be
+            given, e.g.,
+            {'weight': {'max': 80, 'delta': 2}, 'fitness': {'max': 1.0, 'delta': 0.05}}
+            Permitted properties are 'weight', 'age', 'fitness'.
+
+            If img_base is None, no figures are written to file.
+            Filenames are formed as
+            '{}_{:05d}.{}'.format(img_base, img_no, img_fmt)
+            where img_no are consecutive image numbers starting from 0.
+            img_base should contain a path and beginning of a file name.
+            """
 
     def __init__(
             self,
@@ -26,32 +53,8 @@ class BioSim:
             hist_specs=None,
             img_base=None,
             img_fmt="png",
-            plot_graph=False,
+            plot_graph=True,
     ):
-        """
-        :param island_map: Multi-line string specifying island geography
-        :param ini_pop: List of dictionaries specifying initial population
-        :param seed: Integer used as random number seed
-        :param ymax_animals: Number specifying y-axis limit for graph showing animal numbers
-        :param cmax_animals: Dict specifying color-code limits for animal densities
-        :param hist_specs: Specifications for histograms, see below
-        :param img_base: String with beginning of file name for figures, including path
-        :param img_fmt: String with file type for figures, e.g. 'png'
-        If ymax_animals is None, the y-axis limit should be adjusted automatically.
-        If cmax_animals is None, sensible, fixed default values should be used.
-        cmax_animals is a dict mapping species names to numbers, e.g.,
-        {'Herbivore': 50, 'Carnivore': 20}
-        hist_specs is a dictionary with one entry per property for which a histogram shall be shown.
-        For each property, a dictionary providing the maximum value and the bin width must be
-        given, e.g.,
-        {'weight': {'max': 80, 'delta': 2}, 'fitness': {'max': 1.0, 'delta': 0.05}}
-        Permitted properties are 'weight', 'age', 'fitness'.
-        If img_base is None, no figures are written to file.
-        Filenames are formed as
-        '{}_{:05d}.{}'.format(img_base, img_no, img_fmt)
-        where img_no are consecutive image numbers starting from 0.
-        img_base should contain a path and beginning of a file name.
-        """
 
         if island_map is None:  # Set default map if none is provided
             map_str = """WWW\nWLW\nWWW"""  # Set default map str
@@ -106,9 +109,21 @@ class BioSim:
         self._island.set_landscape_params(landscape, params)
 
     def add_population(self, population):
-        """Add a population to specific island cells by providing a list of dictionaries.
+        """Add a population to specific `island` cells by providing a list of dictionaries.
 
         :param population: List of dictionaries specifying population
+
+        :Example:
+            .. code-block:: python
+
+                 example_pop = {
+                    'loc': (4,4),
+                    'pop': [
+                        {'species': 'Herbivore', 'age': 2, 'weight': 60},
+                        {'species': 'Herbivore', 'age': 9, 'weight': 30},
+                        {'species': 'Herbivore', 'age': 16, 'weight': 14}
+                    ]
+                }
         """
         if type(population) == list:
             for loc_dict in population:  # This loop will be replaced with a more elegant iteration
@@ -126,10 +141,14 @@ class BioSim:
             )
 
     def feeding(self, cell):
-        """Iterates through each animal in the cell and feeds it according to species
+        """Iterates through each animal in the cell and feeds it according to species.
 
-        :param cell: Current cell object
+        :param cell: Current cell object where animals should be fed
         :type cell: object
+
+        .. note::
+            `Herbivore` instances will call `eat_fodder` method, while `Carnivore` instances will call
+            `eat_prey` method.
         """
         cell.fodder = cell.f_max()
         # Randomize animals before feeding
@@ -171,17 +190,12 @@ class BioSim:
         self._island.count_animals(num_herbs=len(new_herbs), num_carns=len(new_carns))
 
     def migrate(self, cell):
-        """Iterates through each animal in the cell and migrates
+        """Iterates through each animal in the cell and runs migrate process.
+        Animals will only migrate once due to the `has_moved` property.
 
-        :param loc: Coordinate of current cell
-        :type loc: tuple
         :param cell: Current cell object
         :type cell: object
-        :param all_migrated_animals: Updated list of animals that have migrated the current year
-        :type all_migrated_animals: list
         """
-        # Define neighbor cells once:
-
         migrated_animals = []
         for animal in cell.animals:
             if not animal.has_moved and animal.migrate():
@@ -196,8 +210,19 @@ class BioSim:
         cell.reset_animals()
 
     def run_year_cycle(self):
-        """
-        Runs through each of the 6 yearly seasons for all cells
+        """Runs through each of the 6 yearly seasons for all cells.
+
+        - Step 1: Animals feed
+        - Step 2: Animals procreate
+        - Step 3: Animals migrate
+        - Step 4: Animals age
+        - Step 5: Animals lose weight
+        - Step 6: Animals die
+
+        .. seealso::
+            - `biosim.feeding`
+            - `biosim.procreation`
+            - `biosim.migrate`
         """
         for loc, cell in self._island.land_cells.items():
             #  1. Feeding
@@ -230,12 +255,20 @@ class BioSim:
         self._year += 1  # Add year to simulation
 
     def simulate(self, num_years, vis_years=1, img_years=None):
-        """
-        Run simulation while visualizing the result.
+        """Run simulation while visualizing the result.
+
         :param num_years: number of years to simulate
         :param vis_years: years between visualization updates
         :param img_years: years between visualizations saved to files (default: vis_years)
-        Image files will be numbered consecutively.
+
+        .. note::
+            When `plot_graph` is set to `True`, plots are initiated and updated. Setting`plot_graph` to `False`
+                allows the user to run simulations faster.
+            Image files will be numbered consecutively and used for creating mp4-files.
+
+        .. seealso::
+            - `biosim.run_year_cycle`
+            - `visualization` module
         """
         start_time = time.time()
         self._year_target += num_years
@@ -256,10 +289,12 @@ class BioSim:
 
         for _ in range(num_years):
             self.run_year_cycle()
-            print(f"Year: {self._year}")
-            print(f"Animals: {self._island.num_animals}")
-            print(f"Herbivores: {self._island.num_herbs}")
-            print(f"Carnivore: {self._island.num_carns}")
+
+            if not self._plot_bool:  # Results are printed if visualization is disabled r
+                print(f'Year: {self._year}')
+                print(f'Total animal count: {self.num_animals}')
+                print(f'Species count: {self.num_animals_per_species}')
+
             if self._plot_bool:
                 self._plot.y_herb[self._year] = self._island.num_herbs
                 self._plot.y_carn[self._year] = self._island.num_carns
@@ -280,21 +315,39 @@ class BioSim:
 
         print("Simulation complete.")
         print("Elapsed time: {:.6} seconds".format(finish_time - start_time))
-        # input('Press enter to continue')
 
     @property
     def year(self):
-        """Last year simulated."""
+        """ Last year simulated to be used in plotting and counting.
+
+        :return: Last year simulated
+        :rtype: int
+        """
         return self._year
 
     @property
     def num_animals(self):
-        """Total number of animals on island."""
+        """Total number of animals on island.
+
+        :return: Total number of animals in `Island` instance
+        :rtype: int
+        """
         return self._island.num_animals
 
     @property
     def num_animals_per_species(self):
-        """Number of animals per species in island, as dictionary."""
+        """Number of animals per species in island
+
+        :return: Number of `herbivores` and `carnivores` on island
+        :rtype: dict
+
+        :Example:
+            Returned dict example:
+
+            .. code-block:: python
+
+                {'Herbivore': 255, 'Carnivore': 105}
+        """
         return {"Herbivore": self._island.num_herbs, "Carnivore": self._island.num_carns}
 
     # def make_movie(self):

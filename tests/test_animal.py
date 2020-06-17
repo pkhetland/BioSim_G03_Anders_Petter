@@ -3,8 +3,8 @@
 """
 Tests for animal class.
 """
-from src.animal import Herbivore, Carnivore, Animal
-from src.landscape import Lowland
+from biosim.landscape import Lowland
+from biosim.animal import Herbivore, Carnivore
 import math
 import scipy.stats as stats
 import pytest

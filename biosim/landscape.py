@@ -7,7 +7,7 @@ Lowland class for the simulation.
 import numpy as np
 import operator
 import random
-from src.animal import Herbivore, Carnivore
+from biosim.animal import Herbivore, Carnivore
 
 
 class Island:
