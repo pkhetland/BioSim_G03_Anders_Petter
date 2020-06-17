@@ -3,13 +3,12 @@
 """
 Tests for animal class.
 """
-from src.animal import Herbivore, Carnivore, Animal
+from src.animal import Herbivore, Carnivore
 from src.landscape import Lowland
 import math
 import scipy.stats as stats
 import pytest
 import random
-import numpy as np
 
 
 @pytest.fixture

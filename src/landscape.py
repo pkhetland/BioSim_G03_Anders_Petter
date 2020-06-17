@@ -6,7 +6,7 @@ Lowland class for the simulation.
 
 import numpy as np
 import operator
-import random
+    import random
 from src.animal import Herbivore, Carnivore
 
 
