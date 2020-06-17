@@ -203,10 +203,11 @@ class TestAnimal:
     def test_give_birth(self, gamma_dict, reset_herbivore_params):
         """Test that for animals with fitness close to one, and two animals of same type one specie
         in a cell. The give_birth function should be well approximated by the parameter gamma.
-        An we test this against our function.
+        An we test this against our function under the significance level alpha.
 
-        Null hypothesis: The give_birth function is well approximated by the gamma parameter
-        Alternative hypothesis: We reject the null hypothesis if the value is to far away from
+        Null hypothesis: The give_birth function returns correct with fixed gamma
+        Alternative hypothesis: The give_birth function does not return correct. We reject our
+        null hypothesis.
         """
 
         random.seed(123)
@@ -217,14 +218,8 @@ class TestAnimal:
         list_birth = [Herbivore(weight=200, age=5).give_birth(num_herbs) for _ in range(N)]
         # number when births return True
         n = sum([item[0] for item in list_birth])
-        print("n is", n)
         mean = N * p
-        print(mean)
-        var = N * p * (1 - p)
-        Z = (n - mean) / math.sqrt(var)
-        phi = 2 * stats.norm.cdf(-abs(Z))
-        print(phi)
-        assert phi > TestAnimal.alpha
+        assert phi_z_test(N, p, n) > TestAnimal.alpha
 
 
 
