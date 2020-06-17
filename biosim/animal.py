@@ -189,7 +189,7 @@ class Animal:
         return: array: weight_dist, Standard normal distribution of birth weights
 
         """
-        birth_weight = np.random.normal(self.p["w_birth"], self.p["sigma_birth"])
+        birth_weight = random.gauss(self.p["w_birth"], self.p["sigma_birth"])
         return birth_weight
 
 
