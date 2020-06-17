@@ -85,8 +85,8 @@ class BioSim:
 
     @staticmethod
     def set_animal_parameters(species, params):
-        """
-        Set parameters for animal species.
+        """Set parameters for animal species.
+
         :param species: String, name of animal species
         :param params: Dict with valid parameter specification for species
         """
@@ -106,7 +106,7 @@ class BioSim:
         self._island.set_landscape_params(landscape, params)
 
     def add_population(self, population):
-        """Add a population to the island
+        """Add a population to specific island cells by providing a list of dictionaries.
 
         :param population: List of dictionaries specifying population
         """

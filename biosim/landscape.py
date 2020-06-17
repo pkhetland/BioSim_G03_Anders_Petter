@@ -180,7 +180,7 @@ class Island:
 
         :param map_str: A multi-line string representing cell classes and coordinates
         :type map_str: str
-        ...
+            ...
         :return: The landscape for the simulation with initiated landscape classes
         :rtype: dict
         """
