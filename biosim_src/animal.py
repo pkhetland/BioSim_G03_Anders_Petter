@@ -5,6 +5,7 @@ __email__ = "anders.molmen.host@nmbu.no, petter.storesund.hetland@nmbu.no"
 
 import random as random
 from math import e
+import numpy as np
 
 
 class Animal:
