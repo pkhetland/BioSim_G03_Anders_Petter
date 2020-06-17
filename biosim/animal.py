@@ -157,7 +157,6 @@ class Animal:
             return True
         else:
             return False
-        # return np.random.choice([True, False], p=[move_prob, 1 - move_prob])
 
     def lose_weight(self):
         """Animals lose weight based on parameter eta

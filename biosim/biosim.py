@@ -123,7 +123,7 @@ class BioSim:
                         {'species': 'Herbivore', 'age': 9, 'weight': 30},
                         {'species': 'Herbivore', 'age': 16, 'weight': 14}
                     ]
-                }
+                 }
         """
         if type(population) == list:
             for loc_dict in population:  # This loop will be replaced with a more elegant iteration
@@ -262,13 +262,16 @@ class BioSim:
         :param img_years: years between visualizations saved to files (default: vis_years)
 
         .. note::
-            When `plot_graph` is set to `True`, plots are initiated and updated. Setting`plot_graph` to `False`
+
+            - When `plot_graph` is set to `True`, plots are initiated and updated. Setting`plot_graph` to `False`
                 allows the user to run simulations faster.
-            Image files will be numbered consecutively and used for creating mp4-files.
+            - Image files will be numbered consecutively and used for creating mp4-files.
 
         .. seealso::
+
             - `biosim.run_year_cycle`
             - `visualization` module
+
         """
         start_time = time.time()
         self._year_target += num_years
@@ -336,7 +339,7 @@ class BioSim:
 
     @property
     def num_animals_per_species(self):
-        """Number of animals per species in island
+        """Number of animals per species in island.
 
         :return: Number of `herbivores` and `carnivores` on island
         :rtype: dict
