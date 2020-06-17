@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-from biosim.animal import Herbivore, Carnivore
-from biosim.landscape import Island
-from biosim.visualization import Plotting
+from biosim_src.animal import Herbivore, Carnivore
+from biosim_src.landscape import Island
+from biosim_src.visualization import Plotting
 
 import random as random
 import numpy as np
@@ -153,11 +153,11 @@ class BioSim:
         # Randomize animals before feeding
         cell.randomize_herbs()
 
-        for herb in cell.herbivores:  # Herbivores eat first
+        for herb in cell.herbivores:  # Herbivores eat first in random order
             if cell.fodder > 0:
                 herb.eat_fodder(cell)
 
-        for carn in cell.carnivores:  # Carnivores eat last
+        for carn in cell.sorted_carnivores:  # Carnivores eat last, stronger animals first
             herbs_killed = carn.kill_prey(cell.sorted_herbivores)  # Carnivore hunts for herbivores
             cell.remove_animals(herbs_killed)  # Remove killed animals from cell
             self._island.del_animals(num_herbs=len(herbs_killed))
@@ -188,7 +188,8 @@ class BioSim:
 
         self._island.count_animals(num_herbs=len(new_herbs), num_carns=len(new_carns))
 
-    def migrate(self, cell):
+    @staticmethod
+    def migrate(cell):
         """Iterates through each animal in the cell and runs migrate process.
         Animals will only migrate once due to the `has_moved` property.
 
@@ -219,9 +220,9 @@ class BioSim:
         - Step 6: Animals die
 
         .. seealso::
-            - `biosim.feeding`
-            - `biosim.procreation`
-            - `biosim.migrate`
+            - `biosim_src.feeding`
+            - `biosim_src.procreation`
+            - `biosim_src.migrate`
         """
         for loc, cell in self._island.land_cells.items():
             #  1. Feeding
@@ -268,7 +269,7 @@ class BioSim:
 
         .. seealso::
 
-            - `biosim.run_year_cycle`
+            - `biosim_src.run_year_cycle`
             - `visualization` module
 
         """

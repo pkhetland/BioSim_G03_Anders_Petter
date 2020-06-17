@@ -11,16 +11,17 @@ import numpy as np
 class Animal:
     """Super class for Herbivores and Carnivores.
 
+    **Subclasses**:
+        - Herbivore class
+        - Carnivore class
+
+    :param weight: Weight of animal
+    :type weight: float
+    :param age: Age of animal
+    :type age: int
     """
 
     def __init__(self, weight, age):
-        """Initialize the animal class
-
-        :param weight: Weight of animal
-        :type weight: float
-        :param age: Age of animal
-        :type age: int
-        """
         if weight is None:
             self._weight = self.birth_weight
         else:
@@ -31,11 +32,19 @@ class Animal:
         self._death_prob = None
         self.has_moved = False
 
+        self._fitness = None
+        self._fitness_valid = False
+
     @classmethod
     def set_params(cls, new_params):
-        """Set parameter for animal classes.
+        """Set parameters for animal classes.
 
-        :param new_params: dict
+        :param new_params: New parameters to be set to the class params
+        :type new_params: dict
+
+        .. seealso::
+            - `biosim.set_animal_parameters`
+
         """
         for key in new_params:
             if key not in cls.p:
@@ -49,11 +58,10 @@ class Animal:
 
     @classmethod
     def get_params(cls):
-        """
-        Getter function for the set parameter method
+        """Getter function for the class parameters.
 
-        :return dictionary with parameters
-        :r_type: dict
+        :return: Dictionary with current parameters for class
+        :rtype: dict
         """
         return cls.p
 
@@ -140,6 +148,7 @@ class Animal:
             birth_weight = self.birth_weight
             if birth_weight < self.weight:
                 self.weight -= self.p["xi"] * birth_weight
+                self._fitness_valid = False  # Signal that saved fitness is incorrect
                 return True, birth_weight
             else:
                 return False, None
@@ -163,6 +172,7 @@ class Animal:
         :param eta: from dictionary p of parameters
         """
         self.weight -= self.weight * self.p["eta"]
+        self._fitness_valid = False  # Signal that saved fitness is incorrect
 
     def death(self):
         """Return true when called if the animal is to be removed from the simulation
@@ -198,9 +208,13 @@ class Animal:
         :r_type: int
 
         """
-        return self.q(+1, self.age, self.p["a_half"], self.p["phi_age"]) * self.q(
-            -1, self.weight, self.p["w_half"], self.p["phi_weight"]
-        )
+        if self._fitness is None or not self._fitness_valid:
+            self._fitness = self.q(+1, self.age, self.p["a_half"], self.p["phi_age"]) * self.q(
+                -1, self.weight, self.p["w_half"], self.p["phi_weight"]
+            )
+            self._fitness_valid = True
+
+        return self._fitness
 
     @property
     def birth_weight(self):
@@ -219,9 +233,10 @@ class Animal:
 
 
 class Herbivore(Animal):
+    """
 
-    # Dictionary of parameters belonging to the Herbivore class
-    p = {
+    """
+    p = {  # Dictionary of parameters belonging to the Herbivore class
         "w_birth": 8.0,
         "sigma_birth": 1.5,
         "beta": 0.9,
@@ -257,6 +272,7 @@ class Herbivore(Animal):
             self.weight += self.p["beta"] * cell.fodder  # Eat fodder
             cell.fodder = 0  # Sets fodder to zero.
 
+        self._fitness_valid = False  # Signal that saved fitness is incorrect
 
 class Carnivore(Animal):
     """
@@ -289,6 +305,8 @@ class Carnivore(Animal):
 
         :param sorted_herbivores: Herbivores sorted by fitness levels from low to high
         :type sorted_herbivores: list
+        :param carn_fitness:
+        :type sorted_herbivores: list
             ...
         :return: Animals killed by herbivore to be removed from simulation
         :rtype: list
@@ -299,7 +317,7 @@ class Carnivore(Animal):
 
         for herb in sorted_herbivores:
             if consumption_weight < self.p["F"]:
-                fitness_diff = fitness - herb.fitness
+                fitness_diff = fitness - herb[1]
                 if fitness_diff <= 0:
                     kill_prey = False
 
@@ -311,10 +329,11 @@ class Carnivore(Animal):
                     kill_prey = True
 
                 if kill_prey:  # If the herb is killed
+                    self._fitness_valid = False  # Signal that saved fitness is incorrect
                     consumption_weight += (
-                        herb.weight
+                        herb[0].weight
                     )  # Add herb weight to consumption_weight variable
-                    herbs_killed.append(herb)
+                    herbs_killed.append(herb[0])
             else:
                 continue
 

@@ -7,7 +7,7 @@ Lowland class for the simulation.
 import numpy as np
 import operator
 import random
-from biosim.animal import Herbivore, Carnivore
+from biosim_src.animal import Herbivore, Carnivore
 
 
 class Island:
@@ -581,26 +581,28 @@ class LandscapeCell:
         return len(self.carnivores)
 
     @property
-    def sorted_carnivores(self):  # Will probably be moved to landscape classes
+    def sorted_carnivores(self):
         """Sorts all `carnivores` by `fitness` from higher to lower.
 
-        :return: Sorted carnivores
+        :return: Sorted carnivores and corresponding fitness
         :rtype: list
         """
-        fitness_dict = dict([(carn, carn.fitness) for carn in self.carnivores])
+        fitness_dict = {carn: carn.fitness for carn in self.carnivores}
+        sorted_tuples = dict(sorted(fitness_dict.items(), key=lambda x: x[1], reverse=True))
 
-        return sorted(object=fitness_dict, key=lambda x: x[1], reverse=True)
+        return sorted_tuples.keys()
 
     @property
     def sorted_herbivores(self):
         """Sorts all `herbivores` by `fitness` from lower to higher.
 
-        :return: Sorted herbivores
-        :rtype: list
+        :return: Sorted herbivores and corresponding fitness values
+        :rtype: List of tuples
         """
-        fitness_dict = dict([(herb, herb.fitness) for herb in self.herbivores])
+        fitness_dict = {herb: herb.fitness for herb in self.herbivores}
+        sorted_tuples = sorted(fitness_dict.items(), key=lambda x: x[1], reverse=False)
 
-        return sorted(object=fitness_dict, key=lambda x: x[1], reverse=False)
+        return sorted_tuples
 
     @property
     def is_empty(self):

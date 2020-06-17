@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-A collection of plotting functions for biosim.py
+A collection of plotting functions for biosim_src.py
 
 Needs to be cleaned up and improved (especially histograms)
 """

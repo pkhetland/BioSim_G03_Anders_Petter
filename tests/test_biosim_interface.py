@@ -4,7 +4,7 @@
 Test set for BioSim class interface for INF200 June 2020.
 
 This set of tests checks the interface of the BioSim class to be provided by
-the simulation module of the biosim package.
+the simulation module of the biosim_src package.
 
 Notes:
      - The BioSim class should pass all tests in this set.
