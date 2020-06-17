@@ -126,7 +126,6 @@ class TestAnimal:
         herbivore.weight = 0
         assert herbivore.death()
 
-
     @pytest.mark.parametrize("omega_dict", [{"omega": 0.6}, {"omega": 0.4}])
     def test_death_z_test(self, reset_herbivore_params, omega_dict):
 
@@ -266,7 +265,46 @@ class TestCarnivore:
         assert isinstance(carn, Carnivore)
 
     def test_kill_prey(self):
-        carn = Carnivore(age=5, weight=900)
-        killed_herbivores = carn.kill_prey([Herbivore(age=10, weight=1),
-                                            Herbivore(age=5, weight=80)])
-        assert len(killed_herbivores) > 0
+        """
+        Test kill prey. With a high fitness diff the carnivore will always kill the herbivore.
+        """
+        carn = Carnivore(age=5, weight=30)
+        herb = Herbivore(age=100, weight=50)
+        herb_list = [herb for _ in range(100)]
+        kill_count = 0
+        for _ in herb_list:
+            if carn.kill_prey(herb_list):
+                kill_count += 1
+        assert kill_count == 100
+
+    @pytest.mark.parametrize("params", [{"beta": 0.75, "DeltaPhiMax": 0.1}])
+    def test_weight_gain(self, reset_carnivore_params, reset_herbivore_params, params):
+        """
+        Testing weight gain of carnivores. Assuming they have access to more fodder than they
+        will eat. Making old heavy herbivores with low fitness. Carnivores should add beta * F
+        weight
+        Assuming fitness diff is larger than DeltaPhiMax such that the carnivore always kills
+        the herbivore.
+        """
+        carn = Carnivore(age=5, weight=40)
+        herb = Herbivore(age=100, weight=200)
+        # number of herbivores
+        N = 1000
+        herb_list = [herb for _ in range(N)]
+        kill_count = 0
+        initial_weight = carn.weight
+        print(initial_weight)
+        for _ in herb_list:
+            if carn.kill_prey(herb_list):
+                kill_count += 1
+
+        new_weight = carn.weight
+        n = kill_count
+        print(new_weight)
+        print(carn.p["beta"]*carn.p["F"])
+        assert new_weight == initial_weight +carn.p["beta"]*carn.p["F"]
+        # Assertion fails, weight is added for all herbivores.
+
+
+
+
