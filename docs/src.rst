@@ -1,21 +1,18 @@
 src package
 ===========
 
-Submodules
-----------
+src.biosim module
+-----------------
+
+.. automodule:: src.biosim
+   :members:
+   :undoc-members:
+   :show-inheritance:
 
 src.animal module
 -----------------
 
 .. automodule:: src.animal
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-src.biosim module
------------------
-
-.. automodule:: src.biosim
    :members:
    :undoc-members:
    :show-inheritance:
@@ -40,15 +37,6 @@ src.visualization module
 ------------------------
 
 .. automodule:: src.visualization
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-
-Module contents
----------------
-
-.. automodule:: src
    :members:
    :undoc-members:
    :show-inheritance:
