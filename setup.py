@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="Biosim-G03-Anders-Petter", # Replace with your own username
-    version="0.0.1",
+    version="0.1.0",
     author="Anders Høst; Petter Hetland",
     description="Exam package for INF200 biosim_src project",
     long_description=long_description,

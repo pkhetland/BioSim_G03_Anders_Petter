@@ -233,7 +233,7 @@ class Animal:
 
         .. math::
 
-            q^{+-}(x, x_{\dfrac{1}{2}}, phi) = 1 / (1 + e^{+-phi(x - x_{\dfrac{1}{2}})})
+            q^{+-}(x, x_{half}, \phi) = \dfrac{1}{1 + e^{+-\phi(x - x_{half})}}
 
         """
         return 1.0 / (1.0 + e ** (sgn * phi * (x - x_half)))
@@ -247,7 +247,10 @@ class Animal:
 
         .. math::
 
-            phi = 0 if w <= 0 else q^+ (a, a_(1/2), phi_age) * q^- (w, w_(1/2), phi_weight)
+            \phi_{animal} = q^{+} (a, a_{half}, \phi_{age}) * q^{-} (w, w_{half}, \phi_{weight})
+
+        .. note::
+            If animal weight is <= 0, fitness is set to 0 regardless.
 
         """
         if self._fitness is None or not self._fitness_valid:

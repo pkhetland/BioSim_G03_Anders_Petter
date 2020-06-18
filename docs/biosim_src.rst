@@ -1,8 +1,14 @@
 biosim package
 ==============
 
-biosim.biosim module
---------------------
+The biosim package contains four modules:
+    - biosim
+    - landscape
+    - animal
+    - visualization
+
+biosim module
+--------------
 
 .. automodule:: biosim_src.biosim
    :members:
@@ -17,7 +23,7 @@ landscape module
    :undoc-members:
    :show-inheritance:
 
-biosim.animal module
+animal module
 --------------------
 
 .. automodule:: biosim_src.animal
