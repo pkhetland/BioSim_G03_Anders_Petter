@@ -124,8 +124,11 @@ class TestHighlandLandscapeCell:
         """
         highland_cell.add_animals([Herbivore(weight=50), Herbivore(weight=20)])
         highland_cell.add_animals([Carnivore(weight=25), Carnivore(weight=40)])
-        assert highland_cell.sorted_herbivores == highland_cell.herbivores[::-1]
-        assert highland_cell.sorted_carnivores == highland_cell.carnivores[::-1]
+        sorted_herbivores = highland_cell.sorted_herbivores  highland_cell.herbivores[::-1]
+        highland_cell.sorted_carnivores == highland_cell.carnivores[::-1]
+
+        assert
+        assert
 
     def test_is_empty(self, highland_cell):
         """
