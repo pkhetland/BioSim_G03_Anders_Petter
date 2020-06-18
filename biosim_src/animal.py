@@ -372,6 +372,7 @@ class Carnivore(Animal):
             - BioSim.feeding
             - Herbivore.eat_fodder
             - LandscapeCell.sorted_herbivores
+
         """
         consumption_weight = 0
         herbs_killed = []

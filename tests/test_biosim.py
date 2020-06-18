@@ -10,9 +10,9 @@ import glob
 import os
 import os.path
 
-from biosim.animal import Herbivore, Carnivore
-from biosim.biosim import BioSim
-from biosim.landscape import Lowland, Highland
+from biosim_src.animal import Herbivore, Carnivore
+from biosim_src.biosim import BioSim
+from biosim_src.landscape import Lowland, Highland
 
 
 class TestBioSim:
@@ -174,7 +174,6 @@ class TestBioSim:
         biosim_with_animals.simulate(num_years=500, vis_years=1, img_years=None)
         assert biosim_with_animals.year == 500
 
-
     def test_simulate_extreme(self, biosim_with_animals):
         """
         :method: Biosim.simulate II
@@ -182,7 +181,7 @@ class TestBioSim:
         Test that certain chance of killing prey is 1 if DeltaPhiMax is triggered in kill_preys
         """
         biosim_with_animals.set_animal_parameters('Carnivore', {'DeltaPhiMax': 0.7})
-        biosim_with_animals.simulate(num_years=100, vis_years=1, img_years=None)
+        biosim_with_animals.simulate(num_years=100, vis_years=1, img_years=None, plot_graph=False)
 
     @pytest.fixture
     def figfile_root(self):
