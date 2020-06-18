@@ -320,9 +320,10 @@ class TestCarnivore:
         """
         carn = Carnivore(age=5, weight=30)
         herb_list = [Herbivore(age=100, weight=50) for _ in range(100)]
+        mock_sorted_list = [(herb, herb.fitness) for herb in herb_list]
         kill_count = 0
-        for _ in herb_list:
-            if carn.kill_prey(herb_list):
+        for _ in mock_sorted_list:
+            if carn.kill_prey(mock_sorted_list):
                 kill_count += 1
         assert kill_count == 100
 
@@ -339,8 +340,9 @@ class TestCarnivore:
         # number of herbivores
         N = 1000
         herb_list = [Herbivore(age=100, weight=200) for _ in range(N)]
+        mock_sorted_list = [(herb, herb.fitness) for herb in herb_list]
         initial_weight = carn.weight
-        _ = carn.kill_prey(herb_list)
+        _ = carn.kill_prey(mock_sorted_list)
         new_weight = carn.weight
         assert new_weight == initial_weight + carn.p["beta"] * carn.p["F"]
 
