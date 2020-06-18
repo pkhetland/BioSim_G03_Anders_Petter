@@ -90,7 +90,6 @@ class BioSim:
         self._img_fmt = img_fmt  # Format saved figures
 
         # Set seeds
-        np.random.seed(seed)  # Set numpy seed
         random.seed(seed)  # Seed python random seed
 
     @staticmethod
