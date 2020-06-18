@@ -4,7 +4,7 @@ biosim package
 biosim.biosim module
 --------------------
 
-.. automodule:: biosim.biosim
+.. automodule:: biosim_src.biosim
    :members:
    :undoc-members:
    :show-inheritance:
@@ -12,7 +12,7 @@ biosim.biosim module
 biosim.animal module
 --------------------
 
-.. automodule:: biosim.animal
+.. automodule:: biosim_src.animal
    :members:
    :undoc-members:
    :show-inheritance:
@@ -20,7 +20,7 @@ biosim.animal module
 interface module
 -----------------------
 
-.. automodule:: biosim.interface
+.. automodule:: biosim_src.interface
    :members:
    :undoc-members:
    :show-inheritance:
@@ -28,7 +28,7 @@ interface module
 landscape module
 -----------------------
 
-.. automodule:: biosim.landscape
+.. automodule:: biosim_src.landscape
    :members:
    :undoc-members:
    :show-inheritance:
@@ -36,7 +36,7 @@ landscape module
 visualization module
 ---------------------------
 
-.. automodule:: biosim.visualization
+.. automodule:: biosim_src.visualization
    :members:
    :undoc-members:
    :show-inheritance:

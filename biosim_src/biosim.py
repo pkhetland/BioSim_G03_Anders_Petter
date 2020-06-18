@@ -8,9 +8,22 @@ import random as random
 import numpy as np
 import time
 import os
+import subprocess
 # import ffmpeg
 from os import path
 
+# Update these variables to point to your ffmpeg and convert binaries
+# If you installed ffmpeg using conda or installed both softwares in
+# standard ways on your computer, no changes should be required.
+# _CONVERT_BINARY/magick is only needed if you want to create animated GIFs.
+_FFMPEG_BINARY = 'ffmpeg'
+_CONVERT_BINARY = 'magick'
+
+# update this to the directory and file-name beginning
+# for the graphics files
+_DEFAULT_GRAPHICS_DIR = os.path.join('..', 'data')
+_DEFAULT_GRAPHICS_NAME = 'dv'
+_DEFAULT_MOVIE_FORMAT = 'mp4'   # alternatives: mp4, gif
 
 class BioSim:
     """Main interface class for completing simulations and setting parameters.
@@ -356,14 +369,42 @@ class BioSim:
         """
         return {"Herbivore": self._island.num_herbs, "Carnivore": self._island.num_carns}
 
-    # def make_movie(self):
-    #     """Create MPEG4 movie from visualization images saved."""
-    #     pass
-    #     os.system(
-    #     f"ffmpeg -r 1 -i {self._img_base}_{self._year:05d}.png -vcodec mpeg4 -y movie.mp4")
-    #     (
-    #         ffmpeg
-    #             .input('/path/to/jpegs/*.jpg', pattern_type='glob', framerate=25)
-    #             .output('movie.mp4')
-    #             .run()
-    #     )
+    def make_movie(self, movie_fmt=_DEFAULT_MOVIE_FORMAT):
+        """
+        Creates MPEG4 movie from visualization images saved.
+
+        .. :note:
+            Requires ffmpeg
+
+        The movie is stored as img_base + movie_fmt
+        """
+
+        if self._img_base is None:
+            raise RuntimeError("No filename defined.")
+
+        if movie_fmt == 'mp4':
+            try:
+                # Parameters chosen according to http://trac.ffmpeg.org/wiki/Encode/H.264,
+                # section "Compatibility"
+                subprocess.check_call([_FFMPEG_BINARY,
+                                       '-i', '{}_%05d.png'.format(self._img_base),
+                                       '-y',
+                                       '-profile:v', 'baseline',
+                                       '-level', '3.0',
+                                       '-pix_fmt', 'yuv420p',
+                                       '{}.{}'.format(self._img_base,
+                                                      movie_fmt)])
+            except subprocess.CalledProcessError as err:
+                raise RuntimeError('ERROR: ffmpeg failed with: {}'.format(err))
+        elif movie_fmt == 'gif':
+            try:
+                subprocess.check_call([_CONVERT_BINARY,
+                                       '-delay', '1',
+                                       '-loop', '0',
+                                       '{}_*.png'.format(self._img_base),
+                                       '{}.{}'.format(self._img_base,
+                                                      movie_fmt)])
+            except subprocess.CalledProcessError as err:
+                raise RuntimeError('ERROR: convert failed with: {}'.format(err))
+        else:
+            raise ValueError('Unknown movie format: ' + movie_fmt)

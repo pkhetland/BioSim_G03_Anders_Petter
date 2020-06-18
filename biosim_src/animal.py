@@ -65,21 +65,31 @@ class Animal:
         return cls.p
 
     def __repr__(self):
-        """Format for string representation
+        """Format for string representation.
         """
         return "{}({} years, {:.3} kg)".format(self._species, self._age, self._weight)
 
     def __str__(self):
-        """Format for better readability
+        """Format for better readability.
         """
         return "{}({} years, {:.3} kg)".format(self._species, self._age, self._weight)
 
     @classmethod
     def from_dict(cls, animal_dict):
-        """Allows the sim to add instances directly from dictionaries when adding pop
+        """Allows the sim to add instances directly from dictionaries when adding populations.
 
-        :param animal_dict: Dict with format {'species': 'Herbivore', 'age': 5, 'weight': 20}
+        :param animal_dict: Dictionary that specifies class weight and age
         :type animal_dict: dict
+
+        :Example:
+            .. code-block:: python
+
+                example_dict = {'species': 'Herbivore', 'age': 5, 'weight': 20}
+                herb = Herbivore.from_dict(example_dict)
+
+        .. seealso::
+            - `BioSim.add_population`
+
         """
         class_weight = animal_dict["weight"]
         class_age = animal_dict["age"]
@@ -87,7 +97,8 @@ class Animal:
 
     @property
     def weight(self):
-        """
+        """Getter method for Animal._weight
+
         :return: Weight of animal
         :r_type: float
         """
@@ -95,12 +106,13 @@ class Animal:
 
     @weight.setter
     def weight(self, weight):
-        """Setter method. Set the animal weight."""
+        """Setter method for Animal._weight"""
         self._weight = weight
 
     @property
     def age(self):
-        """
+        """Getter method for Animal._age.
+
         :return: Age of animal
         :r_type: int
         """
@@ -108,30 +120,47 @@ class Animal:
 
     @age.setter
     def age(self, age):
-        """Setter method. Set the animal age."""
+        """Setter method for Animal._age."""
         self._age = age
 
     @property
     def species(self):
-        """
-        :return: Specie of animal
+        """Getter method for Animal._species
+
+        :return: Species of animal
         :r_type: str
         """
         return self._species
 
     def aging(self):
-        """Increments age by one every season
+        """Increments age by one every season.
 
+        .. seealso::
+            - `BioSim.run_year_cycle`
         """
         self.age += 1
 
     def give_birth(self, n_same):
-        """Animals give birth based on fitness and same-type animals in cell
+        """Animals give birth based on fitness and same-type animals in cell.
 
         :param n_same: number of same-type animals
         :type n_same: int
+
+            ...
+
         :return: True or False
         :rtype: bool
+
+        .. note::
+
+            - Animals give birth with a probability depending on fitness and n-same species in cell.
+            - If the animal is to give birth, it will only happen if birth_weight is less
+                than weight of parent.
+
+        .. seealso::
+
+            - `BioSim.procreation`
+
         """
         birth_prob = self.p["gamma"] * self.fitness * (n_same - 1)
         if self.weight < self.p["zeta"] * (self.p["w_birth"] + self.p["sigma_birth"]):
@@ -155,9 +184,15 @@ class Animal:
             return False, None
 
     def migrate(self):
-        """Method deciding whether animal will migrate
+        """Method deciding whether animal will migrate or not.
 
+        :return: Boolean value where True is migrate
         :rtype: bool
+
+        .. seealso::
+            - BioSim.migrate
+            - BioSim.run_year_cycle
+
         """
         move_prob = self.p["mu"] * self.fitness
         if random.random() < move_prob:
@@ -166,10 +201,7 @@ class Animal:
             return False
 
     def lose_weight(self):
-        """Animals lose weight based on parameter eta
-
-        :param eta: from dictionary p of parameters
-        """
+        """Animals lose weight each year based on parameter `eta`."""
         self.weight -= self.weight * self.p["eta"]
         self._fitness_valid = False  # Signal that saved fitness is incorrect
 
@@ -177,36 +209,45 @@ class Animal:
         """Return true when called if the animal is to be removed from the simulation
         and false otherwise.
 
-        :param omega: from dictionary of parameters
-        :param _death_prob: the probability that the animal dies
+        :return: Bool indicating death or no death
         :rtype: bool
+
+        .. seealso::
+            - `BioSim.run_year_cycle`
+
         """
         if self.weight <= 0:
             death = True
         else:
             self._death_prob = self.p["omega"] * (1 - self.fitness)
-
             death = True if random.random() < self._death_prob else False
 
         return death
 
     @staticmethod
     def q(sgn, x, x_half, phi):
-        """
-        Function to be used in fitness function
+        """Mathematical function for calculating fitness.
 
         :param sgn: Sign, positive/negative
-        :param x, x_half, phi: see fitness function and parameter dictionaries for the respective
-        class
+        :param x, x_half, phi: Instance variables
+
+        .. math::
+
+            q^{+-}(x, x_{\dfrac{1}{2}}, phi) = 1 / (1 + e^{+-phi(x - x_{\dfrac{1}{2}})})
+
         """
         return 1.0 / (1.0 + e ** (sgn * phi * (x - x_half)))
 
     @property
     def fitness(self):
-        """
-        Function returning the fitness of an animal.
-        :return: a value between 0 and 1
-        :r_type: int
+        """Function returning the fitness of an animal.
+
+        :return: A value between 0 and 1, where 1 is perfect fitness and 0 is death
+        :rtype: float
+
+        .. math::
+
+            phi = 0 if w <= 0 else q^+ (a, a_(1/2), phi_age) * q^- (w, w_(1/2), phi_weight)
 
         """
         if self._fitness is None or not self._fitness_valid:
@@ -219,14 +260,14 @@ class Animal:
 
     @property
     def birth_weight(self):
-        """
-        Birth weight of newborn animal is drawn randomly
+        """Birth weight of a newborn animal is drawn randomly from a gaussian curve.
 
-        param: w_birth: birth weight of animal
-        param: sigma_birth: standard deviation
-        param: N: Population size
-        return: birth_weight, drawn from gaussian distribution
-        r_type: float
+        :return birth_weight: drawn from gaussian distribution
+        :rtype: float
+
+        .. seealso::
+            - BioSim.procreation
+            - Animal.give_birth
 
         """
         birth_weight = random.gauss(self.p["w_birth"], self.p["sigma_birth"])
@@ -234,8 +275,13 @@ class Animal:
 
 
 class Herbivore(Animal):
-    """
+    """Herbivore class.
 
+    *Properties*:
+        - `p`: Parameters specific to Herbivore instances.
+
+    :param weight: Weight used to initiate Animal super()
+    :param age: Age used to initiate Animal super()
     """
     p = {  # Dictionary of parameters belonging to the Herbivore class
         "w_birth": 8.0,
@@ -258,11 +304,17 @@ class Herbivore(Animal):
         super().__init__(weight, age)
 
     def eat_fodder(self, cell):
-        """
-        When an animal eats, its weight increases
+        """When an animal eats, its weight increases.
 
-        :param: F: the amount of fodder a herbivore can eat
-        :param: beta: a factor to which weight is increased
+        .. note::
+            - Herbivore will try to eat enough ('F') fodder, and if that is not possible,
+                it will eat what is left in the cell.
+            - Weight of herbivore will increase by `F` times `beta`.
+
+        .. seealso::
+            - `Carnivore.kill_prey`
+            - `BioSim.feeding`
+
         """
         consumption_amount = self.p["F"]  # Calculate amount of fodder consumed
         if consumption_amount <= cell.fodder:
@@ -275,12 +327,18 @@ class Herbivore(Animal):
 
         self._fitness_valid = False  # Signal that saved fitness is incorrect
 
+
 class Carnivore(Animal):
+    """Carnivore class.
+
+    *Properties*:
+        - `p`: Parameters specific to Carnivore instances.
+
+    :param weight: Weight used to initiate Animal super()
+    :param age: Age used to initiate Animal super()
     """
-    Carnivore class
-    """
-    # Dictionary containing default parameter values for Carnivore class
-    p = {
+
+    p = {  # Dictionary containing default parameter values for Carnivore class
         "w_birth": 6.0,
         "sigma_birth": 1.0,
         "beta": 0.75,
@@ -302,15 +360,18 @@ class Carnivore(Animal):
         super().__init__(weight, age)
 
     def kill_prey(self, sorted_herbivores):
-        """Iterates through sorted herbivores and eats until F is met
+        """Iterates through sorted herbivores and eats until F is met.
 
         :param sorted_herbivores: Herbivores sorted by fitness levels from low to high
         :type sorted_herbivores: list
-        :param carn_fitness:
-        :type sorted_herbivores: list
-            ...
+
         :return: Animals killed by herbivore to be removed from simulation
         :rtype: list
+
+        .. seealso::
+            - BioSim.feeding
+            - Herbivore.eat_fodder
+            - LandscapeCell.sorted_herbivores
         """
         consumption_weight = 0
         herbs_killed = []

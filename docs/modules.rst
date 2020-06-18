@@ -4,4 +4,4 @@ biosim
 .. toctree::
    :maxdepth: 4
 
-   biosim
+   biosim_src
