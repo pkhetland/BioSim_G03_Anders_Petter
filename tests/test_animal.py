@@ -3,109 +3,232 @@
 """
 Tests for animal class.
 """
-from src.animal import Herbivore, Carnivore
-from src.landscape import Lowland
+from biosim_src.animal import Herbivore, Carnivore
+from biosim_src.landscape import Lowland
 import math
 import scipy.stats as stats
 import pytest
+import random
+
+
+@pytest.fixture()
+def reset_herbivore_params():
+    """
+    Based on test_dish.py
+    set parameters of herbivores back to defaults
+    """
+    yield Herbivore.set_params(Herbivore.p)
+
+
+@pytest.fixture
+def reset_carnivore_params():
+    """
+    Set parameters of carnivores back to defaults
+    """
+    yield Carnivore.set_params(Carnivore.p)
+
+
+def phi_z_test(N, p, n):
+    """
+    Formula for the z-test used in statistical tests
+    Based on H.E. Plesser: biolab/test_bacteria.py
+    """
+    mean = N * p
+    var = N * p * (1 - p)
+    Z = (n - mean) / math.sqrt(var)
+    phi = 2 * stats.norm.cdf(-abs(Z))
+    return phi
 
 
 class TestAnimal:
-    alpha = 0.01
+    alpha = 0.01    # Significance level
 
     """
     Tests for animal class
+    
     """
-    """
-    def test_death_prob(self):
-        # Comment AH. Need a function to create animals
 
-        # Probability of dying 1
+    def test_set_params(self):
+        """
+        Test that parameters can be set
+        """
+        my_params = {"w_birth": 10,
+                     "sigma_birth": 2.5}
+        Herbivore.set_params(my_params)
+        assert Herbivore.p["w_birth"] == 10
+        assert Herbivore.p["sigma_birth"] == 2.5
 
-        self.death_prob = 1
+    def test_set_invalid_params(self, reset_herbivore_params):
+        """
+        Test errors with illegal keys and values
+        """
+        with pytest.raises(KeyError):
+            assert Herbivore.p["w_death"]
+        with pytest.raises(ValueError):
+            assert Herbivore.set_params({"sigma_birth": -5})
+
+    @pytest.fixture    # carnivore instance
+    def carnivore(self):
+        return Carnivore()
+
+    @pytest.fixture    # herbivore instance
+    def herbivore(self):
+        return Herbivore()
+
+    @pytest.fixture
+    def animals(self):
+        """
+        create animals of different type, age and weight to use in test of fitness
         """
 
+        animals = [Herbivore(age=0, weight=5),
+                   Herbivore(age=0, weight=1000),
+                   Herbivore(age=100, weight=5),
+                   Herbivore(age=100, weight=1000),
+                   Herbivore(age=0, weight=5),
+                   Carnivore(age=0, weight=5),
+                   Carnivore(age=0, weight=1000),
+                   Carnivore(age=100, weight=5),
+                   Carnivore(age=100, weight=1000)]
+        return animals
 
-    def test_certain_death(self):
+    def test_fitness(self, animals):
         """
-        Test that the animal always must die given death_prob = 1
-        100 Herbivore instances all must die
+        Fitness function shall return a value between 0 and 1
+        for all animals
+
+        """
+        for animal in animals:
+            assert 0 <= animal.fitness <= 1
+
+    def test_death_mocker(self, herbivore, mocker):
+        """
+        Replace random number by a fixed value 0.
+        Animal will then always die.
+        """
+        mocker.patch("random.random", return_value=0)
+        assert herbivore.death() is True
+
+    def test_migrate(self, herbivore, mocker):
+        """
+        Mock migrate function to see if it returns correct
+        Test passes if animal migrates
+
+        """
+        mocker.patch("random.random", return_value=0)
+        assert herbivore.migrate() is True
+
+    def test_certain_death_weight(self, herbivore):
+        """
+        Test that the animal always must die given a weight of 0.
         See examples/biolab/test_bacteria.py
 
         """
-        h = Herbivore()
-        h.weight = 0
-        assert h.death()
+        herbivore.weight = 0
+        assert herbivore.death()
 
-    def test_death_binom(self):
-        """
-        Test if the death function returns statistical significant results
-        under the bionomial test, with a given death probability p.
-
-        : param p: The hypothesized probability
-        : type p: float
-        : param N: The number of animals
-        : type N: int
-        : param n: The number of deaths
-        : type n: int
-        """
-        h = Herbivore(age=0, weight=10)
-        p = 0.1
-
-        # Comment test fails for high values of p. In biolab bacteria example p can be "anything"
-        # Comment test fails for high values of p
-
-        N = 100
-        n = sum(h.death() for _ in range(N))
-        print("Number of deaths:", n)
-        # Output 27 deaths
-        assert stats.binom_test(h.death(), n, p, "two-sided") > self.alpha
-
-    @pytest.fixture(autouse=True)
-    def create_animals(self):
-        """
-        Based on solution from Bishnu Pudel
-        Create two herbivore objects
-        """
-        h1 = Herbivore(weight=10, age=0)
-        h2 = Herbivore(weight=10, age=0)
-        # set parameters
-        h1.birth_prob = 0.5
-        h2.birth_prob = 0.5
-
-
-
-    def test_death_z_test(self):
+    @pytest.mark.parametrize("omega_dict", [{"omega": 0.6}, {"omega": 0.4}])
+    def test_death_z_test(self, reset_herbivore_params, omega_dict):
 
         """
-        Souce: biolab/test_bacteria.py
+        Based on H.E. Plesser: biolab/test_bacteria.py
 
-        Probabilistic test of death function. Test the number of deaths is
-        normally distributed for large number of animals. And the death probability is
-        significant with a p-value of 0.01.
+        Probabilistic test of death function. Testing on herbivores.
+
+        Given that the sample size is large. Under the Z-test the distribution under the null
+        hypothesis can be estimated approximately by the normal distribution.
+        See https://en.wikipedia.org/wiki/Z-test.
+
+        Assuming low fitness of animals such that omega can be interpreted as an approximation of
+        the death probability. Testing with different values of omega
+        We compute the number of dead animals returned by our death function from class Animal.
+        Then we compare this value to the mean of dead animals derived from a fixed probability.
+
+
+        Null hypothesis: The number of dead animals returned by the death function is
+        statistically significant with a p-value greater than the alpha parameter.
+        Alternative hypothesis: The number of dead animals returned is not statistically
+        significant and we reject the null hypothesis.
         """
-        b = Herbivore(age=0, weight=10)
-        # Set mocking parameter of the death probability of the animal
-        p = 0.1
-        # 100 animals
-        N = 100
-        n = sum(b.death() for _ in range(N))
-        # print([b.death() for _ in range(10)])
+        random.seed(123)
+        # High age ensures low fitness
+        herb = Herbivore(age=100, weight=10)
+        # with low fitness we assume that the death probability is the same as omega
+        herb.set_params(omega_dict)
+        # death probability set equal to omega
+        p = Herbivore.p["omega"]
+        # Number of animals
+        N = 1000
+        # Number of dead animals
+        n = sum(herb.death() for _ in range(N))
+        # Performing the z-test
+        assert phi_z_test(N, p, n) > TestAnimal.alpha
 
+    @pytest.mark.parametrize("birth_dict", [{"w_birth": 8.0, "sigma_birth": 1.5},
+                                            {"w_birth": 6.0, "sigma_birth": 1.0},
+                                            {"w_birth": 7.0, "sigma_birth": 1.5}])
+    def test_mean_birth_weight(self, birth_dict, reset_herbivore_params):
+        """ Test that the birth weight of animals are normal distributed using the normaltest
+        from scipy.
+        https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.normaltest.html
+
+        Null hypothesis: The birth weight of the animal is normally distributed
+        Alternative hypothesis: The birth weight are not normally distributed.
+
+        We keep the null hypothesis if the p-value is larger than the significance level alpha
+        """
+        random.seed(123)
+        N = 1000
+        Herbivore.set_params(birth_dict)
+        herb_birth_weights = [Herbivore(age=5, weight=20).birth_weight for _ in range(N)]
+        k2, phi = stats.normaltest(herb_birth_weights)
+        assert phi > TestAnimal.alpha
+
+    def test_certain_birth(self, mocker, reset_herbivore_params):
+        """
+        test give birth function
+        Mock the random number generator to always return one.
+        Then as long as weight is not zero. give_birth function shall return True.
+
+        """
+        herb = Herbivore(weight=800, age=5)
+        num_herbs = 10
+        mocker.patch("random.random", return_value=0)
+        give_birth, _ = herb.give_birth(num_herbs)
+        assert give_birth is True
+
+    @pytest.mark.parametrize("gamma_dict", [{"gamma": 0.2},
+                                            {"gamma": 0.4},
+                                            {"gamma": 0.6},
+                                            {"gamma": 0.8}])
+    def test_give_birth(self, gamma_dict, reset_herbivore_params):
+        """Test that for animals with fitness close to one, and two animals of same type one specie
+        in a cell. The give_birth function should be well approximated by the parameter gamma.
+        An we test this against our function under the significance level alpha.
+
+        Null hypothesis: The give_birth function returns correct with fixed gamma
+        Alternative hypothesis: The give_birth function does not return correct. We reject our
+        null hypothesis.
+        """
+
+        random.seed(123)
+        N = 1000
+        Herbivore.set_params(gamma_dict)
+        num_herbs = 2
+        p = gamma_dict["gamma"]
+        list_birth = [Herbivore(weight=200, age=5).give_birth(num_herbs) for _ in range(N)]
+        # number when births return True
+        n = sum([item[0] for item in list_birth])
         mean = N * p
-        var = N * p * (1-p)
-        Z = (n-mean) / math.sqrt(var)
-        phi = 2 * stats.norm.cdf(-abs(Z))
-        assert phi > 0.01
-
+        assert phi_z_test(N, p, n) > TestAnimal.alpha
 
     def test_constructor(self):
-            """
-            Herbivore can be created
-            """
-            herb = Herbivore(weight=10, age=0)
-            carn = Carnivore()
-            assert isinstance(herb, Herbivore), isinstance(carn, Carnivore)
+        """
+        Animals can be created
+        """
+        herb = Herbivore(weight=10, age=0)
+        carn = Carnivore()
+        assert isinstance(herb, Herbivore), isinstance(carn, Carnivore)
 
     def test_aging(self):
         """
@@ -117,7 +240,7 @@ class TestAnimal:
         carn.aging()
         assert herb.age > 0, carn.age > 0
 
-    def test_lose_weight(self):
+    def test_lose_weight(self, reset_herbivore_params, reset_carnivore_params):
         """
         Test that animals lose weight
         """
@@ -131,26 +254,41 @@ class TestAnimal:
         assert herb.weight < herb_initial_weight
         assert carn.weight < carn_initial_weight
 
-    def test_parameters(self):
+    def test_parameters(self, reset_herbivore_params, reset_carnivore_params):
         """
         Test parameters of herbs and carns
         """
         herb, carn = Herbivore(), Carnivore()
         assert herb.p != carn.p
 
-    def test_has_moved(self):
+    def test_single_procreation(self):
         """
-        Test if the animal only once per year cycle
+        test that the initial herbivore population will not reproduce a newborn population of
+        greater numbers during a year cycle. Each mother can at most give birth to one animal.
+        A high fitness and gamma parameter ensures highly fertile animals.
         """
-        herb = Herbivore()
-        herb.migrate()
-        assert herb.has_moved() is True
+        num_newborns = 0
+        adult_herbs = [Herbivore(age=5, weight=40) for _ in range(100)]
+        num_adults = len(adult_herbs)
+        for herb in adult_herbs:
+            herb.set_params(({"gamma": 0.99}))
+            if herb.give_birth(num_adults):
+                num_newborns += 1
+        assert num_newborns <= num_adults
 
 
 class TestHerbivore:
     """
     Tests for herbivore class
     """
+
+    def test_constructor(self):
+        """
+        Test herbivores can be constructed
+        """
+        herb = Herbivore()
+        assert isinstance(herb, Herbivore)
+
     def test_eat_fodder(self):
         """
         Weight of animal shall increase after eating fodder
@@ -163,40 +301,49 @@ class TestHerbivore:
         herb_weight_after = herb.weight
         assert herb_weight < herb_weight_after
 
-    def test_give_birth(self):
-        """
-        Test that the give birth function works
-        """
-        pass
-
-    def test_instance_count(self):
-        herb = Herbivore()
-
-        assert herb.herbivore_instance_count == 1
-
-        Herbivore.subtract_herbivore()
-
-        assert Herbivore.herbivore_instance_count == 0
-
 
 class TestCarnivore:
     """
-    Test for carnivore class
+    Tests for carnivore class
     """
+
+    def test_constructor(self):
+
+        """
+        Test carnivores can be constructed
+        """
+        carn = Carnivore()
+        assert isinstance(carn, Carnivore)
+
     def test_kill_prey(self):
-        carn = Carnivore(age=5, weight=900)
-        killed_herbivores = carn.kill_prey([Herbivore(age=10, weight=1), Herbivore(age=5, weight=80)])
-        assert len(killed_herbivores) > 0
-
-    def test_instance_count(self):
         """
-        Test that classmethods for counting instances work
+        Test kill prey. With a high fitness diff the carnivore will always kill the herbivore.
         """
-        carnivores = [Carnivore() for _ in range(5)]
+        carn = Carnivore(age=5, weight=30)
+        herb_list = [Herbivore(age=100, weight=50) for _ in range(100)]
+        mock_sorted_list = [(herb, herb.fitness) for herb in herb_list]
+        kill_count = 0
+        for _ in mock_sorted_list:
+            if carn.kill_prey(mock_sorted_list):
+                kill_count += 1
+        assert kill_count == 100
 
-        Carnivore.subtract_carnivore()
-        Carnivore.subtract_carnivore()
-
-        assert Carnivore.carnivore_instance_count == 3
-
+    @pytest.mark.parametrize("params", [{"beta": 0.75, "DeltaPhiMax": 0.1}])
+    def test_weight_gain(self, reset_carnivore_params, reset_herbivore_params, params):
+        """
+        Testing weight gain of carnivores. Assuming they have access to more fodder than they
+        will eat. Making old heavy herbivores with low fitness. Carnivores should add beta * F
+        weight
+        Assuming fitness diff is larger than DeltaPhiMax such that the carnivore always kills
+        the herbivore.
+        """
+        carn = Carnivore(age=5, weight=40)
+        # number of herbivores
+        N = 1000
+        herb_list = [Herbivore(age=100, weight=200) for _ in range(N)]
+        mock_sorted_list = [(herb, herb.fitness) for herb in herb_list]
+        initial_weight = carn.weight
+        _ = carn.kill_prey(mock_sorted_list)
+        new_weight = carn.weight
+        assert new_weight == initial_weight + carn.p["beta"] * carn.p["F"]
 
