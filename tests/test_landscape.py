@@ -124,8 +124,11 @@ class TestHighlandLandscapeCell:
         """
         highland_cell.add_animals([Herbivore(weight=50), Herbivore(weight=20)])
         highland_cell.add_animals([Carnivore(weight=25), Carnivore(weight=40)])
-        assert highland_cell.sorted_herbivores == highland_cell.herbivores[::-1]
-        assert highland_cell.sorted_carnivores == highland_cell.carnivores[::-1]
+        sorted_herbivores = list([herb[0] for herb in highland_cell.sorted_herbivores])
+        sorted_carnivores = highland_cell.sorted_carnivores
+
+        assert sorted_herbivores == highland_cell.herbivores[::-1]
+        assert sorted_carnivores == highland_cell.carnivores[::-1]
 
     def test_is_empty(self, highland_cell):
         """
@@ -384,7 +387,6 @@ class TestIsland:
         Test that animal ages property is of correct shape and value
         """
         assert biosim._island.animal_ages == [[5.0, 5.0, 5.0], [4.0, 4.0]]
-
 
     def test_animal_fitness(self, biosim):
         """

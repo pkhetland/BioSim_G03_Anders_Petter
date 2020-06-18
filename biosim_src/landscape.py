@@ -590,7 +590,7 @@ class LandscapeCell:
         fitness_dict = {carn: carn.fitness for carn in self.carnivores}
         sorted_tuples = dict(sorted(fitness_dict.items(), key=lambda x: x[1], reverse=True))
 
-        return sorted_tuples.keys()
+        return list(sorted_tuples.keys())
 
     @property
     def sorted_herbivores(self):
