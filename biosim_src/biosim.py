@@ -405,4 +405,5 @@ class BioSim:
             raise ValueError("Unknown movie format: " + movie_fmt)
 
     def image_cleanup(self):
+        pass
 
