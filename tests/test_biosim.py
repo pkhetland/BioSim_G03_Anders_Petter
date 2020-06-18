@@ -49,7 +49,7 @@ class TestBioSim:
         """
         Create basic map instance for testing
         """
-        return BioSim(island_map='WWW\nWLW\nWWW')
+        return BioSim(island_map='WWW\nWLW\nWWW', plot_graph=False)
 
     def test_repr_and_str(self, biosim):
         """
@@ -131,7 +131,7 @@ class TestBioSim:
         """
         Create Biosim instance with population for further testing
         """
-        biosim = BioSim(island_map='WWWWW\nWLDHW\nWWWWW')
+        biosim = BioSim(island_map='WWWWW\nWLDHW\nWWWWW', plot_graph=False)
         biosim.add_population([
             {
                 "loc": (2, 2),

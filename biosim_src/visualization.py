@@ -60,7 +60,7 @@ class Plotting:
             self._hist_specs = hist_specs
 
     def init_plot(self, num_years):
-        """ Initialize the plot at the beginning of the simulation
+        """Initialize the plot at the beginning of the simulation.
 
         :param num_years: Number of years to run sim for x-axis
         :type num_years: int
@@ -112,40 +112,41 @@ class Plotting:
             else:
                 self._ax_main.set_ylim([0, max(self.y_carn) + 20])  # Set y-lim
 
-        weight_data = self._island.animal_weights
-        weight_max = int(max(max(weight_data)))
-        weight_min = int(min(min(weight_data)))
-        weight_delta = self._hist_specs["weight"]["delta"]
-        self._ax_weight.clear()
-        self._weight_hist = self._ax_weight.hist(
-            weight_data, range(weight_min, weight_max + int(weight_delta), weight_delta),
-        )
-        self._ax_weight.set_xlim([0, self._hist_specs["weight"]["max"]])
+        if self._island._num_carns > 0 or self._island._num_herbs > 0:
+            weight_data = self._island.animal_weights
+            weight_max = int(max(max(weight_data)))
+            weight_min = int(min(min(weight_data)))
+            weight_delta = self._hist_specs["weight"]["delta"]
+            self._ax_weight.clear()
+            self._weight_hist = self._ax_weight.hist(
+                weight_data, range(weight_min, weight_max + int(weight_delta), weight_delta),
+            )
+            self._ax_weight.set_xlim([0, self._hist_specs["weight"]["max"]])
 
-        fitness_data = self._island.animal_fitness
-        fitness_delta = self._hist_specs["fitness"]["delta"]
+            fitness_data = self._island.animal_fitness
+            fitness_delta = self._hist_specs["fitness"]["delta"]
 
-        self._ax_fitness.clear()
-        self._ax_fitness.hist(fitness_data, bins=np.arange(0, 1 + fitness_delta, fitness_delta))
+            self._ax_fitness.clear()
+            self._ax_fitness.hist(fitness_data, bins=np.arange(0, 1 + fitness_delta, fitness_delta))
 
-        self._ax_fitness.set_xlim([0, self._hist_specs["fitness"]["max"]])
+            self._ax_fitness.set_xlim([0, self._hist_specs["fitness"]["max"]])
 
-        age_data = self._island.animal_ages
-        age_max = int(max(max(age_data)))
-        age_min = int(min(min(age_data)))
-        age_delta = self._hist_specs["age"]["delta"]
-        self._ax_age.clear()
-        self._ax_age.hist(age_data, bins=range(age_min, age_max + int(age_delta), age_delta))
-        self._ax_age.set_xlim([0, self._hist_specs["age"]["max"]])
+            age_data = self._island.animal_ages
+            age_max = int(max(max(age_data)))
+            age_min = int(min(min(age_data)))
+            age_delta = self._hist_specs["age"]["delta"]
+            self._ax_age.clear()
+            self._ax_age.hist(age_data, bins=range(age_min, age_max + int(age_delta), age_delta))
+            self._ax_age.set_xlim([0, self._hist_specs["age"]["max"]])
 
-        self._herb_line.set_ydata(self.y_herb)
-        self._herb_line.set_xdata(range(len(self.y_herb)))
-        self._carn_line.set_ydata(self.y_carn)
-        self._carn_line.set_xdata(range(len(self.y_carn)))
+            self._herb_line.set_ydata(self.y_herb)
+            self._herb_line.set_xdata(range(len(self.y_herb)))
+            self._carn_line.set_ydata(self.y_carn)
+            self._carn_line.set_xdata(range(len(self.y_carn)))
 
-        self._ax_weight.set_title("Weight distribution")
-        self._ax_fitness.set_title("Fitness distribution")
-        self._ax_age.set_title("Age distribution")
+            self._ax_weight.set_title("Weight distribution")
+            self._ax_fitness.set_title("Fitness distribution")
+            self._ax_age.set_title("Age distribution")
 
         self._imax_herb.set_data(self._island.herb_pop_matrix)
         self._imax_carn.set_data(self._island.carn_pop_matrix)
@@ -225,6 +226,6 @@ class Plotting:
             return
 
         plt.savefig(
-            "images/{base}_{num:05d}.{type}".format(base=img_base, num=self._img_ctr, type=img_fmt)
+            "{base}_{num:05d}.{type}".format(base=img_base, num=self._img_ctr, type=img_fmt)
         )
         self._img_ctr += 1
