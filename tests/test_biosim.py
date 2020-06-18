@@ -181,7 +181,7 @@ class TestBioSim:
         Test that certain chance of killing prey is 1 if DeltaPhiMax is triggered in kill_preys
         """
         biosim_with_animals.set_animal_parameters('Carnivore', {'DeltaPhiMax': 0.7})
-        biosim_with_animals.simulate(num_years=100, vis_years=1, img_years=None, plot_graph=False)
+        biosim_with_animals.simulate(num_years=100, vis_years=1, img_years=None)
 
     @pytest.fixture
     def figfile_root(self):

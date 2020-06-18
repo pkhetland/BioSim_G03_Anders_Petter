@@ -547,7 +547,7 @@ class LandscapeCell:
             elif isinstance(animal, Carnivore):
                 self.carnivores.remove(animal)
             else:
-                raise AttributeError("List may only contain Herbivore and Carnivore instances!")
+                raise ValueError("List may only contain Herbivore and Carnivore instances!")
 
     def randomize_herbs(self):
         """Shuffles the self.herbivores list."""
