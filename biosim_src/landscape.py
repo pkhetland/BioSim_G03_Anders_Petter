@@ -4,8 +4,6 @@
 Lowland class for the simulation.
 """
 
-import numpy as np
-import operator
 import random
 from biosim_src.animal import Herbivore, Carnivore
 
@@ -40,8 +38,10 @@ class Island:
         self._num_herbs = 0  # Herbivore counter
         self._num_carns = 0  # Carnivore counter
 
-        self.herb_pop_matrix = [[0 for _ in self.unique_cols] for _ in self.unique_rows]  # Herbivore population matrix
-        self.carn_pop_matrix = [[0 for _ in self.unique_cols] for _ in self.unique_rows]  # Carnivore population matrix
+        self.herb_pop_matrix = [[0 for _ in self.unique_cols] for _ in self.unique_rows]
+        # Herbivore population matrix
+        self.carn_pop_matrix = [[0 for _ in self.unique_cols] for _ in self.unique_rows]
+        # Carnivore population matrix
 
     def count_animals(self, num_herbs=0, num_carns=0, animal_list=None):
         """Count animals for fast retrieval when needed.

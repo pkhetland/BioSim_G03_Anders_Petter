@@ -5,7 +5,6 @@ __email__ = "anders.molmen.host@nmbu.no, petter.storesund.hetland@nmbu.no"
 
 import random as random
 from math import e
-import numpy as np
 
 
 class Animal:
@@ -42,7 +41,7 @@ class Animal:
         :param new_params: New parameters to be set to the class params
         :type new_params: dict
 
-        .. seealso::
+        .. see also::
             - `biosim.set_animal_parameters`
 
         """

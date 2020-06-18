@@ -19,7 +19,7 @@ sys.path.insert(0, os.path.abspath('..'))
 
 project = 'Biosim-G03-Anders-Petter'
 copyright = '2020, Anders & Petter'
-author = 'Anders & Petter'
+author = 'Anders Mølmen Høst & Petter Kolstad Hetland'
 
 
 # -- General configuration ---------------------------------------------------
