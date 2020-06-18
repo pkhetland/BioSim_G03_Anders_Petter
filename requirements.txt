@@ -9,3 +9,4 @@ pytest-mock
 coverage
 numba
 cython
+scipy

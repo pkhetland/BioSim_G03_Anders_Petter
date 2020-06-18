@@ -30,7 +30,8 @@ def reset_carnivore_params():
 
 def phi_z_test(N, p, n):
     """
-    Formula for the z-test used in tests
+    Formula for the z-test used in statistical tests
+    Based on H.E. Plesser: biolab/test_bacteria.py
     """
     mean = N * p
     var = N * p * (1 - p)
