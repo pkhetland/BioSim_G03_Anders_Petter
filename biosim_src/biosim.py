@@ -9,14 +9,11 @@ import numpy as np
 import time
 import os
 import subprocess
-
-# import ffmpeg
 from os import path
 
 # Update these variables to point to your ffmpeg and convert binaries
 # If you installed ffmpeg using conda or installed both softwares in
 # standard ways on your computer, no changes should be required.
-# _CONVERT_BINARY/magick is only needed if you want to create animated GIFs.
 _FFMPEG_BINARY = "ffmpeg"
 
 # update this to the directory and file-name beginning
@@ -371,13 +368,13 @@ class BioSim:
         return {"Herbivore": self._island.num_herbs, "Carnivore": self._island.num_carns}
 
     def make_movie(self, movie_fmt=_DEFAULT_MOVIE_FORMAT):
-        """
-        Creates MPEG4 movie from visualization images saved.
+        """Creates MPEG4 movie from visualization images saved.
 
-        .. :note:
-            Requires ffmpeg
+        .. note:
+            - Requires ffmpeg
 
-        The movie is stored as img_base + movie_fmt
+        The movie is stored as img_base + movie_fmt.
+        Author: Hans E. Plasser
         """
 
         if self._img_base is None:
@@ -406,3 +403,6 @@ class BioSim:
                 raise RuntimeError("ERROR: ffmpeg failed with: {}".format(err))
         else:
             raise ValueError("Unknown movie format: " + movie_fmt)
+
+    def image_cleanup(self):
+
