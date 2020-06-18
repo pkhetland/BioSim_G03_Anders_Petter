@@ -99,7 +99,7 @@ class TestHighlandLandscapeCell:
         animals = [Herbivore(), Carnivore(), Herbivore()]
         highland_cell.add_animals(animals)
         highland_cell.remove_animals([animals[0], animals[1]])
-        assert highland_cell.animal_count == 1
+        assert highland_cell.herb_count == 1
 
     @pytest.mark.parametrize('add_remove_func',
                              ['add', 'remove'])
