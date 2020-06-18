@@ -124,19 +124,11 @@ class TestHighlandLandscapeCell:
         """
         highland_cell.add_animals([Herbivore(weight=50), Herbivore(weight=20)])
         highland_cell.add_animals([Carnivore(weight=25), Carnivore(weight=40)])
-<<<<<<< HEAD
-        sorted_herbivores = highland_cell.sorted_herbivores  highland_cell.herbivores[::-1]
-        highland_cell.sorted_carnivores == highland_cell.carnivores[::-1]
-
-        assert
-        assert
-=======
         sorted_herbivores = list([herb[0] for herb in highland_cell.sorted_herbivores])
         sorted_carnivores = highland_cell.sorted_carnivores
 
         assert sorted_herbivores == highland_cell.herbivores[::-1]
         assert sorted_carnivores == highland_cell.carnivores[::-1]
->>>>>>> test_coverage_phase
 
     def test_is_empty(self, highland_cell):
         """
