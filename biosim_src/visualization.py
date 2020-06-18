@@ -1,19 +1,14 @@
 # -*- coding: utf-8 -*-
 
-"""
-A collection of plotting functions for biosim_src.py
-
-Needs to be cleaned up and improved (especially histograms)
-"""
 
 import matplotlib.pyplot as plt
 import numpy as np
 
 
 class Plotting:
+    """Plotting class to be used in biosim.py.
+    """
     def __init__(self, island, cmax=None, ymax=None, hist_specs=None):
-        # Arguments for plotting
-
         self._island = island
         self._img_base = None
         self._img_ctr = 0
@@ -112,7 +107,7 @@ class Plotting:
             else:
                 self._ax_main.set_ylim([0, max(self.y_carn) + 20])  # Set y-lim
 
-        if self._island._num_carns > 0 or self._island._num_herbs > 0:
+        if self._island.num_carns > 0 or self._island.num_herbs > 0:
             weight_data = self._island.animal_weights
             weight_max = int(max(max(weight_data)))
             weight_min = int(min(min(weight_data)))
@@ -189,9 +184,7 @@ class Plotting:
             self._axlg.text(0.35, ix * 0.2, name, transform=self._axlg.transAxes)
 
     def _plot_heatmap(self):
-        """Create matrix for population and create heatmap
-
-        Create self._axhm_herb and self._axhm_carn?
+        """Create matrix for population and initiate heatmap.
         """
         self.herb_pop_matrix = [
             [0 for _ in self._island.unique_cols] for _ in self._island.unique_rows
@@ -220,7 +213,7 @@ class Plotting:
         plt.colorbar(self._imax_carn, ax=self._axhm_carn, orientation="vertical")
 
     def save_graphics(self, img_base, img_fmt):
-        """Saves graphics to file if file name given. From randviz sim."""
+        """Saves graphics to file if file name given. Modified from Hans E. Plasser."""
 
         if img_base is None:
             return
