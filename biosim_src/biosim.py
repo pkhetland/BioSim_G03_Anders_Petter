@@ -93,10 +93,6 @@ class BioSim:
         np.random.seed(seed)  # Set numpy seed
         random.seed(seed)  # Seed python random seed
 
-        if self._img_base:  # Create images folder
-            if not path.exists("images"):
-                os.mkdir("images")
-
     @staticmethod
     def set_animal_parameters(species, params):
         """Set parameters for animal species.
@@ -277,8 +273,7 @@ class BioSim:
         .. note::
 
             - When `plot_graph` is set to `True`, plots are initiated and updated.
-            Setting`plot_graph` to `False`
-                allows the user to run simulations faster.
+                Setting`plot_graph` to `False` allows the user to run simulations faster.
             - Image files will be numbered consecutively and used for creating mp4-files.
 
         .. seealso::
@@ -405,4 +400,5 @@ class BioSim:
             raise ValueError("Unknown movie format: " + movie_fmt)
 
     def image_cleanup(self):
-
+        """Removes created image files after movie is rendered."""
+        pass
