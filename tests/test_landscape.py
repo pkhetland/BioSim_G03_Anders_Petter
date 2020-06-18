@@ -4,14 +4,15 @@
 Test set for the initial Lowland class.
 """
 
-from biosim.landscape import Island, Desert, Highland, Lowland, Water
-from biosim.animal import Herbivore, Carnivore
-from biosim.biosim import BioSim
+from biosim_src.landscape import Island, Desert, Highland, Lowland, Water
+from biosim_src.animal import Herbivore, Carnivore
+from biosim_src.biosim import BioSim
 import pytest
 
 """
 Tests of classes in landscape.py. Check if classes behaves as expected
 """
+
 
 class TestHighlandLandscapeCell:
 

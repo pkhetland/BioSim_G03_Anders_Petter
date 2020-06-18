@@ -29,7 +29,8 @@ class BioSim:
             cmax_animals is a dict mapping species names to numbers, e.g.,
             {'Herbivore': 50, 'Carnivore': 20}.
 
-            hist_specs is a dictionary with one entry per property for which a histogram shall be shown.
+            hist_specs is a dictionary with one entry per property for which a histogram shall be
+            shown.
             For each property, a dictionary providing the maximum value and the bin width must be
             given, e.g.,
             {'weight': {'max': 80, 'delta': 2}, 'fitness': {'max': 1.0, 'delta': 0.05}}
@@ -146,7 +147,8 @@ class BioSim:
         :type cell: object
 
         .. note::
-            `Herbivore` instances will call `eat_fodder` method, while `Carnivore` instances will call
+            `Herbivore` instances will call `eat_fodder` method, while `Carnivore` instances will
+            call
             `eat_prey` method.
         """
         cell.fodder = cell.f_max()
@@ -263,7 +265,8 @@ class BioSim:
 
         .. note::
 
-            - When `plot_graph` is set to `True`, plots are initiated and updated. Setting`plot_graph` to `False`
+            - When `plot_graph` is set to `True`, plots are initiated and updated.
+            Setting`plot_graph` to `False`
                 allows the user to run simulations faster.
             - Image files will be numbered consecutively and used for creating mp4-files.
 
@@ -356,7 +359,8 @@ class BioSim:
     # def make_movie(self):
     #     """Create MPEG4 movie from visualization images saved."""
     #     pass
-    #     os.system(f"ffmpeg -r 1 -i {self._img_base}_{self._year:05d}.png -vcodec mpeg4 -y movie.mp4")
+    #     os.system(
+    #     f"ffmpeg -r 1 -i {self._img_base}_{self._year:05d}.png -vcodec mpeg4 -y movie.mp4")
     #     (
     #         ffmpeg
     #             .input('/path/to/jpegs/*.jpg', pattern_type='glob', framerate=25)

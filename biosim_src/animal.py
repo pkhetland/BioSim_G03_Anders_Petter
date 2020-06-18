@@ -5,7 +5,6 @@ __email__ = "anders.molmen.host@nmbu.no, petter.storesund.hetland@nmbu.no"
 
 import random as random
 from math import e
-import numpy as np
 
 
 class Animal:
@@ -42,7 +41,7 @@ class Animal:
         :param new_params: New parameters to be set to the class params
         :type new_params: dict
 
-        .. seealso::
+        .. see also::
             - `biosim.set_animal_parameters`
 
         """
@@ -194,8 +193,11 @@ class Animal:
     @staticmethod
     def q(sgn, x, x_half, phi):
         """
+        Function to be used in fitness function
+
         :param sgn: Sign, positive/negative
-        :param x, x_half, phi: see fitness function
+        :param x, x_half, phi: see fitness function and parameter dictionaries for the respective
+        class
         """
         return 1.0 / (1.0 + e ** (sgn * phi * (x - x_half)))
 
@@ -203,7 +205,6 @@ class Animal:
     def fitness(self):
         """
         Function returning the fitness of an animal.
-
         :return: a value between 0 and 1
         :r_type: int
 

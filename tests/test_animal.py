@@ -167,7 +167,8 @@ class TestAnimal:
                                             {"w_birth": 6.0, "sigma_birth": 1.0},
                                             {"w_birth": 7.0, "sigma_birth": 1.5}])
     def test_mean_birth_weight(self, birth_dict, reset_herbivore_params):
-        """ Test that the birth weight of animals are normal distributed using the kstest
+        """ Test that the birth weight of animals are normal distributed using the normaltest
+        from scipy.
         https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.normaltest.html
 
         Null hypothesis: The birth weight of the animal is normally distributed
@@ -219,8 +220,6 @@ class TestAnimal:
         n = sum([item[0] for item in list_birth])
         mean = N * p
         assert phi_z_test(N, p, n) > TestAnimal.alpha
-
-
 
     def test_constructor(self):
         """
@@ -304,7 +303,7 @@ class TestHerbivore:
 
 class TestCarnivore:
     """
-    Test for carnivore class
+    Tests for carnivore class
     """
 
     def test_constructor(self):
@@ -341,14 +340,7 @@ class TestCarnivore:
         N = 1000
         herb_list = [Herbivore(age=100, weight=200) for _ in range(N)]
         initial_weight = carn.weight
-        # print(initial_weight)
         _ = carn.kill_prey(herb_list)
-        # kill_count = len(herbs_killed)
-
         new_weight = carn.weight
-        # n = kill_count
-        print(new_weight)
-        print(carn.p["beta"]*carn.p["F"])
         assert new_weight == initial_weight + carn.p["beta"] * carn.p["F"]
-        # Assertion fails, weight is aded for all herbivores.
 
