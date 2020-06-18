@@ -67,7 +67,7 @@ class Island:
             self._num_herbs += num_herbs  # Count herbs
             self._num_carns += num_carns  # Count carns
         else:
-            raise ValueError('num_herbs and num_carns need to be 0 or a positive integer.')
+            raise ValueError("num_herbs and num_carns need to be 0 or a positive integer.")
 
         if animal_list is not None:
             self._num_herbs += len(
@@ -98,7 +98,7 @@ class Island:
             self._num_herbs -= num_herbs  # Remove herbs
             self._num_carns -= num_carns  # Remove carns
         else:
-            raise ValueError('num_herbs and num_carns need to be 0 or a positive integer.')
+            raise ValueError("num_herbs and num_carns need to be 0 or a positive integer.")
 
         if animal_list is not None:
             self._num_herbs -= len(
@@ -192,9 +192,7 @@ class Island:
         elif landscape == "H":
             Highland.set_params(params)
         else:
-            raise ValueError(
-                "Only params in Lowland and Highland can be changed! No params set."
-            )
+            raise ValueError("Only params in Lowland and Highland can be changed! No params set.")
 
     @property
     def land_cells(self):
@@ -442,6 +440,7 @@ class LandscapeCell:
         Island object.
 
     """
+
     def __init__(self):
         self._fodder = self.f_max()
         self._is_mainland = True
@@ -624,6 +623,7 @@ class Lowland(LandscapeCell):
         - LandscapeCell.set_params
 
     """
+
     params = {"f_max": 800.0}
 
     def __init__(self):
@@ -640,6 +640,7 @@ class Highland(LandscapeCell):
         - LandscapeCell.set_params
 
     """
+
     params = {"f_max": 300.0}
 
     def __init__(self, location=None):
@@ -657,6 +658,7 @@ class Desert(LandscapeCell):
             instances of this subclass.
 
     """
+
     params = {"f_max": 0.0}
 
     def __init__(self):
@@ -670,6 +672,7 @@ class Water:
         - `is_mainland`: Set to false for Water instances.
 
     """
+
     is_mainland = False
     type = "Water"
 

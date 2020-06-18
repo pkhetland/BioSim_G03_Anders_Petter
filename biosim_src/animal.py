@@ -283,6 +283,7 @@ class Herbivore(Animal):
     :param weight: Weight used to initiate Animal super()
     :param age: Age used to initiate Animal super()
     """
+
     p = {  # Dictionary of parameters belonging to the Herbivore class
         "w_birth": 8.0,
         "sigma_birth": 1.5,
@@ -393,9 +394,9 @@ class Carnivore(Animal):
 
                 if kill_prey:  # If the herb is killed
                     self._fitness_valid = False  # Signal that saved fitness is incorrect
-                    consumption_weight += (
-                        herb[0].weight
-                    )  # Add herb weight to consumption_weight variable
+                    consumption_weight += herb[
+                        0
+                    ].weight  # Add herb weight to consumption_weight variable
                     herbs_killed.append(herb[0])
             else:
                 continue

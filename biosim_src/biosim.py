@@ -9,6 +9,7 @@ import numpy as np
 import time
 import os
 import subprocess
+
 # import ffmpeg
 from os import path
 
@@ -16,13 +17,14 @@ from os import path
 # If you installed ffmpeg using conda or installed both softwares in
 # standard ways on your computer, no changes should be required.
 # _CONVERT_BINARY/magick is only needed if you want to create animated GIFs.
-_FFMPEG_BINARY = 'ffmpeg'
+_FFMPEG_BINARY = "ffmpeg"
 
 # update this to the directory and file-name beginning
 # for the graphics files
-_DEFAULT_GRAPHICS_DIR = os.path.join('..', 'data')
-_DEFAULT_GRAPHICS_NAME = 'biosim'
-_DEFAULT_MOVIE_FORMAT = 'mp4'   # alternatives: mp4, gif
+_DEFAULT_GRAPHICS_DIR = os.path.join("..", "data")
+_DEFAULT_GRAPHICS_NAME = "biosim"
+_DEFAULT_MOVIE_FORMAT = "mp4"  # alternatives: mp4, gif
+
 
 class BioSim:
     """Main interface class for completing simulations and setting parameters.
@@ -56,16 +58,16 @@ class BioSim:
             """
 
     def __init__(
-            self,
-            island_map=None,
-            ini_pop=[],
-            seed=123,
-            ymax_animals=None,
-            cmax_animals=None,
-            hist_specs=None,
-            img_base=None,
-            img_fmt="png",
-            plot_graph=True,
+        self,
+        island_map=None,
+        ini_pop=[],
+        seed=123,
+        ymax_animals=None,
+        cmax_animals=None,
+        hist_specs=None,
+        img_base=None,
+        img_fmt="png",
+        plot_graph=True,
     ):
 
         if island_map is None:  # Set default map if none is provided
@@ -96,7 +98,7 @@ class BioSim:
 
         if self._img_base:  # Create images folder
             if not path.exists("images"):
-                os.mkdir('images')
+                os.mkdir("images")
 
     @staticmethod
     def set_animal_parameters(species, params):
@@ -177,7 +179,7 @@ class BioSim:
             self._island.del_animals(num_herbs=len(herbs_killed))
 
     def procreation(self, cell):
-        """Iterates through each animal in the cell and procreates
+        """Iterates through each animal in the cell and procreates.
 
         :param cell: Current cell object
         :type cell: object
@@ -309,9 +311,9 @@ class BioSim:
             self.run_year_cycle()
 
             if not self._plot_bool:  # Results are printed if visualization is disabled r
-                print(f'Year: {self._year}')
-                print(f'Total animal count: {self.num_animals}')
-                print(f'Species count: {self.num_animals_per_species}')
+                print(f"Year: {self._year}")
+                print(f"Total animal count: {self.num_animals}")
+                print(f"Species count: {self.num_animals_per_species}")
 
             if self._plot_bool:
                 self._plot.y_herb[self._year] = self._island.num_herbs
@@ -381,19 +383,26 @@ class BioSim:
         if self._img_base is None:
             raise RuntimeError("No filename defined.")
 
-        if movie_fmt == 'mp4':
+        if movie_fmt == "mp4":
             try:
                 # Parameters chosen according to http://trac.ffmpeg.org/wiki/Encode/H.264,
                 # section "Compatibility"
-                subprocess.check_call([_FFMPEG_BINARY,
-                                       '-i', '{}_%05d.png'.format(self._img_base),
-                                       '-y',
-                                       '-profile:v', 'baseline',
-                                       '-level', '3.0',
-                                       '-pix_fmt', 'yuv420p',
-                                       '{}.{}'.format(self._img_base,
-                                                      movie_fmt)])
+                subprocess.check_call(
+                    [
+                        _FFMPEG_BINARY,
+                        "-i",
+                        "{}_%05d.png".format(self._img_base),
+                        "-y",
+                        "-profile:v",
+                        "baseline",
+                        "-level",
+                        "3.0",
+                        "-pix_fmt",
+                        "yuv420p",
+                        "{}.{}".format(self._img_base, movie_fmt),
+                    ]
+                )
             except subprocess.CalledProcessError as err:
-                raise RuntimeError('ERROR: ffmpeg failed with: {}'.format(err))
+                raise RuntimeError("ERROR: ffmpeg failed with: {}".format(err))
         else:
-            raise ValueError('Unknown movie format: ' + movie_fmt)
+            raise ValueError("Unknown movie format: " + movie_fmt)
