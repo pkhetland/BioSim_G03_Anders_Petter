@@ -3,10 +3,9 @@
 """
 Tests for animal class.
 """
-from biosim.animal import Herbivore, Carnivore
-from biosim.landscape import Lowland
+from biosim_src.animal import Herbivore, Carnivore
+from biosim_src.landscape import Lowland
 import math
-import numpy as np
 import scipy.stats as stats
 import pytest
 import random
