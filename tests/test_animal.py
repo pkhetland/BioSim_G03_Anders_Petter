@@ -107,7 +107,7 @@ class TestAnimal:
         Animal will then always die.
         """
         mocker.patch("random.random", return_value=0)
-        assert herbivore.death() is True
+        assert herbivore.death()
 
     def test_migrate(self, herbivore, mocker):
         """
@@ -116,7 +116,7 @@ class TestAnimal:
 
         """
         mocker.patch("random.random", return_value=0)
-        assert herbivore.migrate() is True
+        assert herbivore.migrate()
 
     def test_certain_death_weight(self, herbivore):
         """
@@ -195,7 +195,7 @@ class TestAnimal:
         num_herbs = 10
         mocker.patch("random.random", return_value=0)
         give_birth, _ = herb.give_birth(num_herbs)
-        assert give_birth is True
+        assert give_birth
 
     @pytest.mark.parametrize("gamma_dict", [{"gamma": 0.2},
                                             {"gamma": 0.4},

@@ -57,7 +57,7 @@ class BioSim:
     def __init__(
         self,
         island_map=None,
-        ini_pop=[],
+        ini_pop=[],    # should have been None
         seed=123,
         ymax_animals=None,
         cmax_animals=None,
@@ -329,7 +329,7 @@ class BioSim:
 
     @property
     def year(self):
-        """ Last year simulated to be used in plotting and counting.
+        """ Last year simulated to be used in s and counting.
 
         :return: Last year simulated
         :rtype: int

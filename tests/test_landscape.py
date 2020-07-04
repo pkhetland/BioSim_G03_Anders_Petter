@@ -60,9 +60,9 @@ class TestHighlandLandscapeCell:
         Test that has_moved property is correctly set and reset
         """
         highland_cell.add_animals([Carnivore(), Herbivore()])
-        highland_cell.carnivores[0].has_moved = True
-        highland_cell.reset_animals()
-        assert highland_cell.carnivores[0].has_moved is False
+        if highland_cell.carnivores[0].has_moved:
+            highland_cell.reset_animals()
+        assert not highland_cell.carnivores[0].has_moved
 
     def test_shuffle_herbs(self, highland_cell):
         """
@@ -136,7 +136,7 @@ class TestHighlandLandscapeCell:
         :property: LandscapeCell.is_empty
         """
         highland_cell.fodder = 0
-        assert highland_cell.is_empty is True
+        assert highland_cell.is_empty
 
 
 class TestLowland:
